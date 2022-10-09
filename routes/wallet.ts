@@ -26,7 +26,7 @@ module.exports.addWalletBalance = function addWalletBalance () {
       const wallet = await WalletModel.increment({ balance: req.body.balance }, { where: { UserId: req.body.UserId } })
       if (wallet) {
         res.status(200).json({ status: 'success' })
-        //Modify this line to fix some errors.   res.status(200).json({ status: 'success', data: wallet.balance })
+        // Modify this line to fix some errors.   res.status(200).json({ status: 'success', data: wallet.balance })
       } else {
         res.status(404).json({ status: 'error' })
       }
