@@ -17,6 +17,11 @@ module.exports = function changePassword () {
     const newPassword = query.new
     const newPasswordInString = newPassword?.toString()
     const repeatPassword = query.repeat
+
+    /* Password policy validation would be implemented here to test if newPassword meets NIST requirements. 
+       The code implementation was done in a separate file. 
+    */
+
     if (!newPassword || newPassword === 'undefined') {
       res.status(401).send(res.__('Password cannot be empty.'))
     } else if (newPassword !== repeatPassword) {
