@@ -417,6 +417,11 @@ restoreOverwrittenFilesWithOriginals().then(() => {
     security.isAuthorized(),
     twoFactorAuth.disable()
   )
+
+  /* An IP limit  would be implemented and if breached would block the IP either indefinitely or for a time period 
+     However, an application or service such as CloudFlare is needed.
+  */ 
+
   /* Verifying DB related challenges can be postponed until the next request for challenges is coming via finale */
   app.use(verify.databaseRelatedChallenges())
 
