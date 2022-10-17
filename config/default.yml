@@ -2,16 +2,16 @@ server:
   port: 3000
   basePath: ''
 application:
-  domain: juice-sh.op
-  name: 'OWASP Juice Shop'
-  logo: JuiceShop_Logo.png
+  domain: guardian.com
+  name: 'Guardian Store'
+  logo: guardian-store.png
   favicon: favicon_js.ico
-  theme: bluegrey-lightgreen # Options: bluegrey-lightgreen blue-lightblue deeppurple-amber indigo-pink pink-bluegrey purple-green deeporange-indigo
+  theme: blue-lightblue # Options: bluegrey-lightgreen blue-lightblue deeppurple-amber indigo-pink pink-bluegrey purple-green deeporange-indigo
   showVersionNumber: true
   showGitHubLinks: true
   localBackupEnabled: true
   numberOfRandomFakeUsers: 0
-  altcoinName: Juicycoin
+  altcoinName: GuardianCoin
   privacyContactEmail: donotreply@owasp-juice.shop
   customMetricsPrefix: juiceshop
   chatBot:

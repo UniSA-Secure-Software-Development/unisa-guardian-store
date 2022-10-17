@@ -406,13 +406,14 @@ restoreOverwrittenFilesWithOriginals().then(() => {
   app.get('/rest/2fa/status', security.isAuthorized(), twoFactorAuth.status())
   /* Enable 2FA for the current User */
   app.post('/rest/2fa/setup',
-    new RateLimit({ windowMs: 5 * 60 * 1000, max: 100 }),
+    new RateLimit({ windowMs: 5 * 60 * 1000, max: 10 }),
+    
     security.isAuthorized(),
     twoFactorAuth.setup()
   )
   /* Disable 2FA Status for the current User */
   app.post('/rest/2fa/disable',
-    new RateLimit({ windowMs: 5 * 60 * 1000, max: 100 }),
+    new RateLimit({ windowMs: 5 * 60 * 1000, max: 10 }),
     security.isAuthorized(),
     twoFactorAuth.disable()
   )
@@ -654,7 +655,7 @@ const customizeEasterEgg = require('./lib/startup/customizeEasterEgg') // vuln-c
 
 export async function start (readyCallback: Function) {
   const datacreatorEnd = startupGauge.startTimer({ task: 'datacreator' })
-  await sequelize.sync({ force: true })
+  await sequelize.sync()
   await datacreator()
   datacreatorEnd()
   const port = process.env.PORT ?? config.get('server.port')

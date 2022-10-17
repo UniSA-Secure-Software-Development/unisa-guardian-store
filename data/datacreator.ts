@@ -4,6 +4,7 @@
  */
 
 /* jslint node: true */
+import { createUnparsedSourceFile } from 'typescript'
 import { AddressModel } from '../models/address'
 import { BasketModel } from '../models/basket'
 import { BasketItemModel } from '../models/basketitem'
@@ -106,6 +107,7 @@ async function createChallenges () {
 
 async function createUsers () {
   const users = await loadStaticData('users')
+  users.map((user: any)=>console.log(user))
 
   await Promise.all(
     users.map(async ({ username, email, password, customDomain, key, role, deletedFlag, profileImage, securityQuestion, feedback, address, card, totpSecret, lastLoginIp = '' }: User) => {
@@ -365,7 +367,7 @@ async function createProducts () {
               reviews.map(({ text, author }) =>
                 mongodb.reviews.insert({
                   message: text,
-                  author: datacache.users[author].email,
+                  author: datacache?.users[author]?.email,
                   product: id,
                   likesCount: 0,
                   likedBy: []

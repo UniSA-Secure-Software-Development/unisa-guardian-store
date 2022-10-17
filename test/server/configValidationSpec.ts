@@ -385,7 +385,7 @@ describe('configValidation', () => {
     })
   })
 
-  it(`should accept the active config from config/${process.env.NODE_ENV}.yml`, () => {
+  it(`should accept the active config from config/guardian-store.yml`, () => {
     expect(validateConfig({ exitOnFailure: false })).to.equal(true)
   })
 

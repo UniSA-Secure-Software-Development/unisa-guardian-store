@@ -23,6 +23,7 @@ module.exports = function login () {
     BasketModel.findOrCreate({ where: { UserId: user.data.id } })
       .then(([basket]: [BasketModel, boolean]) => {
         const token = security.authorize(user)
+        console.log(token);
         user.bid = basket.id // keep track of original basket
         security.authenticatedUsers.put(token, user)
         res.json({ authentication: { token, bid: basket.id, umail: user.data.email } })
