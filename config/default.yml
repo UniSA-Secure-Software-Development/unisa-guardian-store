@@ -39,9 +39,9 @@ application:
     textColor: '#ffffff'
     buttonColor: '#558b2f'
     buttonTextColor: '#ffffff'
-    message: 'This website uses fruit cookies to ensure you get the juiciest tracking experience.'
-    dismissText: 'Me want it!'
-    linkText: 'But me wait!'
+    message: 'To give you the best experience, this website uses cookies. Learn more about Cookies. https://www.cookiepro.com/knowledge/tracking-cookie/#:~:text=A%20tracking%20cookie%20is%20a,%2C%20purchase%20trends%2C%20and%20more.'
+    dismissText: 'Accept'
+    linkText: 'Accept'
     linkUrl: 'https://www.youtube.com/watch?v=9PnbKL3wuH4'
   securityTxt:
     contact: 'mailto:donotreply@owasp-juice.shop'
@@ -64,7 +64,7 @@ application:
       - { uri: 'https://juice-shop.wtf' }
       - { uri: 'http://localhost:3000', proxy: 'https://local3000.owasp-juice.shop' }
       - { uri: 'http://127.0.0.1:3000', proxy: 'https://local3000.owasp-juice.shop' }
-      - { uri: 'http://localhost:4200', proxy: 'https://local4200.owasp-juice.shop' }
+      - { uri: 'http://localhost:3000', proxy: 'https://local4200.owasp-juice.shop' }
       - { uri: 'http://127.0.0.1:4200', proxy: 'https://local4200.owasp-juice.shop' }
       - { uri: 'http://192.168.99.100:3000', proxy: 'https://localmac.owasp-juice.shop' }
       - { uri: 'http://192.168.99.100:4200', proxy: 'https://localmac.owasp-juice.shop' }
