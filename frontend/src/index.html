@@ -17,14 +17,30 @@
   <script>
     window.addEventListener("load", function(){
       window.cookieconsent.initialise({
-        "palette": {
+        palette: {
           "popup": { "background": "#37474f", "text": "#ffffff" },
-          "button": { "background": "#558b2f", "text": "#ffffff" }
+          "button": { "background": "#558b2f", "text": "#ffffff" },
+          "button2": { "background": "#338b2f", "text": "#ffffff" }
         },
-        "theme": "classic",
-        "position": "bottom-right",
-        "content": { "message": "This website uses fruit cookies to ensure you get the juiciest tracking experience.", "dismiss": "Me want it!", "link": "But me wait!", "href": "https://www.youtube.com/watch?v=9PnbKL3wuH4" }
-      })});
+        revokable: true,
+        onStatusChange: function(status) {
+          console.log(this.hasConsented() ?
+          'enable cookies' : 'disable cookies');
+        },
+        theme: "edgeless",
+        position: "bottom-right",
+        content: { 
+            header: 'Cookies used on the website!',
+            message: "To give you the best experience, this website uses cookies.", 
+            dismiss: "Allow", 
+            deny: "Decline",
+            link: "Learn more", 
+            policy: 'Cookie Policy',
+            href: "https://www.cookiepro.com/knowledge/tracking-cookie/#:~:text=A%20tracking%20cookie%20is%20a,%2C%20purchase%20trends%2C%20and%20more",
+            target: "_blank"
+            }
+        })
+      });
   </script>
 </head>
 <body class="mat-app-background bluegrey-lightgreen-theme">

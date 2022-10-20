@@ -47,7 +47,6 @@ export class LoginComponent implements OnInit {
     } else {
       this.rememberMe.setValue(false)
     }
-
     // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
     this.redirectUri = `${this.windowRefService.nativeWindow.location.protocol}//${this.windowRefService.nativeWindow.location.host}`
     this.configurationService.getApplicationConfiguration().subscribe((config) => {

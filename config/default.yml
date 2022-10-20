@@ -39,9 +39,9 @@ application:
     textColor: '#ffffff'
     buttonColor: '#558b2f'
     buttonTextColor: '#ffffff'
-    message: 'To give you the best experience, this website uses cookies. Learn more about Cookies. https://www.cookiepro.com/knowledge/tracking-cookie/#:~:text=A%20tracking%20cookie%20is%20a,%2C%20purchase%20trends%2C%20and%20more.'
-    dismissText: 'Accept'
-    linkText: 'Accept'
+    message: 'This website uses fruit cookies to ensure you get the juiciest tracking Experience.'
+    dismissText: 'Me want it!'
+    linkText: 'But me wait!'
     linkUrl: 'https://www.youtube.com/watch?v=9PnbKL3wuH4'
   securityTxt:
     contact: 'mailto:donotreply@owasp-juice.shop'
