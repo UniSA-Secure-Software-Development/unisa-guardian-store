@@ -64,7 +64,7 @@ application:
       - { uri: 'https://juice-shop.wtf' }
       - { uri: 'http://localhost:3000', proxy: 'https://local3000.owasp-juice.shop' }
       - { uri: 'http://127.0.0.1:3000', proxy: 'https://local3000.owasp-juice.shop' }
-      - { uri: 'http://localhost:3000', proxy: 'https://local4200.owasp-juice.shop' }
+      - { uri: 'http://localhost:4200', proxy: 'https://local4200.owasp-juice.shop' }
       - { uri: 'http://127.0.0.1:4200', proxy: 'https://local4200.owasp-juice.shop' }
       - { uri: 'http://192.168.99.100:3000', proxy: 'https://localmac.owasp-juice.shop' }
       - { uri: 'http://192.168.99.100:4200', proxy: 'https://localmac.owasp-juice.shop' }

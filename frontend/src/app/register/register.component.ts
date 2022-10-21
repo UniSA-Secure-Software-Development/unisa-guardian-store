@@ -5,7 +5,7 @@
 
 import { SecurityAnswerService } from '../Services/security-answer.service'
 import { UserService } from '../Services/user.service'
-import { AbstractControl, UntypedFormControl, Validators } from '@angular/forms'
+import { AbstractControl, UntypedFormControl, ValidationErrors, Validators } from '@angular/forms'
 import { Component, NgZone, OnInit } from '@angular/core'
 import { SecurityQuestionService } from '../Services/security-question.service'
 import { Router } from '@angular/router'
@@ -28,7 +28,7 @@ dom.watch()
 })
 export class RegisterComponent implements OnInit {
   public emailControl: UntypedFormControl = new UntypedFormControl('', [Validators.required, Validators.email])
-  public passwordControl: UntypedFormControl = new UntypedFormControl('', [Validators.required, Validators.minLength(5), Validators.maxLength(40)])
+  public passwordControl: UntypedFormControl = new UntypedFormControl('', [Validators.required, Validators.minLength(10), Validators.maxLength(30), Validators.pattern(/(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@$!%*#?&^_-]).{10,}/)])
   public repeatPasswordControl: UntypedFormControl = new UntypedFormControl('', [Validators.required, matchValidator(this.passwordControl)])
   public securityQuestionControl: UntypedFormControl = new UntypedFormControl('', [Validators.required])
   public securityAnswerControl: UntypedFormControl = new UntypedFormControl('', [Validators.required])
@@ -94,6 +94,17 @@ function matchValidator (passwordControl: AbstractControl) {
     if (password !== passwordRepeat) {
       return { notSame: true }
     }
+    return null
+  }
+}
+
+function strengthValidator (passwordControl: AbstractControl) {
+  const password = passwordControl.value
+  let score: number = 0
+  score = this.isLengthMet(password) ? score + 1 : score
+  if (score > 0) {
+    return 1
+  } else {
     return null
   }
 }
