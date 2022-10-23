@@ -1,10 +1,10 @@
 # vuln-code-snippet start resetPasswordBjoernOwaspChallenge resetPasswordBjoernChallenge resetPasswordJimChallenge resetPasswordBenderChallenge resetPasswordUvoginChallenge
 - # vuln-code-snippet neutral-line resetPasswordJimChallenge
-  question: 'Your eldest siblings middle name?' # vuln-code-snippet vuln-line resetPasswordJimChallenge
+  question: 'What was your favourite food as a child?' # vuln-code-snippet vuln-line resetPasswordJimChallenge
 -
-  question: "Mother's maiden name?"
+  question: "Your favorite book?"
 -
-  question: "Mother's birth date? (MM/DD/YY)"
+  question: "Your favorite movie?"
 -
   question: "Father's birth date? (MM/DD/YY)"
 -
@@ -14,9 +14,9 @@
 - # vuln-code-snippet neutral-line resetPasswordBjoernOwaspChallenge
   question: 'Name of your favorite pet?' # vuln-code-snippet vuln-line resetPasswordBjoernOwaspChallenge
 -
-  question: "Last name of dentist when you were a teenager? (Do not include 'Dr.')"
+  question: "What was your favourite subject in high school?"
 - # vuln-code-snippet neutral-line resetPasswordBjoernChallenge
-  question: 'Your ZIP/postal code when you were a teenager?' # vuln-code-snippet vuln-line resetPasswordBjoernChallenge
+  question: 'What was your favourite vacation as a child?' # vuln-code-snippet vuln-line resetPasswordBjoernChallenge
 - # vuln-code-snippet neutral-line resetPasswordBenderChallenge
   question: 'Company you first work for as an adult?' # vuln-code-snippet vuln-line resetPasswordBenderChallenge
 -
@@ -27,4 +27,4 @@
   question: 'Number of one of your customer or ID cards?'
 -
   question: "What's your favorite place to go hiking?"
-# vuln-code-snippet end resetPasswordBjoernOwaspChallenge resetPasswordBjoernChallenge resetPasswordJimChallenge resetPasswordBenderChallenge resetPasswordUvoginChallenge
+# vuln-code-snippet end resetPasswordBjoernOwaspChallenge resetPasswordBjoernChallenge resetPasswordJimChallenge resetPasswordBenderChallenge resetPasswordUvoginChallenge-

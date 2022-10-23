@@ -23,4 +23,11 @@ export class SecurityAnswerService {
       catchError((err) => { throw err })
     )
   }
+
+  findBy (email: string) {
+    return this.http.get(this.hostServer + '/' + 'rest/user/security-question?email=' + email).pipe(
+      map((response: any) => response),
+      catchError((error) => { throw error })
+    )
+  }
 }

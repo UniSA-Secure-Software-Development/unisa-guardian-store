@@ -12,6 +12,10 @@ import { faSave } from '@fortawesome/free-solid-svg-icons'
 import { faEdit } from '@fortawesome/free-regular-svg-icons'
 import { SecurityQuestion } from '../Models/securityQuestion.model'
 import { TranslateService } from '@ngx-translate/core'
+import { SecurityAnswerService } from '../Services/security-answer.service'
+// import { SecurityAnswerModel } from '../../../../models/securityAnswer'
+// import { UserModel } from '../../../../models/user'
+// import { hmac } from '../../../../lib/insecurity'
 
 library.add(faSave, faEdit)
 dom.watch()
@@ -23,16 +27,29 @@ dom.watch()
 })
 export class ForgotPasswordComponent {
   public emailControl: UntypedFormControl = new UntypedFormControl('', [Validators.required, Validators.email])
-  public securityQuestionControl: UntypedFormControl = new UntypedFormControl({ disabled: true, value: '' }, [Validators.required])
+  public securityQuestionControl: UntypedFormControl = new UntypedFormControl({ disabled: false, value: '' }, [Validators.required])
   public passwordControl: UntypedFormControl = new UntypedFormControl({ disabled: true, value: '' }, [Validators.required, Validators.minLength(5)])
   public repeatPasswordControl: UntypedFormControl = new UntypedFormControl({ disabled: true, value: '' }, [Validators.required, matchValidator(this.passwordControl)])
   public securityQuestion?: string
+  public securityQuestions!: SecurityQuestion[]
+  public securityAnswerControl: UntypedFormControl = new UntypedFormControl('', [Validators.required])
+  public selected?: number
   public error?: string
   public confirmation?: string
   public timeoutDuration = 1000
   private timeout
 
-  constructor (private readonly securityQuestionService: SecurityQuestionService, private readonly userService: UserService, private readonly translate: TranslateService) { }
+  constructor (
+    private readonly securityQuestionService: SecurityQuestionService,
+    private readonly securityAnswerService: SecurityAnswerService,
+    private readonly userService: UserService,
+    private readonly translate: TranslateService) { }
+
+  ngOnInit () {
+    this.securityQuestionService.find(null).subscribe((securityQuestions: any) => {
+      this.securityQuestions = securityQuestions
+    }, (err) => console.log(err))
+  }
 
   findSecurityQuestion () {
     clearTimeout(this.timeout)
@@ -60,6 +77,38 @@ export class ForgotPasswordComponent {
       }
     }, this.timeoutDuration)
   }
+
+  /** this code designed to enable password fields
+  // find the security question, authorise password change
+  // only on valid email + valid question + valid answer combo
+  const email = this.emailControl.value
+  const quest = this.securityQuestionControl.value
+  const answer = this.securityAnswerControl.value
+  // console.log(email)
+  // console.log(quest)
+  // console.log(answer)
+  if (email && quest && answer) {
+    console.log('testing the correct question now')
+    const q: any = this.securityQuestionService.findBy(email)
+    if (quest === q.id) {
+      console.log('correct question selected')
+      SecurityAnswerModel.findOne({
+        include: [{
+          model: UserModel,
+          where: { email }
+        }]
+      }).then((data: SecurityAnswerModel | null) => {
+        if (answer === data.answer) {
+          console.log(' yay, email and question are correct ')
+          this.passwordControl.enable()
+          this.repeatPasswordControl.enable()
+          this.resetPassword()
+        } else {
+          console.log('Wrong answer to security question.')
+        }
+      }, (err) => console.log(err))
+    }
+  } **/
 
   resetPassword () {
     this.userService.resetPassword({
