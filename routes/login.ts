@@ -33,10 +33,12 @@ module.exports = function login () {
 
   return (req: Request, res: Response, next: NextFunction) => {
     verifyPreLoginChallenges(req) // vuln-code-snippet hide-line
-    models.sequelize.query(`SELECT * FROM Users WHERE email = :mail AND password = '${security.hash(req.body.password || '')}' AND deletedAt IS NULL`, // vuln-code-snippet vuln-line loginAdminChallenge loginBenderChallenge loginJimChallenge
-      { replacements: { mail: req.body.email }, model: UserModel, plain: true })
+    console.log('verifying details')
+    models.sequelize.query(`SELECT * FROM Users WHERE username = :usern AND password = '${security.hash(req.body.password || '')}' AND deletedAt IS NULL`, // vuln-code-snippet vuln-line loginAdminChallenge loginBenderChallenge loginJimChallenge
+      { replacements: { usern: req.body.username }, model: UserModel, plain: true })
       .then((authenticatedUser: { data: User }) => { // vuln-code-snippet neutral-line loginAdminChallenge loginBenderChallenge loginJimChallenge
         const user = utils.queryResultToJson(authenticatedUser)
+        console.log('user credentials: {} ', user)
         if (user.data?.id && user.data.totpSecret !== '') {
           res.status(401).json({
             status: 'totp_token_required',

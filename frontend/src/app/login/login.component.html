@@ -13,13 +13,13 @@
     <div class="form-container" id="login-form">
 
       <mat-form-field color="accent" appearance="outline">
-        <mat-label translate>LABEL_EMAIL</mat-label>
-        <input id="email" #email name="email"
-               [formControl]="emailControl"
+        <mat-label translate>LABEL_USERNAME</mat-label>
+        <input id="username" #username name="username"
+               [formControl]="usernameControl"
                (focus)="this.error=null"
                matInput placeholder=""
-               aria-label="Text field for the login email">
-        <mat-error *ngIf="emailControl.invalid" translate>MANDATORY_EMAIL</mat-error>
+               aria-label="Text field for the login username">
+        <mat-error *ngIf="usernameControl.invalid" translate>MANDATORY_USERNAME</mat-error>
       </mat-form-field>
 
       <mat-form-field color="accent" appearance="outline">
@@ -43,7 +43,7 @@
 
       <a class="primary-link forgot-pw" routerLink="/forgot-password" translate>FORGOT_PASSWORD</a>
 
-      <button type="submit" id="loginButton" [disabled]="!emailControl.value||!passwordControl.value" mat-raised-button
+      <button type="submit" id="loginButton" [disabled]="!usernameControl.value||!passwordControl.value" mat-raised-button
               color="primary" (click)="login()" aria-label="Login">
         <mat-icon>
           exit_to_app

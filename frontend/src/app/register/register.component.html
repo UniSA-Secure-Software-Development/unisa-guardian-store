@@ -21,6 +21,14 @@
       </mat-form-field>
 
       <mat-form-field appearance="outline" color="accent">
+        <mat-label translate>LABEL_USERNAME</mat-label>
+        <input id="usernameControl" [formControl]="usernameControl" (focus)="this.error=null" type="text" matInput
+               aria-label="Username address field">
+        <mat-error *ngIf="usernameControl.invalid && usernameControl.errors.required" translate>MANDATORY_USERNAME</mat-error>
+        <mat-error *ngIf="usernameControl.invalid && usernameControl.errors.username" translate>INVALID_USERNAME</mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" color="accent">
         <mat-label translate>LABEL_PASSWORD</mat-label>
         <input #password id="passwordControl" [formControl]="passwordControl" (focus)="this.error=null" type="password"
                matInput aria-label="Field for the password">
@@ -96,7 +104,7 @@
       <button type="submit"
               id="registerButton"
               mat-raised-button color="primary"
-              [disabled]="emailControl.invalid || passwordControl.invalid || repeatPasswordControl.invalid || securityQuestionControl.invalid || securityAnswerControl.invalid"
+              [disabled]="usernameControl.invalid || emailControl.invalid || passwordControl.invalid || repeatPasswordControl.invalid || securityQuestionControl.invalid || securityAnswerControl.invalid"
               (click)="save()"
               aria-label="Button to complete the registration">
         <i class="material-icons">

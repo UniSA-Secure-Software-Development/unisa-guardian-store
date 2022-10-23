@@ -27,7 +27,7 @@ const oauthProviderUrl = 'https://accounts.google.com/o/oauth2/v2/auth'
   styleUrls: ['./login.component.scss']
 })
 export class LoginComponent implements OnInit {
-  public emailControl = new UntypedFormControl('', [Validators.required])
+  public usernameControl = new UntypedFormControl('', [Validators.required])
   public passwordControl = new UntypedFormControl('', [Validators.required])
   public hide = true
   public user: any
@@ -68,7 +68,7 @@ export class LoginComponent implements OnInit {
 
   login () {
     this.user = {}
-    this.user.email = this.emailControl.value
+    this.user.username = this.usernameControl.value
     this.user.password = this.passwordControl.value
     this.userService.login(this.user).subscribe((authentication: any) => {
       localStorage.setItem('token', authentication.token)
@@ -90,18 +90,18 @@ export class LoginComponent implements OnInit {
       sessionStorage.removeItem('bid')
       this.error = error
       this.userService.isLoggedIn.next(false)
-      this.emailControl.markAsPristine()
+      this.usernameControl.markAsPristine()
       this.passwordControl.markAsPristine()
     })
 
     if (this.rememberMe.value) {
-      localStorage.setItem('email', this.user.email)
+      localStorage.setItem('username', this.user.username)
     } else {
-      localStorage.removeItem('email')
+      localStorage.removeItem('username')
     }
   }
 
   googleLogin () {
-    this.windowRefService.nativeWindow.location.replace(`${oauthProviderUrl}?client_id=${this.clientId}&response_type=token&scope=email&redirect_uri=${this.redirectUri}`)
+    this.windowRefService.nativeWindow.location.replace(`${oauthProviderUrl}?client_id=${this.clientId}&response_type=token&scope=username&redirect_uri=${this.redirectUri}`)
   }
 }
