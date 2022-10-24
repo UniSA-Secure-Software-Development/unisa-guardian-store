@@ -32,7 +32,7 @@ jobs:
         distribution: 'temurin'
         java-version: '11'
     # Install node packages
-    - run: npm ci
+    - run: npm install
     
     # Add commands below to run SAST tests
     # OWASP Dependency Check
