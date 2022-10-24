@@ -20,8 +20,28 @@ module.exports = function resetPassword () {
     const answer = body.answer
     const newPassword = body.new
     const repeatPassword = body.repeat
+
+    //Pop up message when the user has reached a failed number of attempt.
+    var failAttempt = 0; 
+    var failCounter = 3000; 
+
     if (!email || !answer) {
+
+      //Exits out of the function
+        if (failAttempt == 3) {
+
+          alert("Too many unsuccessful attempts! ", failCounter, "Until you can reset your password");
+
+          //Pauses the function for minimum 30 seconds, increases the timer
+          setTimeout(() => { resetPassword () }, failCounter);
+          failCounter += 3000; 
+          return; 
+        }
+
+      failAttempt += 1; 
+
       next(new Error('Blocked illegal activity by ' + connection.remoteAddress))
+
     } else if (!newPassword || newPassword === 'undefined') {
       res.status(401).send(res.__('Password cannot be empty.'))
     } else if (newPassword !== repeatPassword) {
