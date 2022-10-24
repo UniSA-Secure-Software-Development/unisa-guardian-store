@@ -12,3 +12,17 @@ FROM mcr.microsoft.com/vscode/devcontainers/typescript-node:0-${VARIANT}
 
 # [Optional] Uncomment if you want to install more global node packages
 # RUN su node -c "npm install -g <your-package-list -here>"
+# Install dependencies
+# Java (for Dependency Check)
+RUN apt-get update && \
+    DEBIAN_FRONTEND=noninteractive \
+    apt-get -y install default-jre-headless && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/* 
+# node / npm
+RUN apt-get update && \
+    apt-get install -y nodejs npm
+# Act
+RUN curl https://raw.githubusercontent.com/nektos/act/master/install.sh -o /tmp/install.sh && \
+    chmod +x /tmp/install.sh && \
+    /bin/bash /tmp/install.sh
