@@ -13,6 +13,7 @@ import { faEdit } from '@fortawesome/free-regular-svg-icons'
 import { SecurityQuestion } from '../Models/securityQuestion.model'
 import { TranslateService } from '@ngx-translate/core'
 import { SecurityAnswerService } from '../Services/security-answer.service'
+import { CaptchaService } from '../Services/captcha.service'
 // import { SecurityAnswerModel } from '../../../../models/securityAnswer'
 // import { UserModel } from '../../../../models/user'
 // import { hmac } from '../../../../lib/insecurity'
@@ -34,6 +35,10 @@ export class ForgotPasswordComponent {
   public securityQuestions!: SecurityQuestion[]
   public securityAnswerControl: UntypedFormControl = new UntypedFormControl('', [Validators.required])
   public selected?: number
+  public feedback: any = undefined
+  public captchaControl: UntypedFormControl = new UntypedFormControl('', [Validators.required, Validators.pattern('-?[\\d]*')])
+  public captcha: any
+  public captchaId: any
   public error?: string
   public confirmation?: string
   public timeoutDuration = 1000
@@ -43,12 +48,22 @@ export class ForgotPasswordComponent {
     private readonly securityQuestionService: SecurityQuestionService,
     private readonly securityAnswerService: SecurityAnswerService,
     private readonly userService: UserService,
+    private readonly captchaService: CaptchaService,
     private readonly translate: TranslateService) { }
 
   ngOnInit () {
     this.securityQuestionService.find(null).subscribe((securityQuestions: any) => {
       this.securityQuestions = securityQuestions
+      this.feedback = {}
     }, (err) => console.log(err))
+    this.getNewCaptcha()
+  }
+
+  getNewCaptcha () {
+    this.captchaService.getCaptcha().subscribe((data: any) => {
+      this.captcha = data.captcha
+      this.captchaId = data.captchaId
+    }, (err) => err)
   }
 
   findSecurityQuestion () {
@@ -111,6 +126,8 @@ export class ForgotPasswordComponent {
   } **/
 
   resetPassword () {
+    this.feedback.captchaId = this.captchaId
+    this.feedback.captcha = this.captchaControl.value
     this.userService.resetPassword({
       email: this.emailControl.value,
       answer: this.securityQuestionControl.value,
