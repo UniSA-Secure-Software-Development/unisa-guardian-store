@@ -1,0 +1,40 @@
+[
+  {
+    "applies_to": [
+      "typescript",
+      "javascript"
+    ],
+    "description": "when use sql may exist SQL injection vulnerability",
+    "id": "DS7001",
+    "name": "SQLin: SQL injection vulnerability",
+    "patterns": [
+      {
+        "pattern": "models.sequelize.query",
+        "type": "string",
+        "scopes": [
+          "all"
+        ]
+      }
+    ],
+    "severity": "important"
+  },
+  {
+    "applies_to": [
+      "typescript",
+      "javascript"
+    ],
+    "description": "when use NoSql may exist NoSQL injection vulnerability",
+    "id": "DS7002",
+    "name": "NoSQLin: NoSQL injection vulnerability",
+    "patterns": [
+      {
+        "pattern": "db.reviews.",
+        "type": "string",
+        "scopes": [
+          "all"
+        ]
+      }
+    ],
+    "severity": "important"
+  }
+]

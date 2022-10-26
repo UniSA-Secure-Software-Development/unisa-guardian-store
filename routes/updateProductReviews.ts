@@ -14,6 +14,15 @@ const security = require('../lib/insecurity')
 module.exports = function productReviews () {
   return (req: Request, res: Response, next: NextFunction) => {
     const user = security.authenticatedUsers.from(req) // vuln-code-snippet vuln-line forgedReviewChallenge
+
+    // if (String(req.body.id).match(/.*['|-|;|{|}|$].*/) || String(req.body.message).match(/.*['|-|;|{|}|$].*/)) {
+    //  res.status(451).send(res.__('NoSQL Injection detected.'))
+    // }
+    if (typeof req.body.id !== 'string' || typeof req.body.message !== 'string') {
+      res.status(451).send(res.__('NoSQL Injection detected.'))
+      return
+    }
+
     db.reviews.update( // vuln-code-snippet neutral-line forgedReviewChallenge
       { _id: req.body.id }, // vuln-code-snippet vuln-line noSqlReviewsChallenge forgedReviewChallenge
       { $set: { message: req.body.message } },
