@@ -1,0 +1,53 @@
+name: Build
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+env:
+  SEMGREP_R2C_INTERNAL_EXPLICIT_SEMGREPIGNORE: ./tests/assets/.semgrepignore
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        python-version: [3.8, 3.9, '3.10']
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v1
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install tox semgrep
+
+    - name: Lint
+      run: |
+        tox -e lint
+
+    - name: Bandit
+      run: |
+        tox -e bandit
+
+    - name: Semgrep validate rules
+      run: |
+        semgrep --validate --strict --config=./njsscan/rules/semantic_grep/
+
+    - name: Semgrep tests
+      run: |
+        semgrep --quiet --test --config ./njsscan/rules/semantic_grep ./tests/assets/node_source/true_positives/semantic_grep/
+
+    - name: Run tests
+      run: |
+        tox -e py
+
+    - name: Clean Up
+      run: |
+        tox -e clean

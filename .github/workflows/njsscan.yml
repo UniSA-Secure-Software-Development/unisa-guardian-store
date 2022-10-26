@@ -1,0 +1,24 @@
+name: njsscan
+on:
+  push:
+    branches:
+      - master
+    paths-ignore:
+    - 'README.md'
+  pull_request:
+    branches:
+      - master
+    paths-ignore:
+    - 'README.md'
+jobs:
+  njsscan:
+    runs-on: ubuntu-latest
+    name: njsscan check
+    steps:
+    - name: Checkout the code
+      uses: actions/checkout@v2
+    - name: nodejsscan scan
+      id: njsscan
+      uses: unisa-guardian-store/njsscan-action@master
+      with:
+        args: '.'
