@@ -19,6 +19,6 @@ jobs:
       uses: actions/checkout@v2
     - name: nodejsscan scan
       id: njsscan
-      uses: unisa-guardian-store/njsscan-action@master
+      uses: ajinabraham/njsscan-action@master
       with:
         args: '.'
