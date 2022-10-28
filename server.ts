@@ -565,7 +565,7 @@ restoreOverwrittenFilesWithOriginals().then(() => {
   app.post('/rest/chatbot/respond', chatbot.process())
   /* NoSQL API endpoints */
   app.get('/rest/products/:id/reviews', showProductReviews())
-  app.put('/rest/products/:id/reviews', createProductReviews())
+  app.put('/rest/products/:id/reviews', security.appendUserEmailIfAvailable(), createProductReviews())
   app.patch('/rest/products/reviews', security.isAuthorized(), updateProductReviews())
   app.post('/rest/products/reviews', security.isAuthorized(), likeProductReviews())
 

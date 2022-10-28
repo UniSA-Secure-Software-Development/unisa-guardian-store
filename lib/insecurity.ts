@@ -201,6 +201,16 @@ exports.appendUserId = () => {
   }
 }
 
+exports.appendUserEmailIfAvailable = () => {
+  return (req: Request, res: Response, next: NextFunction) => {
+    const user = authenticatedUsers.tokenMap[utils.jwtFrom(req)]
+    if (user) {
+      req.body.UserEmail = user.data.email
+    }
+    next()
+  }
+}
+
 exports.updateAuthenticatedUsers = () => (req: Request, res: Response, next: NextFunction) => {
   const token = req.cookies.token || utils.jwtFrom(req)
   if (token) {
