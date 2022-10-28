@@ -1,0 +1,40 @@
+name: Continuous Integration (CI) for Automated Security Testing
+# Run the workflow whenever a push or pull request is requested.
+on: [push, pull_request]
+
+jobs:
+  # Build the app
+  build:
+    # Configure the job
+    name: Build
+    runs-on: ubuntu-latest
+    # Steps to run
+    steps:
+      - run: echo "This workflow is only for security testing and does not have a working flow for build process during deployment"
+
+  # Run security scans
+  scan:
+    # Configure the job
+    name: Security Scanning Job
+    needs: build
+    runs-on: ubuntu-latest
+
+    # Steps to run
+    steps:
+      # Set up prerequisites for tests
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+      # Java is required to run OWASP Dependency Check
+      - uses: actions/setup-java@v2
+        with:
+          distribution: "temurin"
+          java-version: "11"
+      # Install node packages
+      - run: npm ci
+
+      # DevSkim
+      - uses: actions/checkout@v2
+      - uses: microsoft/DevSkim-Action@v1
+      - uses: github/codeql-action/upload-sarif@v1
+        with:
+          sarif_file: devskim-results.sarif
