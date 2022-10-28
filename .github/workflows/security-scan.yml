@@ -3,7 +3,7 @@
 # separate terms of service, privacy policy, and support
 # documentation.
 
-name: DevSkim
+name: Continuous Integration (CI) Security Pipeline
 
 on:
   push:
@@ -32,3 +32,13 @@ jobs:
         uses: github/codeql-action/upload-sarif@v2
         with:
           sarif_file: devskim-results.sarif
+          directory-to-scan: /
+          should-scan-archives: false
+          output-filename: devskim-results.sarif
+          output-directory: .github/workflows/outputs
+
+      # Publish scan results as an artifact
+      - uses: actions/upload-artifact@v2
+        with: 
+          name: scan-results
+          path: .github/workflows/outputs
