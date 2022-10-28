@@ -37,8 +37,8 @@ jobs:
           output-filename: devskim-results.sarif
           output-directory: .github/workflows/outputs
 
-      # Publish scan results as an artifact
-      - uses: actions/upload-artifact@v2
+      - name: Publish DevSkim scan results as an artifact
+        uses: actions/upload-artifact@v2
         with: 
           name: scan-results
           path: .github/workflows/outputs
