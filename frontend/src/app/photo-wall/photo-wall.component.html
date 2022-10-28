@@ -48,7 +48,8 @@
         <div>
           <button mat-stroked-button type="button" (click)="filePicker.click()">{{'LABEL_PICK_IMAGE' | translate}}
           </button>
-          <input type="file" name='file' #filePicker (change)="onImagePicked($event)">
+          <input type="file" accept=".jpeg, .jpeg. .png" name='file' #filePicker (change)="onImagePicked($event)">
+         
         </div>
         <div class="image-preview" *ngIf="imagePreview !== '' && imagePreview && form.get('image').valid">
           <img [src]="imagePreview" [alt]="form.value.caption">

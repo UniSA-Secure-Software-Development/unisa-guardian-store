@@ -4,6 +4,7 @@
 		"angular.ng-template",
 		"dbaeumer.vscode-eslint",
 		"stylelint.vscode-stylelint"
+		
 	],
     "settings": {
         "eslint.workingDirectories": [
@@ -12,7 +13,7 @@
     },
 	"postCreateCommand": "export NG_CLI_ANALYTICS=ci && npm i -g @angular/cli && npm install",
 	"build": {
-		"dockerfile": ".devcontainer\\Dockerfile",
+		"dockerfile": ".devcontainer/Dockerfile",
 		"args": {
 			"VARIANT": "16-bullseye"
 		}

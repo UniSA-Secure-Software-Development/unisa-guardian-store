@@ -61,14 +61,34 @@ export class PhotoWallComponent implements OnInit {
   }
 
   onImagePicked (event: Event) {
+    const safefileNameLength = 30
+    const maxFileSize = 1000000
+    const allowedFileTypes = ['image/jpeg', 'image/jpg', 'image/png']
     const file = (event.target as HTMLInputElement).files[0]
-    this.form.patchValue({ image: file })
-    this.form.get('image').updateValueAndValidity()
-    const reader = new FileReader()
-    reader.onload = () => {
-      this.imagePreview = reader.result as string
+    // console.log(file)
+
+    // console.log((file.name.split('.').length - 1))
+    const numDots = (file.name.split('.').length - 1)
+
+    if (!allowedFileTypes.includes(file.type)) {
+      alert('file must be a jpg, jpeg or png!')
+    } else if (file.name.length > safefileNameLength) {
+      alert('file name too long for upload!')
+    } else if (file.size > maxFileSize) {
+      alert('file size too large!')
+    } else if (file.name.includes('%00')) {
+      alert('your file appears to have a null byte in it!')
+    } else if (numDots > 1) {
+      alert('your file name has more than one dot in it!')
+    } else {
+      this.form.patchValue({ image: file })
+      this.form.get('image').updateValueAndValidity()
+      const reader = new FileReader()
+      reader.onload = () => {
+        this.imagePreview = reader.result as string
+      }
+      reader.readAsDataURL(file)
     }
-    reader.readAsDataURL(file)
   }
 
   save () {

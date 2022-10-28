@@ -28,10 +28,12 @@ export class ComplaintComponent implements OnInit {
   @ViewChild('fileControl', { static: true }) fileControl!: ElementRef // For controlling the DOM Element for file input.
   public fileUploadError: any = undefined // For controlling error handling related to file input.
   public uploader: FileUploader = new FileUploader({
-    url: environment.hostServer + '/file-upload',
+    url: environment.hostServer + '/complaints/file-upload',
     authToken: `Bearer ${localStorage.getItem('token')}`,
-    allowedMimeType: ['application/pdf', 'application/xml', 'text/xml', 'application/zip', 'application/x-zip-compressed', 'multipart/x-zip'],
-    maxFileSize: 100000
+    allowedMimeType: ['application/pdf'], // only allow PDF
+    allowedFileType: ['application/pdf'],
+    queueLimit: 1,
+    maxFileSize: 100000 // 100kb
   })
 
   public userEmail: any = undefined
@@ -90,6 +92,10 @@ export class ComplaintComponent implements OnInit {
       this.resetForm()
       this.fileUploadError = undefined
     }, (error) => error)
+  }
+
+  isLoggedIn () {
+    return localStorage.getItem('token')
   }
 
   resetForm () {

@@ -23,9 +23,10 @@ module.exports.addWalletBalance = function addWalletBalance () {
     const cardId = req.body.paymentId
     const card = cardId ? await CardModel.findOne({ where: { id: cardId, UserId: req.body.UserId } }) : null
     if (card) {
-      const wallet = await WalletModel.increment({ balance: req.body.balance }, { where: { UserId: req.body.UserId } })
-      if (wallet) {
-        res.status(200).json({ status: 'success', data: wallet.balance })
+      await WalletModel.increment({ balance: req.body.balance }, { where: { UserId: req.body.UserId } })
+      const walletNew = await WalletModel.findOne({ where: { UserId: req.body.UserId } })
+      if (walletNew) {
+        res.status(200).json({ status: 'success', data: walletNew.balance })
       } else {
         res.status(404).json({ status: 'error' })
       }

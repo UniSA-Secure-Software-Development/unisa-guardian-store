@@ -3,7 +3,7 @@
   ~ SPDX-License-Identifier: MIT
   -->
 
-<div fxLayoutAlign="center">
+<div fxLayoutAlign="center" *ngIf="isLoggedIn()">
   <mat-card class="mat-elevation-z6">
 
     <h1 translate>NAV_COMPLAIN</h1>
@@ -11,7 +11,7 @@
     <div class="confirmation" [hidden]="!(confirmation && !messageControl.dirty)">{{ confirmation }}</div>
 
     <div class="error fileUploadError" *ngIf="(fileUploadError && fileUploadError.name == 'mimeType')">{{
-      "INVALID_FILE_TYPE" | translate: { type: 'PDF, ZIP' } }}
+      "INVALID_FILE_TYPE" | translate: { type: 'PDF' } }}
     </div>
     <div class="error fileUploadError" *ngIf="(fileUploadError && fileUploadError.name == 'fileSize')">{{
       "INVALID_FILE_SIZE" | translate: { size: '100 KB' } }}
@@ -42,7 +42,7 @@
 
       <div style="margin-top: 15px;">
         <label for="file" translate>LABEL_INVOICE<span>:</span></label>
-        <input #fileControl ng2FileSelect [uploader]="uploader" id="file" type="file" accept=".pdf,.zip" style="margin-left: 10px;" aria-label="Input area for uploading a single invoice PDF or XML B2B order file or a ZIP archive containing multiple invoices or orders<!---->">
+        <input #fileControl ng2FileSelect [uploader]="uploader" id="file" type="file" accept=".pdf" style="margin-left: 10px;" aria-label="Input area for uploading a single invoice PDF<!---->">
       </div>
 
     </div>
@@ -56,4 +56,8 @@
     </button>
 
   </mat-card>
+</div>
+
+<div fxLayoutAlign="center" *ngIf="!isLoggedIn()">
+  <h2>you must be logged in to make a complaint!</h2>
 </div>
