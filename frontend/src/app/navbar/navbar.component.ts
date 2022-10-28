@@ -8,7 +8,14 @@ import { ChallengeService } from "../Services/challenge.service";
 import { UserService } from "../Services/user.service";
 import { AdministrationService } from "../Services/administration.service";
 import { ConfigurationService } from "../Services/configuration.service";
-import { Component, EventEmitter, NgZone, OnInit, Output } from "@angular/core";
+import {
+  Component,
+  EventEmitter,
+  NgZone,
+  OnInit,
+  Output,
+  SecurityContext,
+} from "@angular/core";
 import { CookieService } from "ngx-cookie";
 import { TranslateService } from "@ngx-translate/core";
 import { Router } from "@angular/router";
@@ -188,7 +195,11 @@ export class NavbarComponent implements OnInit {
 
   search(value: string) {
     if (value) {
-      const queryParams = { queryParams: { q: value } };
+      var sanitizedInput: string = this.sanitizer.sanitize(
+        SecurityContext.HTML,
+        value
+      );
+      const queryParams = { queryParams: { q: sanitizedInput } };
       this.ngZone.run(
         async () => await this.router.navigate(["/search"], queryParams)
       );
