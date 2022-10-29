@@ -19,7 +19,19 @@ jobs:
     # Install node packages
     - run: npm install --ignore-scripts --legacy-peer-deps
 
-    - run: npm run test:dependency
+    - name: Depcheck
+        uses: dependency-check/Dependency-Check_Action@main
+        id: Depcheck
+        with:
+          project: 'unisa-guardian-store'
+          path: '.'
+          format: 'HTML'
+          out: 'reports' # this is the default, no need to specify unless you wish to override it
+      - name: Upload Test results
+        uses: actions/upload-artifact@master
+        with:
+           name: Depcheck report
+           path: ${{github.workspace}}/reports
 
     # DevSkim
     # - Some CI support inbuilt tasks and scans, for  ease of use
