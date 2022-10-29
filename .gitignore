@@ -24,7 +24,7 @@ cache/
 dist/
 logs/
 dependency-check-bin/
-owasp/
+output/
 vagrant/.vagrant/
 *.orig
 *.out
