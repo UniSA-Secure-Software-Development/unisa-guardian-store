@@ -489,7 +489,9 @@ async function createAnonymousFeedback () {
 
 async function createFeedback (UserId: number | null, comment: string, rating: number, author?: string) {
   const authoredComment = author ? `${comment} (***${author.slice(3)})` : `${comment} (anonymous)`
-  return await FeedbackModel.create({ UserId, comment: authoredComment, rating }).catch((err: unknown) => {
+  // fix xss
+  const filterXss = authoredComment.replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&apos;')
+  return await FeedbackModel.create({ UserId, comment: filterXss, rating }).catch((err: unknown) => {
     logger.error(`Could not insert Feedback ${authoredComment} mapped to UserId ${UserId}: ${utils.getErrorMessage(err)}`)
   })
 }
