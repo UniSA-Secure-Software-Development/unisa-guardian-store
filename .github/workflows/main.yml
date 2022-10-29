@@ -38,8 +38,8 @@ jobs:
           path: result.txt
 
   # Deploy the app
-  deploy:
     # Configure the job
+  deploy:
     name: Deploy
     needs: scan
     runs-on: ubuntu-latest
