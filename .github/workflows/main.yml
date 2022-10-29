@@ -22,7 +22,7 @@ jobs:
         run: npm ci
       - uses: oke-py/npm-audit-action@v2
         with:
-          audit_level: moderate
+          audit_level: critical
           github_token: ${{ secrets.GITHUB_TOKEN }}
           issue_assignees: chrisT-pixel
           issue_labels: vulnerability,test
