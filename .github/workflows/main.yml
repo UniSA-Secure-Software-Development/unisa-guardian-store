@@ -25,5 +25,6 @@ jobs:
           audit_level: critical
           github_token: ${{ secrets.GITHUB_TOKEN }}
           issue_assignees: chrisT-pixel
-          issue_labels: vulnerability,test
+          create_issues: true
+          create_pr_comments: false
           dedupe_issues: true
