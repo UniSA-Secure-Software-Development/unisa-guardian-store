@@ -24,7 +24,6 @@ cache/
 dist/
 logs/
 dependency-check-bin/
-output/
 vagrant/.vagrant/
 *.orig
 *.out
