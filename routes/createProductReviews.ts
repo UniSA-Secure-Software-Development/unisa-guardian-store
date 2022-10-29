@@ -6,12 +6,13 @@
 import { Request, Response } from 'express'
 
 const reviews = require('../data/mongodb').reviews
-
+const logger = require('../lib/logger')
 const utils = require('../lib/utils')
 
 module.exports = function productReviews () {
   return (req: Request, res: Response) => {
     if (req.body.UserEmail !== req.body.author) {
+      logger.error(`User ${req.body.UserEmail ? req.body.UserEmail : 'Anonymous User'} tried to create a review with another users name`)
       res.status(401).json({ status: 'error', message: 'not authorised' })
     } else {
       reviews.insert({

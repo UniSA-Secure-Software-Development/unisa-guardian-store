@@ -16,6 +16,7 @@ const sanitizeFilename = require('sanitize-filename')
 const z85 = require('z85')
 const utils = require('./utils')
 const fs = require('fs')
+const logger = require('../lib/logger')
 
 const publicKey = fs.readFileSync('encryptionkeys/jwt.pub', 'utf8')
 module.exports.publicKey = publicKey
@@ -207,6 +208,7 @@ exports.appendUserEmailIfAvailable = (requiresEmail: boolean) => {
     if (user) {
       req.body.UserEmail = user.data.email
     } else if (requiresEmail) {
+      logger.error('Attempt to access resource without an authenticated account')
       res.status(401).json({ status: 'error', message: 'unauthorised' })
       return
     }
