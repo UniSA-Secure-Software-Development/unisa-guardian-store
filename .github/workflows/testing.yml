@@ -11,11 +11,7 @@ jobs:
      # Set up prerequisites for tests
     - uses: actions/checkout@v2
     - uses: actions/setup-node@v1
-    # Java is required to run OWASP Dependency Check
-    - uses: actions/setup-java@v2
-      with:
-        distribution: 'temurin'
-        java-version: '11'
+
     # Install node packages
     - run: npm install --ignore-scripts --legacy-peer-deps
 
@@ -37,8 +33,14 @@ jobs:
         path: .output/
 
   depchecktest:
+    needs: static
     runs-on: ubuntu-latest
     name: depecheck_test
+    # Java is required to run OWASP Dependency Check
+    - uses: actions/setup-java@v2
+      with:
+        distribution: 'temurin'
+        java-version: '11'
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -65,7 +67,7 @@ jobs:
   build:
     # Configure the job 
     name: Build
-    needs: dependency
+    needs: depchecktest
     runs-on: ubuntu-latest
     # Steps to run
     steps:
