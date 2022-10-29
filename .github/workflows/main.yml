@@ -1,4 +1,4 @@
-#auto run npm audit when pushing to repo
+#auto run npm audit when pushing to repo - need to create package-lock.json prior
 name: npm audit
 
 on:
