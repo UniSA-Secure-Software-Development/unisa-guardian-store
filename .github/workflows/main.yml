@@ -1,17 +1,61 @@
-name: Continuous Integration (CI) for Automated Security Testing
-# Run the workflow whenever a push or pull request is requested.
+name: Continuous Integration (CI)
+# Run the workflow each time code is pushed, or when a pull-request is created
 on: [push, pull_request]
 
 jobs:
   # Build the app
+  build:
+    # Configure the job
+    name: Build
+    runs-on: ubuntu-latest
+    # Steps to run
+    steps:
+      - run: echo "Build the app..."
+      - run: echo "Not implemented to save time when running the workflow"
+
   # Run security scans
   scan:
-    name: Security Scanning Job
+    # Configure the job
+    name: Run security scans
     needs: build
     runs-on: ubuntu-latest
-      # DevSkim
+
+    # Steps to run
+    steps:
+      # Set up prerequisites for tests
       - uses: actions/checkout@v2
-      - uses: microsoft/DevSkim-Action@v1
-      - uses: github/codeql-action/upload-sarif@v1
+      - uses: actions/setup-node@v1
+      # Java is required to run OWASP Dependency Check
+      - uses: actions/setup-java@v2
         with:
-          sarif_file: devskim-results.sarif
+          distribution: "temurin"
+          java-version: "11"
+      # Install node packages
+      #- run: npm ci
+
+      # DevSkim
+      # - Some CI support inbuilt tasks and scans, for  ease of use
+      # - We could install and run DevSkim directly, but we can do it more easily using the DevSkim action
+      # - See docs at: https://github.com/microsoft/DevSkim-Action
+      - uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: "3.1.x"
+      - run: dotnet tool install --global Microsoft.CST.DevSkim.CLI
+      - run: devskim analyze routes -r sectesting result.txt
+      # Publish the scan results as an artifact
+      - uses: actions/upload-artifact@v2
+        with:
+          name: scan-results
+          path: result.txt
+
+  # Deploy the app
+  deploy:
+    # Configure the job
+    name: Deploy
+    needs: scan
+    runs-on: ubuntu-latest
+
+    # Steps to run
+    steps:
+      - run: echo "Deploy the app..."
+      - run: echo "Not implemented to save time when running the workflow"
