@@ -2,7 +2,6 @@
  * Copyright (c) 2014-2022 Bjoern Kimminich & the OWASP Juice Shop contributors.
  * SPDX-License-Identifier: MIT
  */
-
 import { Request, Response, NextFunction } from 'express'
 import { WalletModel } from '../models/wallet'
 import { CardModel } from '../models/card'
@@ -25,7 +24,7 @@ module.exports.addWalletBalance = function addWalletBalance () {
     if (card) {
       const wallet = await WalletModel.increment({ balance: req.body.balance }, { where: { UserId: req.body.UserId } })
       if (wallet) {
-        res.status(200).json({ status: 'success', data: wallet[0][0].balance })
+        res.status(200).json({ status: 'success', data: wallet[0][0] ? wallet[0][0].balance : 0 })
       } else {
         res.status(404).json({ status: 'error' })
       }

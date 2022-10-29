@@ -212,6 +212,8 @@ exports.appendUserEmailIfAvailable = (requiresEmail: boolean) => {
       res.status(401).json({ status: 'error', message: 'unauthorised' })
       return
     }
+    // Public will be given a hard coded anonymous by the front end default to this
+    req.body.UserEmail = 'Anonymous'
     next()
   }
 }
