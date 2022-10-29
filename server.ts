@@ -565,8 +565,8 @@ restoreOverwrittenFilesWithOriginals().then(() => {
   app.post('/rest/chatbot/respond', chatbot.process())
   /* NoSQL API endpoints */
   app.get('/rest/products/:id/reviews', showProductReviews())
-  app.put('/rest/products/:id/reviews', security.appendUserEmailIfAvailable(), createProductReviews())
-  app.patch('/rest/products/reviews', security.isAuthorized(), updateProductReviews())
+  app.put('/rest/products/:id/reviews', security.appendUserEmailIfAvailable(false), createProductReviews())
+  app.patch('/rest/products/reviews', security.appendUserEmailIfAvailable(true), updateProductReviews())
   app.post('/rest/products/reviews', security.isAuthorized(), likeProductReviews())
 
   /* B2B Order API */

@@ -201,11 +201,14 @@ exports.appendUserId = () => {
   }
 }
 
-exports.appendUserEmailIfAvailable = () => {
+exports.appendUserEmailIfAvailable = (requiresEmail: boolean) => {
   return (req: Request, res: Response, next: NextFunction) => {
     const user = authenticatedUsers.tokenMap[utils.jwtFrom(req)]
     if (user) {
       req.body.UserEmail = user.data.email
+    } else if (requiresEmail) {
+      res.status(401).json({ status: 'error', message: 'unauthorised' })
+      return
     }
     next()
   }

@@ -3,29 +3,36 @@
  * SPDX-License-Identifier: MIT
  */
 
-import challengeUtils = require('../lib/challengeUtils')
 import { Request, Response, NextFunction } from 'express'
 
-const challenges = require('../data/datacache').challenges
+const sanitize = require('mongo-sanitize')
 const db = require('../data/mongodb')
-const security = require('../lib/insecurity')
 
 // vuln-code-snippet start noSqlReviewsChallenge forgedReviewChallenge
 module.exports = function productReviews () {
   return (req: Request, res: Response, next: NextFunction) => {
-    const user = security.authenticatedUsers.from(req) // vuln-code-snippet vuln-line forgedReviewChallenge
-    db.reviews.update( // vuln-code-snippet neutral-line forgedReviewChallenge
-      { _id: req.body.id }, // vuln-code-snippet vuln-line noSqlReviewsChallenge forgedReviewChallenge
-      { $set: { message: req.body.message } },
-      { multi: true } // vuln-code-snippet vuln-line noSqlReviewsChallenge
-    ).then(
-      (result: { modified: number, original: Array<{ author: any }> }) => {
-        challengeUtils.solveIf(challenges.noSqlReviewsChallenge, () => { return result.modified > 1 }) // vuln-code-snippet hide-line
-        challengeUtils.solveIf(challenges.forgedReviewChallenge, () => { return user?.data && result.original[0] && result.original[0].author !== user.data.email && result.modified === 1 }) // vuln-code-snippet hide-line
-        res.json(result)
-      }, (err: unknown) => {
-        res.status(500).json(err)
-      })
+    // Sanatize the id for the query cause that's what we should do
+    const sanatizedId = sanitize(req.body.id)
+    db.reviews.find({ _id: sanatizedId }).limit(1).then((result: any[]) => {
+      // There shoud only be 1 result
+      const previousReview = result[0]
+      if (!previousReview) {
+        res.status(404).json({ status: 'error', message: 'review does not exist' })
+      } else if (previousReview.author !== req.body.UserEmail) {
+        // If not the same author then there is an issue.
+        res.status(401).json({ status: 'error', message: 'unauthorised access' })
+      } else {
+        db.reviews.update(
+          { _id: sanatizedId },
+          { $set: { message: req.body.message } }
+        ).then(
+          (result: { modified: number, original: Array<{ author: any }> }) => {
+            res.json(result)
+          }, (err: unknown) => {
+            res.status(500).json(err)
+          })
+      }
+    })
   }
 }
 // vuln-code-snippet end noSqlReviewsChallenge forgedReviewChallenge
