@@ -6,7 +6,7 @@ jobs:
   # Build the app
   # Run security scans
   scan:
-    # Configure the job
+  # Configure the job
     name: Security Scanning Job
     needs: build
     runs-on: ubuntu-latest
