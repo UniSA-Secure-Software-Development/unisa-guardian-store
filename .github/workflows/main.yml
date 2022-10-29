@@ -4,6 +4,16 @@ name: Continuous Integration (CI)
 on: [push, pull_request]
 
 jobs:
+  # Build the app
+  build:
+    # Configure the job 
+    name: Build
+    runs-on: ubuntu-latest
+    # Steps to run
+    steps:
+    - run: echo "Build the app..."
+    - run: echo "Not implemented to save time when running the workflow"
+  
   # Run security scans
   scan:
     # Configure the job 
