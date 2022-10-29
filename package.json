@@ -265,20 +265,13 @@
     "webdriver-manager": "^13.0.0"
   },
   "engines": {
-    "node": "14 - 18"
+    "node": "18"
   },
   "os": [
-    "win32",
-    "linux",
-    "darwin",
-    "freebsd",
-    "openbsd"
+    "linux"
   ],
   "cpu": [
-    "x64",
-    "x32",
-    "arm64",
-    "arm"
+    "x64"
   ],
   "heroku-run-build-script": true,
   "standard": {

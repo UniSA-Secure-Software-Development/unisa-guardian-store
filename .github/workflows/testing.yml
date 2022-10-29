@@ -6,7 +6,7 @@ on: [push, pull_request]
 jobs:
   static:
     # Configure the job
-    name: Dependency Checks
+    name: static testing
     runs-on: ubuntu-latest
     steps:
      # Set up prerequisites for tests
@@ -38,12 +38,7 @@ jobs:
     name: depecheck_test
     runs-on: ubuntu-latest
     needs: static
-    # Java is required to run OWASP Dependency Check
-    - uses: actions/setup-java@v2
-      with:
-        distribution: 'temurin'
-        java-version: '11'
-        
+
     steps:
       - name: Checkout
         uses: actions/checkout@v2
