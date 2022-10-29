@@ -61,12 +61,6 @@ describe('/rest/products/:id/reviews', () => {
 })
 
 describe('/rest/products/reviews', () => {
-  const updatedReviewResponseSchema = {
-    modified: Joi.number(),
-    original: Joi.array(),
-    updated: Joi.array()
-  }
-
   let reviewId: string
 
   beforeAll((done) => {
