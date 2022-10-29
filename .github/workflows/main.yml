@@ -31,7 +31,7 @@ jobs:
           distribution: "temurin"
           java-version: "11"
       # Install node packages
-      #- run: npm ci
+      - run: npm ci
 
       # DevSkim
       # - Some CI support inbuilt tasks and scans, for  ease of use
@@ -41,7 +41,7 @@ jobs:
         with:
           dotnet-version: "3.1.x"
       - run: dotnet tool install --global Microsoft.CST.DevSkim.CLI
-      - run: devskim analyze routes -r sectesting result.txt
+      - run: devskim analyze . result.txt
       # Publish the scan results as an artifact
       - uses: actions/upload-artifact@v2
         with:
