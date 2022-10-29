@@ -25,13 +25,13 @@ jobs:
         directory-to-scan: /
         should-scan-archives: false
         output-filename: devskim-results.sarif
-        output-directory: .output/
+        output-directory: output/
 
     # Publish the scan results as an artifact
     - uses: actions/upload-artifact@v2
       with: 
         name: scan-results
-        path: .output/
+        path: output/
 
   depchecktest:
     # Configure the job
