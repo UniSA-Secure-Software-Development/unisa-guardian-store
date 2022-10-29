@@ -4,23 +4,9 @@ name: Continuous Integration (CI)
 on: [push, pull_request]
 
 jobs:
-  # Build the app
-  build:
-    # Configure the job 
-    name: Build
+  dependency:
+    name: Dependency Checks
     runs-on: ubuntu-latest
-    # Steps to run
-    steps:
-    - run: echo "Build the app..."
-    - run: echo "Not implemented to save time when running the workflow"
-  
-  # Run security scans
-  scan:
-    # Configure the job 
-    name: Run security scans
-    needs: build
-    runs-on: ubuntu-latest
-    
     steps:
      # Set up prerequisites for tests
     - uses: actions/checkout@v2
@@ -31,14 +17,14 @@ jobs:
         distribution: 'temurin'
         java-version: '11'
     # Install node packages
-    - run: npm ci
+    - run: npm install
 
     - run: npm run test:dependencies
 
     # DevSkim
     # - Some CI support inbuilt tasks and scans, for  ease of use
     # - We could install and run DevSkim directly, but we can do it more easily using the DevSkim action
-    # - See docs at: https://github.com/microsoft/DevSkim-Action 
+    # - See docs at: https://github.com/microsoft/DevSkim-Action git
     - uses: microsoft/devskim-action@v1
       with:
         directory-to-scan: /
@@ -51,3 +37,21 @@ jobs:
       with: 
         name: scan-results
         path: .output/
+
+  # Build the app
+  build:
+    # Configure the job 
+    name: Build
+    needs: dependency
+    runs-on: ubuntu-latest
+    # Steps to run
+    steps:
+    - run: echo "Build the app..."
+    - run: echo "Not implemented to save time when running the workflow"
+  
+  # Run security scans
+  tests:
+    # Configure the job 
+    name: Run security scans
+    needs: build
+    runs-on: ubuntu-latest

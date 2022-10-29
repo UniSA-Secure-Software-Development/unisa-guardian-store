@@ -12,7 +12,7 @@ const http = require('http')
 const REST_URL = 'http://localhost:3000/rest'
 
 const jsonHeader = { 'content-type': 'application/json' }
-let authHeader = { Authorization: `Bearer ${security.authorize()}`, 'content-type': 'application/json' }
+const authHeader = { Authorization: `Bearer ${security.authorize()}`, 'content-type': 'application/json' }
 
 describe('/rest/products/:id/reviews', () => {
   const reviewResponseSchema = {
