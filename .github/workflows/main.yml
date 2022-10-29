@@ -1,3 +1,4 @@
+#auto run npm audit when pushing to repo
 name: npm audit
 
 on:
