@@ -22,17 +22,6 @@ jobs:
 
     # Steps to run
     steps:
-      # Set up prerequisites for tests
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v1
-      # Java is required to run OWASP Dependency Check
-      - uses: actions/setup-java@v2
-        with:
-          distribution: "temurin"
-          java-version: "11"
-      # Install node packages
-      - run: npm ci
-
       # Owasp dependency check
       name: Checkout
         uses: actions/checkout@v2
