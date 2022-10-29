@@ -17,7 +17,7 @@ jobs:
         distribution: 'temurin'
         java-version: '11'
     # Install node packages
-    - run: npm install
+    - run: npm install --ignore-scripts --legacy-peer-deps
 
     - run: npm run test:dependencies
 
