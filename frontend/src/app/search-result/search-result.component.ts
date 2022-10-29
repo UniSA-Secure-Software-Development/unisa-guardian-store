@@ -148,6 +148,7 @@ export class SearchResultComponent implements OnDestroy, AfterViewInit {
       this.ngZone.runOutsideAngular(() => { // vuln-code-snippet hide-start
         this.io.socket().emit('verifyLocalXssChallenge', queryParam)
       }) // vuln-code-snippet hide-end
+      queryParam = queryParam.replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&apos;').replace(/javascript:/g, '').replace(/<iframe/g, '&lt;')
       this.dataSource.filter = queryParam.toLowerCase()
       this.searchValue = this.sanitizer.bypassSecurityTrustHtml(queryParam) // vuln-code-snippet vuln-line localXssChallenge xssBonusChallenge
       this.gridDataSource.subscribe((result: any) => {
