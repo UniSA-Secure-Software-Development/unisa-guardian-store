@@ -12,7 +12,7 @@
     },
 	"postCreateCommand": "export NG_CLI_ANALYTICS=ci && npm i -g @angular/cli && npm install",
 	"build": {
-		"dockerfile": ".devcontainer\\Dockerfile",
+		"dockerfile": ".devcontainer/Dockerfile",
 		"args": {
 			"VARIANT": "16-bullseye"
 		}

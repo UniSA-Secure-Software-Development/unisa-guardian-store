@@ -8,6 +8,7 @@ import { Request, Response, NextFunction } from 'express'
 
 import { UserModel } from '../models/user'
 import challengeUtils = require('../lib/challengeUtils')
+import { token } from 'morgan'
 const utils = require('../lib/utils')
 const security = require('../lib/insecurity')
 const challenges = require('../data/datacache').challenges
@@ -16,7 +17,6 @@ const config = require('config')
 const themes = require('../views/themes/themes').themes
 const Entities = require('html-entities').AllHtmlEntities
 const entities = new Entities()
-
 module.exports = function getUserProfile () {
   return (req: Request, res: Response, next: NextFunction) => {
     fs.readFile('views/userProfile.pug', function (err, buf) {
@@ -60,6 +60,7 @@ module.exports = function getUserProfile () {
           res.set({
             'Content-Security-Policy': CSP
           })
+          res.cookie('token', req.cookies.token, { sameSite: 'strict' })
 
           res.send(fn(user))
         }).catch((error: Error) => {

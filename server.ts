@@ -42,6 +42,8 @@ const RateLimit = require('express-rate-limit')
 const client = require('prom-client')
 const ipfilter = require('express-ipfilter').IpFilter
 const swaggerDocument = yaml.load(fs.readFileSync('./swagger.yml', 'utf8'))
+var csrf_protect = require('csrf')
+var csrfProtect = csrf_protect({ cookie: true })
 const {
   ensureFileIsPassed,
   handleZipFileUpload,
@@ -114,6 +116,7 @@ const memory = require('./routes/memory')
 const chatbot = require('./routes/chatbot')
 const locales = require('./data/static/locales.json')
 const i18n = require('i18n')
+
 
 const appName = config.get('application.customMetricsPrefix')
 const startupGauge = new client.Gauge({
@@ -590,7 +593,6 @@ restoreOverwrittenFilesWithOriginals().then(() => {
   /* Routes for profile page */
   app.get('/profile', security.updateAuthenticatedUsers(), userProfile())
   app.post('/profile', updateUserProfile())
-
   /* Route for vulnerable code snippets */
   app.get('/snippets', vulnCodeSnippet.serveChallengesWithCodeSnippet())
   app.get('/snippets/:challenge', vulnCodeSnippet.serveCodeSnippet())

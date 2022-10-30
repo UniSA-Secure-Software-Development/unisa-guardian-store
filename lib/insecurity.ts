@@ -1,3 +1,4 @@
+/* eslint-disable spaced-comment */
 /*
  * Copyright (c) 2014-2022 Bjoern Kimminich & the OWASP Juice Shop contributors.
  * SPDX-License-Identifier: MIT
@@ -208,7 +209,7 @@ exports.updateAuthenticatedUsers = () => (req: Request, res: Response, next: Nex
       if (err === null) {
         if (authenticatedUsers.get(token) === undefined) {
           authenticatedUsers.put(token, decoded)
-          res.cookie('token', token)
+          res.cookie('token', token, { sameSite: 'strict' })
         }
       }
     })

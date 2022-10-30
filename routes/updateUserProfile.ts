@@ -11,7 +11,6 @@ const security = require('../lib/insecurity')
 const utils = require('../lib/utils')
 const cache = require('../data/datacache')
 const challenges = cache.challenges
-
 module.exports = function updateUserProfile () {
   return (req: Request, res: Response, next: NextFunction) => {
     const loggedInUser = security.authenticatedUsers.get(req.cookies.token)
@@ -28,7 +27,7 @@ module.exports = function updateUserProfile () {
             savedUser = utils.queryResultToJson(savedUser)
             const updatedToken = security.authorize(savedUser)
             security.authenticatedUsers.put(updatedToken, savedUser)
-            res.cookie('token', updatedToken)
+            res.cookie('token', updatedToken, { sameSite: 'strict' })
             res.location(process.env.BASE_PATH + '/profile')
             res.redirect(process.env.BASE_PATH + '/profile')
           })
