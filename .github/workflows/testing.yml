@@ -25,7 +25,6 @@ jobs:
         directory-to-scan: /
         should-scan-archives: false
         output-filename: devskim-results.sarif
-        output-directory: ${{github.workspace}}
 
     # Publish the scan results as an artifact
     - uses: actions/upload-artifact@v2
