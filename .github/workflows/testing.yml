@@ -25,13 +25,13 @@ jobs:
         directory-to-scan: /
         should-scan-archives: false
         output-filename: devskim-results.sarif
-        output-directory: .output/static
+        output-directory: ${{github.workspace}}
 
     # Publish the scan results as an artifact
     - uses: actions/upload-artifact@v2
       with: 
         name: scan-results
-        path: .output/static
+        path: ${{github.workspace}}
 
   depchecktest:
     # Configure the job
@@ -59,7 +59,7 @@ jobs:
         uses: actions/upload-artifact@master
         with:
            name: Depcheck report
-           path: .output/dependency
+           path: ${{github.workspace}}
 
   # Build the app
   build:
