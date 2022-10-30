@@ -349,8 +349,8 @@ describe('SearchResultComponent', () => {
     component.addToBasket(2)
     expect(console.log).toHaveBeenCalledWith('Error')
   }))
-  
-    it('Escape key characters passed in during search', () => {
+
+  it('Escape key characters passed in during search', () => {
     activatedRoute.setQueryParameter('<p style="color: red">Xss</p>')
     component.filterTable()
     expect(sanitizer.bypassSecurityTrustHtml).toHaveBeenCalledWith('<p style="color: red">Xss</p>')
