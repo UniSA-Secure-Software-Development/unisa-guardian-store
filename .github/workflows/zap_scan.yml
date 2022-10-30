@@ -1,4 +1,4 @@
-name: "ZAP Full Scan"
+name: "OWASP ZAP Full Scan"
 
 on: [push]
 
@@ -11,12 +11,12 @@ jobs:
         uses: actions/checkout@5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f
         with:
           ref: develop
-      - name: ZAP Scan
+      - name: ZAP Full Scan
         uses: zaproxy/action-full-scan@v0.4.0
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          docker_name: 'owasp/zap2docker-weekly'
+          docker_name: 'owasp/zap2docker-stable'
           #this target url should be local to get a correct output, im confused tbh
           target: 'https://preview.owasp-juice.shop'
           rules_file_name: '.zap/rules.tsv'
-          cmd_options: '-a'
+          cmd_options: '-a -j'

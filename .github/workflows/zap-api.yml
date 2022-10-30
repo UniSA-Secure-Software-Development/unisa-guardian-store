@@ -1,4 +1,4 @@
-name: "ZAP API Scan"
+name: "OWASP ZAP API Scan"
 
 on: [push]
 
@@ -12,13 +12,13 @@ jobs:
         with:
           ref: develop
 
-      - name: ZAP Scan
-        uses: zaproxy/action-api-scan@v0.1.1
+      - name: ZAP API Scan
+        uses: zaproxy/action-api-scan@v0.2.0
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          docker_name: 'owasp/zap2docker-weekly'
+          docker_name: 'owasp/zap2docker-stable'
           format: openapi
           #this target url should be localhost to get a correct output, im confused tbh
           target: 'https://preview.owasp-juice.shop/swagger.yml'
           rules_file_name: '.zap/rules.tsv'
-          cmd_options: '-a'
+          cmd_options: '-a -j'
