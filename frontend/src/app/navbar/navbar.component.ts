@@ -8,7 +8,7 @@ import { ChallengeService } from '../Services/challenge.service'
 import { UserService } from '../Services/user.service'
 import { AdministrationService } from '../Services/administration.service'
 import { ConfigurationService } from '../Services/configuration.service'
-import { Component, EventEmitter, NgZone, OnInit, Output } from '@angular/core'
+import { Component, EventEmitter, NgZone, OnInit, Output, SecurityContext } from '@angular/core'
 import { CookieService } from 'ngx-cookie'
 import { TranslateService } from '@ngx-translate/core'
 import { Router } from '@angular/router'
@@ -16,6 +16,8 @@ import { SocketIoService } from '../Services/socket-io.service'
 import { LanguagesService } from '../Services/languages.service'
 import { MatSnackBar } from '@angular/material/snack-bar'
 import { BasketService } from '../Services/basket.service'
+// Built-in sanitizer library
+import { DomSanitizer } from '@angular/platform-browser'
 
 import {
   faBomb,
@@ -69,7 +71,7 @@ export class NavbarComponent implements OnInit {
     private readonly configurationService: ConfigurationService, private readonly userService: UserService, private readonly ngZone: NgZone,
     private readonly cookieService: CookieService, private readonly router: Router, private readonly translate: TranslateService,
     private readonly io: SocketIoService, private readonly langService: LanguagesService, private readonly loginGuard: LoginGuard,
-    private readonly snackBar: MatSnackBar, private readonly basketService: BasketService) { }
+    private readonly snackBar: MatSnackBar, private readonly basketService: BasketService, private readonly sanitizer: DomSanitizer) { }
 
   ngOnInit () {
     this.getLanguages()
@@ -139,7 +141,12 @@ export class NavbarComponent implements OnInit {
 
   search (value: string) {
     if (value) {
-      const queryParams = { queryParams: { q: value } }
+      // define the variable that holds the sanitized value
+      // using the sanitize function in DomSanitizer, value is 'cleaned' by detecting
+      // untrusted data. If it is deemed untrusted, the string result will be empty.
+      // Else, it will keep the value as it was without altering the format.
+      const sanitizeredValue: string = this.sanitizer.sanitize(SecurityContext.HTML, value)
+      const queryParams = { queryParams: { q: sanitizeredValue } }
       this.ngZone.run(async () => await this.router.navigate(['/search'], queryParams))
     } else {
       this.ngZone.run(async () => await this.router.navigate(['/search']))
