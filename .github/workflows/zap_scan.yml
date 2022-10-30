@@ -8,9 +8,9 @@ jobs:
     name: Scan Guardian Care Store
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f
         with:
-          ref: master
+          ref: develop
       - name: ZAP Scan
         uses: zaproxy/action-full-scan@v0.4.0
         with:
