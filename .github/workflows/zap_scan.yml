@@ -1,6 +1,6 @@
 name: "OWASP ZAP Full Scan"
 
-on: [push]
+on: [push, pull-request]
 
 jobs:
   zap_scan:

@@ -67,6 +67,7 @@ export class NavbarComponent implements OnInit {
 
   @Output() public sidenavToggle = new EventEmitter()
 
+  //initialise sanitizer in the constructor 
   constructor (private readonly administrationService: AdministrationService, private readonly challengeService: ChallengeService,
     private readonly configurationService: ConfigurationService, private readonly userService: UserService, private readonly ngZone: NgZone,
     private readonly cookieService: CookieService, private readonly router: Router, private readonly translate: TranslateService,
@@ -144,7 +145,6 @@ export class NavbarComponent implements OnInit {
       // define the variable that holds the sanitized value
       // using the sanitize function in DomSanitizer, value is 'cleaned' by detecting
       // untrusted data. If it is deemed untrusted, the string result will be empty.
-      // Else, it will keep the value as it was without altering the format.
       const sanitizeredValue: string = this.sanitizer.sanitize(SecurityContext.HTML, value)
       const queryParams = { queryParams: { q: sanitizeredValue } }
       this.ngZone.run(async () => await this.router.navigate(['/search'], queryParams))
