@@ -70,6 +70,7 @@ export class LoginComponent implements OnInit {
   login () {
     this.user = {}
     this.user.email = this.emailControl.value
+    this.user.email = this.passwordControl.value
     this.user.password = this.passwordControl.value
     this.userService.login(this.user).subscribe((authentication: any) => {
       localStorage.setItem('token', authentication.token)
