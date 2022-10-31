@@ -172,4 +172,12 @@ describe('LoginComponent', () => {
     component.login()
     expect(localStorage.getItem('email')).toBe('horst@juice-sh.op')
   }))
+  // Universal mailbox test
+  it('When you log in using the universal mailbox, returns error message from server to client', () => {
+    userService.login.and.returnValue(of({}))
+    component.emailControl.setValue("'or 1=1 --")
+    component.passwordControl.setValue('1')
+    component.login()
+    expect(component.error).toBeTruthy()
+  })
 })
