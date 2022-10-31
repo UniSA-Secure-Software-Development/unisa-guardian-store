@@ -11,7 +11,7 @@ module.exports.getWalletBalance = function getWalletBalance () {
   return async (req: Request, res: Response, next: NextFunction) => {
     const wallet = await WalletModel.findOne({ where: { UserId: req.body.UserId } })
     if (wallet) {
-      res.status(200).json({ status: 'success', data: wallet.balance })
+      res.status(200).json({ status: 'success' })
     } else {
       res.status(404).json({ status: 'error' })
     }
