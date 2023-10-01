@@ -19,7 +19,7 @@ module.exports = function productReviews () {
     reviews.insert({
       product: req.params.id,
       message: req.body.message,
-      author: req.body.author,
+      author: user.data.email,
       likesCount: 0,
       likedBy: []
     }).then(() => {
