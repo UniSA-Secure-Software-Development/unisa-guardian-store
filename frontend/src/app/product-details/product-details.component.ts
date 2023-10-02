@@ -52,7 +52,7 @@ export class ProductDetailsComponent implements OnInit, OnDestroy {
   }
 
   addReview (textPut: HTMLTextAreaElement) {
-    const review = { message: textPut.value, author: this.author }
+    const review = { message: textPut.value }
 
     textPut.value = ''
     this.productReviewService.create(this.data.productData.id, review).subscribe(() => {

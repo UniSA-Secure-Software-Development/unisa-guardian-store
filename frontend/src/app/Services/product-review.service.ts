@@ -25,7 +25,7 @@ export class ProductReviewService {
     )
   }
 
-  create (id: number, review: { message: string, author: string }) {
+  create (id: number, review: { message: string }) {
     return this.http.put(`${this.host}/${id}/reviews`, review).pipe(map((response: any) => response.data),
       catchError((err) => { throw err })
     )
