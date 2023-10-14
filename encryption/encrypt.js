@@ -1,4 +1,3 @@
-
 // import Nodejs built in crypto module
 const crypto = require('crypto')
 const fs = require('fs')
@@ -19,16 +18,8 @@ function encrypt (text) {
   // encrpyted data is returned as a hex string
   return { iv: iv.toString('hex'), encryptedData: encrypted.toString('hex') }
 }
-
-// decrypt function takes encrpyted text and returns the decrpyted plain text
-function decrypt (text) {
-  const iv = Buffer.from(text.iv, 'hex')
-  const encryptedText = Buffer.from(text.encryptedData, 'hex')
-  const decipher = crypto.createDecipheriv(algorithm, Buffer.from(key), iv)
-  let decrypted = decipher.update(encryptedText)
-  decrypted = Buffer.concat([decrypted, decipher.final()])
-  return decrypted.toString()
-}
+// Store key after encryption
+fs.writeFileSync('key.txt', key)
 
 // import file with sensitive data exposure
 const file = '../data/static/users.yml'
@@ -39,10 +30,7 @@ const yamlContent = fs.readFileSync(file, 'utf8')
 // Encrypt the content
 const encryptedContent = encrypt(yamlContent)
 
-// Save the encrypted content to another file
+// overwrite the file
 fs.writeFileSync(file, JSON.stringify(encryptedContent))
 
 console.log('File encrypted successfully!')
-
-// If you want to test decryption, you can use the below code:
-console.log('decrypted file: ' + decrypt(encryptedContent))
