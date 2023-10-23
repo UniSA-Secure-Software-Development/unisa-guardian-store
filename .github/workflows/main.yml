@@ -16,6 +16,6 @@ jobs:
           output-filename: devskim-results.sarif
           output-directory: output
       - uses: actions/upload-artifact@v2
-            with: 
-              name: scan-results
-              path: output
+        with: 
+          name: scan-results
+          path: output
