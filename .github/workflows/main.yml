@@ -9,7 +9,6 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v1
-      - run: npm install
       - uses: microsoft/devskim-action@v1
         with:
           directory-to-scan: /
