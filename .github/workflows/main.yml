@@ -14,4 +14,4 @@ jobs:
           directory-to-scan: /
           should-scan-archives: false
           output-filename: devskim-results.sarif
-          output-directory: ../../logs
+          output-directory: logs
