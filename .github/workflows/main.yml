@@ -1,0 +1,25 @@
+name: DevSkim Analysis
+
+on: [push, pull_request]
+
+jobs:
+  devskim_analysis:
+    name: Run DevSkim Analysis
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v1
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run DevSkim
+        uses: microsoft/devskim-action@v1
+        with:
+          directory-to-scan: /
+          should-scan-archives: false
+          output-filename: devskim-results.sarif
+          output-directory: ../logs
