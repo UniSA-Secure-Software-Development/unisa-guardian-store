@@ -1,8 +1,8 @@
 name: "ZAP Baseline Scan"
 
 on:
-  schedule:
-    - cron:  '0 18 * * 6'
+  pull_request:
+    branches: [ develop ]
 
 jobs:
   zap_scan:
@@ -10,9 +10,7 @@ jobs:
     name: Scan Juice Shop preview instance on Heroku
     steps:
       - name: Check out Git repository
-        uses: actions/checkout@5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f #v2: v2.3.4 available
-        with:
-          ref: develop
+        uses: actions/checkout@v2.3.4
       - name: ZAP Scan
         uses: zaproxy/action-baseline@v0.3.0
         with:
