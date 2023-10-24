@@ -1,9 +1,9 @@
 // import Nodejs built in crypto module
 const crypto = require('crypto')
 const fs = require('fs')
-// using AES encrpytion
+// using AES encryption
 const algorithm = 'aes-256-cbc'
-// generates a random 256-bit key for encryption, required for AES encrpytion
+// generates a random 256-bit key for encryption, required for AES encryption
 const key = crypto.randomBytes(32)
 // generates a random 128-bit initalisation vector
 const iv = crypto.randomBytes(16)
@@ -15,7 +15,7 @@ function encrypt (text) {
   // text is encrpyted using the cipher
   let encrypted = cipher.update(text)
   encrypted = Buffer.concat([encrypted, cipher.final()])
-  // encrpyted data is returned as a hex string
+  // encrypted data is returned as a hex string
   return { iv: iv.toString('hex'), encryptedData: encrypted.toString('hex') }
 }
 // Store key after encryption
