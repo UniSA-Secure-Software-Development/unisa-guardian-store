@@ -158,7 +158,7 @@ jobs:
   scan:
     # Configure the job 
     name: Run security scans
-    needs: build
+    needs: api-test
     runs-on: ubuntu-latest
 
     # Steps to run
