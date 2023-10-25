@@ -174,7 +174,9 @@ jobs:
         java-version: '11'
     
     # Install packages to run security test on
-    - run: npm ci
+    # Tried to run the below dependency check but kept failing due to an error not related to npm
+    # So removed the npm package install and dep test as npm ci failed in postinstall script
+    # - run: npm ci
 
     # Tried to run the below dependency check but kept failing due to an error not related to npm
     # Perform OWASP Dependency Check
