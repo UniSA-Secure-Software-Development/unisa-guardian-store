@@ -1,6 +1,6 @@
 # App
 node_modules/
-.automated-security-tests/tools/dependency-check
+.automated-security-tests/tools/dependency-check/data
 juiceshop.sqlite
 order_*.pdf
 app/
