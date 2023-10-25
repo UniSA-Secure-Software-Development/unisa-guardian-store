@@ -158,7 +158,7 @@ jobs:
   scan:
     # Configure the job 
     name: Run security scans
-    needs: api-test
+    needs: lint
     runs-on: ubuntu-latest
 
     # Steps to run
