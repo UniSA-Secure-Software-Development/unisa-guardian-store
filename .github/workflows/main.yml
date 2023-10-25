@@ -1,0 +1,38 @@
+# Automated security testing runs on each push
+name: Automated Security Testing
+on: [push, pull_request]
+
+jobs:
+  scan:
+    name: Run security scans
+    runs-on: ubuntu-latest
+
+    steps:
+
+    # Set up test prerequisites
+    - uses: actions/checkout@v2
+
+    # Java for OWASP Dependency Check
+    - uses: actions/setup-java@v2
+      with:
+        distribution: 'temurin'
+        java-version: '11'
+    
+    # Run OWASP Dependency Check
+    - name: OWASP Dependency Check
+      run: .comp4035/dependency-check/bin/dependency-check.sh -s . -o .comp4035/output --disableAssembly --disableArchive
+    
+    # Run DevSkim SAST tool
+    - name: DevSkim
+      uses: microsoft/DevSkim-Action@v1.0.11
+      with:
+        directory-to-scan: /
+        should-scan-archives: false
+        output-filename: devskim-results.sarif
+        output-directory: .comp4035/output
+
+    # Publish the outputs of both scans as an artifact
+    - uses: actions/upload-artifact@v2
+      with: 
+        name: scan-results
+        path: .comp4035/output
