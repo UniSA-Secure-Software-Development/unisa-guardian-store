@@ -173,7 +173,6 @@ jobs:
         distribution: 'temurin'
         java-version: '11'
     
-    # Add commands below to run SAST tests
     # OWASP Dependency Check
     # - '-s .' scans the current directory for a supported package list
     # - '-o .automated-security-tests/output' sets the location of the scan output file
