@@ -87,7 +87,7 @@ describe('/rest/products/reviews', () => {
       .expect('header', 'content-type', /application\/json/)
       .expect('jsonTypes', updatedReviewResponseSchema)
   })
-
+  
   it('PATCH single product review editing need an authenticated user', () => {
     return frisby.patch(`${REST_URL}/products/reviews`, {
       body: {
@@ -97,6 +97,21 @@ describe('/rest/products/reviews', () => {
     })
       .expect('status', 401)
   })
+
+
+  // Example security unit test
+  it('PATCH single product review editing needs the original author', () => {
+    let anotherUsersReviewId = "xxvcKEZpvZ3XaMx6o"
+
+    return frisby.patch(`${REST_URL}/products/reviews`, {
+      body: {
+        id: anotherUsersReviewId,
+        message: 'Lorem Ipsum'
+      }
+    })
+      .expect('status', 403)  // Forbidden HTTP Status
+  })
+
 
   it('POST non-existing product review cannot be liked', () => {
     return frisby.post(`${REST_URL}/user/login`, {

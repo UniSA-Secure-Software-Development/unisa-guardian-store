@@ -152,7 +152,6 @@ jobs:
           path: |
             api-lcov.info
   
-  
   ####################################################################################################
   # Run security scans
   scan:
@@ -163,32 +162,10 @@ jobs:
 
     # Steps to run
     steps:
-    # Set up prerequisites for tests
-    - uses: actions/checkout@v2
-    - uses: actions/setup-node@v1
-
-    # Java is required to run OWASP Dependency Check
-    - uses: actions/setup-java@v2
-      with:
-        distribution: 'temurin'
-        java-version: '11'
-    
-    # Install packages to run security test on
-    # Tried to run the below dependency check but kept failing due to an error not related to npm
-    # So removed the npm package install and dep test as npm ci failed in postinstall script
-    # - run: npm ci
-
-    # Tried to run the below dependency check but kept failing due to an error not related to npm
-    # Perform OWASP Dependency Check
-    # - '-s .' scans the current directory for a supported package list
-    # - '-o .automated-security-tests/output' sets the location of the scan output file
-    # - run: .automated-security-tests/tools/dependency-check/bin/dependency-check.sh -s . -o .automated-security-tests/output --disableAssembly
-    
     - run: echo "Add Security Unit Tests here..."
-  
-  ####################################################################################################
-  
 
+  ####################################################################################################
+    
   coverage-report:
     needs: [test, api-test]
     runs-on: ubuntu-latest
