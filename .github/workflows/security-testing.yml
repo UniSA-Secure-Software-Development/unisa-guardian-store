@@ -1,0 +1,30 @@
+name: Security Testing
+
+on: [push, pull_request]
+
+jobs:
+  devskim-scan:
+    name: devSkim Scan
+    runs-on: ubuntu-latest
+    
+    # setup prereqs
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-node@v1
+
+   # Run DevSkim SAST
+   # format output file as text using -f text
+   # currently scanning only the routes folder as all implementation logic is located there
+    - uses: microsoft/devskim-action@v1
+      with:
+        directory-to-scan: routes
+        should-scan-archives: false
+        output-filename: devskim-results.txt
+        output-directory: securityTestOutputs
+        extra-options: -f text
+
+    # Publish the scan results as an artifact
+    - uses: actions/upload-artifact@v2
+      with: 
+        name: scan-results
+        path: securityTestOutputs/

@@ -1,0 +1,9 @@
+languages.ts:10:50:10:54 [ManualReview] DS176209 Suspicious comment
+likeProductReviews.ts:30:14:36:55 [ManualReview] DS172411 Review setTimeout for untrusted data
+fileUpload.ts:85:30:85:34 [ManualReview] DS176209 Suspicious comment
+vulnCodeSnippet.ts:106:27:106:31 [ManualReview] DS176209 Suspicious comment
+vulnCodeSnippet.ts:110:39:110:43 [ManualReview] DS176209 Suspicious comment
+userProfile.ts:36:25:44:23 [ManualReview] DS189424 Review eval for untrusted data
+captcha.ts:23:19:23:46 [ManualReview] DS189424 Review eval for untrusted data
+verify.ts:261:19:261:22 [Critical] DS126858 Weak/Broken Hash Algorithm
+For guidance on reported issues visit the relevant page here: https://github.com/microsoft/DevSkim/tree/main/guidance.
