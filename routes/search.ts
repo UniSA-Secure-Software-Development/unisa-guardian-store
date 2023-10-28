@@ -24,7 +24,7 @@ module.exports = function searchProducts () {
     // Fix SQL Injection Vulnerability using PREPARED STATEMENTS
     models.sequelize.query(
       `SELECT * FROM Products WHERE ((name LIKE :searchCriteria OR description LIKE :searchCriteria) AND deletedAt IS NULL) ORDER BY name`,
-      { replacements: { searchCriteria : `%${criteria}%` } })
+      { replacements: { searchCriteria: `%${criteria}%` } })
       .then(([products]: any) => {
         const dataString = JSON.stringify(products)
         if (challengeUtils.notSolved(challenges.unionSqlInjectionChallenge)) { // vuln-code-snippet hide-start
