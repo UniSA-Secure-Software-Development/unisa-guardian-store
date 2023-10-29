@@ -9,12 +9,16 @@ import { User } from '../data/types'
 import { BasketModel } from '../models/basket'
 import { UserModel } from '../models/user'
 import challengeUtils = require('../lib/challengeUtils')
+import validator from 'validator'
 
 const utils = require('../lib/utils')
 const security = require('../lib/insecurity')
 const challenges = require('../data/datacache').challenges
 const users = require('../data/datacache').users
 const config = require('config')
+const sanitiseWhitelist = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!?$#^&*@.'
+let inputEmail = ''
+let inputPassword = ''
 
 // vuln-code-snippet start loginAdminChallenge loginBenderChallenge loginJimChallenge
 module.exports = function login () {
@@ -33,7 +37,21 @@ module.exports = function login () {
 
   return (req: Request, res: Response, next: NextFunction) => {
     verifyPreLoginChallenges(req) // vuln-code-snippet hide-line
-    models.sequelize.query(`SELECT * FROM Users WHERE email = '${req.body.email || ''}' AND password = '${security.hash(req.body.password || '')}' AND deletedAt IS NULL`, { model: UserModel, plain: true }) // vuln-code-snippet vuln-line loginAdminChallenge loginBenderChallenge loginJimChallenge
+    // Validating email
+    if (validator.isEmail(req.body.email)) {
+      inputEmail = validator.whitelist(req.body.email, sanitiseWhitelist) // Sanitise email
+    }
+    // Sanitise password
+    inputPassword = validator.whitelist(req.body.password, sanitiseWhitelist)
+    models.sequelize.query('SELECT * FROM Users WHERE email = :email AND password = :password AND deletedAt IS NULL',
+      {
+        replacements: {
+          email: inputEmail || '',
+          password: security.hash(inputPassword || '')
+        },
+        model: UserModel,
+        plain: true
+      }) // vuln-code-snippet vuln-line loginAdminChallenge loginBenderChallenge loginJimChallenge
       .then((authenticatedUser: { data: User }) => { // vuln-code-snippet neutral-line loginAdminChallenge loginBenderChallenge loginJimChallenge
         const user = utils.queryResultToJson(authenticatedUser)
         if (user.data?.id && user.data.totpSecret !== '') {

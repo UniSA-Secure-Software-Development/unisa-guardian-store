@@ -4,7 +4,16 @@
  */
 
 module.exports = {
-  extends: 'standard-with-typescript',
+  "plugins": [
+    '@typescript-eslint',
+    'security'
+  ],
+  extends: [
+    'standard-with-typescript',
+    'eslint:recommended',
+    'plugin:@typescript-eslint/recommended',
+    'plugin:security/recommended'
+  ],
   env: {
     browser: true,
     node: true,

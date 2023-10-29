@@ -6,10 +6,13 @@
 import models = require('../models/index')
 import { Request, Response, NextFunction } from 'express'
 import { UserModel } from '../models/user'
+import validator from 'validator'
 
 const utils = require('../lib/utils')
 const challengeUtils = require('../lib/challengeUtils')
 const challenges = require('../data/datacache').challenges
+const sanitiseWhitelist = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789()"'
+let inputSearch = ''
 
 class ErrorWithParent extends Error {
   parent: Error | undefined
@@ -20,7 +23,13 @@ module.exports = function searchProducts () {
   return (req: Request, res: Response, next: NextFunction) => {
     let criteria: any = req.query.q === 'undefined' ? '' : req.query.q ?? ''
     criteria = (criteria.length <= 200) ? criteria : criteria.substring(0, 200)
-    models.sequelize.query(`SELECT * FROM Products WHERE ((name LIKE '%${criteria}%' OR description LIKE '%${criteria}%') AND deletedAt IS NULL) ORDER BY name`) // vuln-code-snippet vuln-line unionSqlInjectionChallenge dbSchemaChallenge
+    inputSearch = '%' + validator.whitelist(criteria, sanitiseWhitelist) + '%' // Sanitise search input
+    models.sequelize.query('SELECT * FROM Products WHERE ((name LIKE :criteria OR description LIKE :criteria) AND deletedAt IS NULL) ORDER BY name',
+      {
+        replacements: {
+          criteria: inputSearch
+        }
+      }) // vuln-code-snippet vuln-line unionSqlInjectionChallenge dbSchemaChallenge
       .then(([products]: any) => {
         const dataString = JSON.stringify(products)
         if (challengeUtils.notSolved(challenges.unionSqlInjectionChallenge)) { // vuln-code-snippet hide-start
