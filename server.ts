@@ -170,6 +170,19 @@ restoreOverwrittenFilesWithOriginals().then(() => {
     }
   }))
 
+  /* Content Security Policy header */
+  app.use(helmet.contentSecurityPolicy({
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'", "'unsafe-inline'"],
+      styleSrc: ["'self'", "'unsafe-inline'"],
+      imgSrc: ["'self'", 'data:'],
+      fontSrc: ["'self'"],
+      objectSrc: ["'none'"],
+      upgradeInsecureRequests: []
+    }
+  }))
+
   /* Hiring header */
   app.use((req: Request, res: Response, next: NextFunction) => {
     res.append('X-Recruiting', config.get('application.securityTxt.hiring'))
