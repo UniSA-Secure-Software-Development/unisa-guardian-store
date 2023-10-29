@@ -18,8 +18,8 @@ jobs:
       with:
         node-version: '16'
       
-      - name: Install dependencies
-        run: npm install
+    - name: Install dependencies
+      run: npm install
 
-      - name: Run ESLint
-        run: npx eslint "routes/*.ts"
+    - name: Run ESLint
+      run: npx eslint "routes/*.ts"
