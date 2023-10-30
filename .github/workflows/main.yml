@@ -25,10 +25,16 @@ jobs:
     steps:
     # Set up prerequisites for tests
     - uses: actions/checkout@v2
-    - uses: actions/setup-node@f1f314fca9dfce2769ece7d933488f076716723e
+    - uses: actions/setup-node@v1
 
     # Install node packages
-    - run: npm ci
+    - name: "Install CLI tools"
+      run: npm install -g @angular/cli@$ANGULAR_CLI_VERSION
+    - name: "Install application minimalistically"
+      run: |
+        npm install --ignore-scripts
+        cd frontend
+        npm install --ignore-scripts --legacy-peer-deps
 
     # DevSkim
     # - Some CI support inbuilt tasks and scans, for  ease of use
