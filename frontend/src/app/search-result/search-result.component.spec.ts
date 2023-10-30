@@ -83,8 +83,7 @@ describe('SearchResultComponent', () => {
     translateService.onLangChange = new EventEmitter()
     translateService.onTranslationChange = new EventEmitter()
     translateService.onDefaultLangChange = new EventEmitter()
-    sanitizer = jasmine.createSpyObj('DomSanitizer', ['bypassSecurityTrustHtml', 'sanitize'])
-    sanitizer.bypassSecurityTrustHtml.and.returnValue(of({}))
+    sanitizer = jasmine.createSpyObj('DomSanitizer', ['sanitize'])
     sanitizer.sanitize.and.returnValue({})
     activatedRoute = new MockActivatedRoute()
     mockSocket = new MockSocket()
@@ -138,7 +137,7 @@ describe('SearchResultComponent', () => {
     productService.search.and.returnValue(of([{ description: '<script>alert("XSS")</script>' }]))
     component.ngAfterViewInit()
     fixture.detectChanges()
-    expect(sanitizer.bypassSecurityTrustHtml).toHaveBeenCalledWith('<script>alert("XSS")</script>')
+    expect(sanitizer.sanitize).toHaveBeenCalledWith('<script>alert("XSS")</script>')
   })
 
   it('should hold no products when product search API call fails', () => {
@@ -188,7 +187,7 @@ describe('SearchResultComponent', () => {
   it('should pass the search query as trusted HTML', () => {
     activatedRoute.setQueryParameter('<script>scripttag</script>')
     component.filterTable()
-    expect(sanitizer.bypassSecurityTrustHtml).toHaveBeenCalledWith('<script>scripttag</script>')
+    expect(sanitizer.sanitize).toHaveBeenCalledWith('<script>scripttag</script>')
   })
 
   it('should open a modal dialog with product details', () => {

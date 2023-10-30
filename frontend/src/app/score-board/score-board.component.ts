@@ -179,7 +179,7 @@ export class ScoreBoardComponent implements OnInit {
   }
 
   trustDescriptionHtml (challenge: Challenge) {
-    challenge.description = this.sanitizer.bypassSecurityTrustHtml(challenge.description as string)
+    challenge.description = this.sanitizer.sanitize(SecurityContext.HTML, challenge.description as string)
   }
 
   calculateCodingProgressPercentage () {

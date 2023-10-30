@@ -23,8 +23,8 @@ describe('TrackResultComponent', () => {
   beforeEach(waitForAsync(() => {
     trackOrderService = jasmine.createSpyObj('TrackOrderService', ['find'])
     trackOrderService.find.and.returnValue(of({ data: [{ }] }))
-    sanitizer = jasmine.createSpyObj('DomSanitizer', ['bypassSecurityTrustHtml', 'sanitize'])
-    sanitizer.bypassSecurityTrustHtml.and.callFake((args: any) => args)
+    sanitizer = jasmine.createSpyObj('DomSanitizer', ['sanitize'])
+    sanitizer.sanitize.and.callFake((args: any) => args)
     sanitizer.sanitize.and.returnValue({})
 
     TestBed.configureTestingModule({
@@ -59,7 +59,7 @@ describe('TrackResultComponent', () => {
     trackOrderService.find.and.returnValue(of({ data: [{ orderId: component.orderId }] }))
     component.ngOnInit()
 
-    expect(sanitizer.bypassSecurityTrustHtml).toHaveBeenCalledWith('<code><a src="link">Link</a></code>')
+    expect(sanitizer.sanitize).toHaveBeenCalledWith('<code><a src="link">Link</a></code>')
   })
 
   it('should set "delivered" status for delivered orders', () => {

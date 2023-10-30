@@ -62,8 +62,8 @@ describe('ScoreBoardComponent', () => {
     translateService.onDefaultLangChange = new EventEmitter()
     codeSnippetService = jasmine.createSpyObj('CodeSnippetService', ['challenges'])
     codeSnippetService.challenges.and.returnValue(of([]))
-    sanitizer = jasmine.createSpyObj('DomSanitizer', ['bypassSecurityTrustHtml', 'sanitize'])
-    sanitizer.bypassSecurityTrustHtml.and.callFake((args: any) => args)
+    sanitizer = jasmine.createSpyObj('DomSanitizer', ['sanitize'])
+    sanitizer.sanitize.and.callFake((args: any) => args)
     sanitizer.sanitize.and.returnValue({})
     mockSocket = new MockSocket()
     socketIoService = jasmine.createSpyObj('SocketIoService', ['socket'])
@@ -139,7 +139,7 @@ describe('ScoreBoardComponent', () => {
   it('should consider challenge description as trusted HTML', () => {
     challengeService.find.and.returnValue(of([{ description: '<a src="link">Link</a>' }]))
     component.ngOnInit()
-    expect(sanitizer.bypassSecurityTrustHtml).toHaveBeenCalledWith('<a src="link">Link</a>')
+    expect(sanitizer.sanitize).toHaveBeenCalledWith('<a src="link">Link</a>')
   })
 
   it('should calculate percent of challenges solved', () => {
