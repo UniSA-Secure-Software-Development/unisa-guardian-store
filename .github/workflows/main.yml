@@ -33,3 +33,5 @@ jobs:
       with: 
         name: scan-results
         path: .scans/output
+    
+   #TODO Scan aimed at SQL injection vulnerability
