@@ -1,37 +1,32 @@
-# Friendly name for the workflow in GitHub
-name: Continuous Integration (CI)
-# Run the workflow each time code is pushed, or when a pull-request is created
-on: [push, pull_request]
+name: Codacy Security Scan
+
+on:
+  push:
+    branches: [ "master", "main" ]
+  pull_request:
+    branches: [ "master", "main" ]
 
 jobs:
-
-  # Run security scans
-  scan:
-    # Configure the job 
-    name: Run security scans
+  codacy-security-scan:
+    name: Codacy Security Scan
     runs-on: ubuntu-latest
-
-    # Steps to run
     steps:
-    # Set up prerequisites for tests
-    - uses: actions/checkout@v2
-    - uses: actions/setup-node@v1
+      - name: Checkout code
+        uses: actions/checkout@main
 
-    # DevSkim
-    # - Some CI support inbuilt tasks and scans, for  ease of use
-    # - We could install and run DevSkim directly, but we can do it more easily using the DevSkim action
-    # - See docs at: https://github.com/microsoft/DevSkim-Action 
-    - uses: microsoft/devskim-action@v1
-      with:
-        directory-to-scan: /
-        should-scan-archives: false
-        output-filename: devskim-results.sarif
-        output-directory: /
-
-    # Publish the scan results as an artifact
-    - uses: actions/upload-artifact@v2
-      with: 
-        name: scan-results
-        path: /
-    
-   #TODO Scan aimed at SQL injection vulnerability
+      - name: Run Codacy Analysis CLI
+        uses: codacy/codacy-analysis-cli-action@master
+        with:
+          output: .scans/results.sarif
+          format: sarif
+          # Adjust severity of non-security issues
+          gh-code-scanning-compat: true
+          # Force 0 exit code to allow SARIF file generation
+          # This will hand over control about PR rejection to the GitHub side
+          max-allowed-issues: 2147483647
+      
+      # Upload the SARIF file generated in the previous step
+      - name: Upload SARIF results file
+        uses: github/codeql-action/upload-sarif@main
+        with:
+          sarif_file: .scans/results.sarif
