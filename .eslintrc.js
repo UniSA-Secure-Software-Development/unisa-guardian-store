@@ -42,5 +42,11 @@ module.exports = {
         '@typescript-eslint/no-var-requires': 'off' // 509
       }
     }
-  ]
+  ],
+  // Security-specific ESLint rules for enhancing application security
+  plugins: ['security'],
+  rules: {
+    'security/detect-object-injection': 'error',
+    'security/detect-unsafe-regex': 'error'
+  }
 }

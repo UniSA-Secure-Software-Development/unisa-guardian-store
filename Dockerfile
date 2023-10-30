@@ -1,6 +1,7 @@
 FROM node:16 as installer
 COPY . /juice-shop
 WORKDIR /juice-shop
+RUN npm install -g typescript tslint
 RUN npm i -g typescript ts-node
 RUN npm install --omit=dev --unsafe-perm
 RUN npm dedupe
