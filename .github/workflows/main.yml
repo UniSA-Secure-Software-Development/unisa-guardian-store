@@ -25,7 +25,7 @@ jobs:
     steps:
     # Set up prerequisites for tests
     - uses: actions/checkout@v2
-    - uses: actions/setup-node@v1
+    - uses: actions/setup-node@f1f314fca9dfce2769ece7d933488f076716723e
 
     # Install node packages
     - run: npm ci
