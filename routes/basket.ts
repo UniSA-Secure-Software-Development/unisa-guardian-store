@@ -15,21 +15,24 @@ const challenges = require('../data/datacache').challenges
 module.exports = function retrieveBasket () {
   return (req: Request, res: Response, next: NextFunction) => {
     const id = req.params.id
-    BasketModel.findOne({ where: { id }, include: [{ model: ProductModel, paranoid: false, as: 'Products' }] })
-      .then((basket: BasketModel | null) => {
-        /* jshint eqeqeq:false */
-        challengeUtils.solveIf(challenges.basketAccessChallenge, () => {
-          const user = security.authenticatedUsers.from(req)
-          return user && id && id !== 'undefined' && id !== 'null' && id !== 'NaN' && user.bid && user.bid != id // eslint-disable-line eqeqeq
-        })
-        if (basket?.Products && basket.Products.length > 0) {
-          for (let i = 0; i < basket.Products.length; i++) {
-            basket.Products[i].name = req.__(basket.Products[i].name)
-          }
-        }
+    const user = security.authenticatedUsers.from(req) // Get the authenticated user
 
-        res.json(utils.queryResultToJson(basket))
-      }).catch((error: Error) => {
+    BasketModel.findOne({ where: { id }, include: [{ model: ProductModel, paranoid: false, as: 'Products' }] })
+      .then((basket) => {
+        /* jshint eqeqeq:false */
+        // Check if the user can access the basket
+        if (!user || !id || id === 'null' || user.bid !== id) {
+          res.status(401).json({ error: 'Unauthorized' }) // Return 401 Unauthorized
+        } else {
+          if (basket?.Products && basket.Products.length > 0) {
+            for (let i = 0; i < basket.Products.length; i++) {
+              basket.Products[i].name = req.__(basket.Products[i].name)
+            }
+          }
+          res.json(utils.queryResultToJson(basket))
+        }
+      })
+      .catch((error) => {
         next(error)
       })
   }
