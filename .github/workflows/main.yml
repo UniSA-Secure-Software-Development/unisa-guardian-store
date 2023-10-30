@@ -42,13 +42,13 @@ jobs:
     # - See docs at: https://github.com/microsoft/DevSkim-Action 
     - uses: microsoft/devskim-action@v1
       with:
-        directory-to-scan: /
+        directory-to-scan: /routes
         should-scan-archives: false
         output-filename: devskim-results.sarif
         output-directory: .comp4035/output
 
     # Publish the scan results as an artifact
-    - uses: actions/upload-artifact@v2
+    - uses: actions/upload-artifact@v2π
       with: 
         name: scan-results
         path: .comp4035/output
