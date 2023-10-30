@@ -1,0 +1,48 @@
+name: Continuous Integration (CI)
+on: [push, pull_request]
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    # Steps to run
+    steps:
+    - run: echo "Build the app..."
+    - run: echo "Not implemented to save time when running the workflow"
+
+# Run security scans 
+  scan:
+    name: Run security scans
+    runs-on: ubuntu-latest
+    steps:
+
+    - uses: actions/checkout@v2
+    - uses: actions/setup-node@v3
+      with:
+          node-version: 14
+
+    # Install node packages
+    - run: npm ci
+    
+    # Add commands below to run SAST tests
+    # OWASP Dependency Check
+    # - '-s .' scans the current directory for a supported package list
+    # - '-o .comp4035/output' sets the location of the scan output file
+    - run: .comp4035/tools/dependency-check/bin/dependency-check.sh -s . -o .comp4035/output --disableAssembly
+
+    # DevSkim
+    # - Some CI support inbuilt tasks and scans, for  ease of use
+    # - We could install and run DevSkim directly, but we can do it more easily using the DevSkim action
+    # - See docs at: https://github.com/microsoft/DevSkim-Action 
+    - uses: microsoft/devskim-action@v1
+      with:
+        directory-to-scan: /
+        should-scan-archives: false
+        output-filename: devskim-results.sarif
+        output-directory: .comp4035/output
+
+    # Publish the scan results as an artifact
+    - uses: actions/upload-artifact@v2
+      with: 
+        name: scan-results
+        path: .comp4035/output
