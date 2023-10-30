@@ -26,12 +26,12 @@ jobs:
         directory-to-scan: /
         should-scan-archives: false
         output-filename: devskim-results.sarif
-        output-directory: .scans/output
+        output-directory: /
 
     # Publish the scan results as an artifact
     - uses: actions/upload-artifact@v2
       with: 
         name: scan-results
-        path: .scans/output
+        path: /
     
    #TODO Scan aimed at SQL injection vulnerability
