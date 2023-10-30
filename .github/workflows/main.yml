@@ -1,6 +1,6 @@
 name: DevSkim Analysis
 
-on: [push, pull_request]
+on: [pull_request]
 
 jobs:
   devskim_analysis:
