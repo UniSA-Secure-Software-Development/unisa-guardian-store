@@ -23,7 +23,7 @@ module.exports = function searchProducts () {
     models.sequelize.query('SELECT * FROM Products WHERE ((name LIKE :search_text OR description LIKE :search_text) AND deletedAt IS NULL) ORDER BY name',
       {
         replacements: { search_text: '%' + criteria + '%' }
-      }) // vuln-code-snippet vuln-line unionSqlInjectionChallenge dbSchemaChallenge
+      })
       .then(([products]: any) => {
         const dataString = JSON.stringify(products)
         if (challengeUtils.notSolved(challenges.unionSqlInjectionChallenge)) { // vuln-code-snippet hide-start
