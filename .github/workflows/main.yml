@@ -35,7 +35,7 @@ jobs:
           chmod +x tools/dependency-check/bin/dependency-check.sh
           tools/dependency-check/bin/dependency-check.sh -s . -o output --disableAssembly
 
-    - name: DevSkim
+    - name: "DevSkim"
       uses: microsoft/devskim-action@v1
       with:
         directory-to-scan: /
@@ -43,7 +43,7 @@ jobs:
         output-filename: devskim-results.sarif
         output-directory: output
 
-    # Publish the scan results as an artifact
+    # Publish results of the SAST tests
     - uses: actions/upload-artifact@v2
       with: 
         name: scan-results
