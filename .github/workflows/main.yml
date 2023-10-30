@@ -42,6 +42,7 @@ jobs:
     # - See docs at: https://github.com/microsoft/DevSkim-Action 
     - uses: microsoft/devskim-action@v1
       with:
+      # Run the routes only as suggested by Jakob
         directory-to-scan: /routes
         should-scan-archives: false
         output-filename: devskim-results.sarif
