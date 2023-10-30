@@ -1,48 +1,50 @@
 name: Continuous Integration (CI)
 on: [push, pull_request]
 
+env:
+  ANGULAR_CLI_VERSION: 13 
+
 jobs:
   build:
-    name: Build
-    runs-on: ubuntu-latest
-    # Steps to run
-    steps:
-    - run: echo "Build the app..."
-    - run: echo "Not implemented to save time when running the workflow"
-
-# Run security scans 
-  scan:
     name: Run security scans
     runs-on: ubuntu-latest
-    steps:
 
+    # Run Security Scans
+    steps:
     - uses: actions/checkout@v2
     - uses: actions/setup-node@v3
       with:
           node-version: 14
+    - uses: actions/setup-java@v2
+      with:
+        distribution: 'temurin'
+        java-version: '11'
 
-    # Install node packages
-    - run: npm ci
+    # Install node packages (npm ci)
+    - name: "Install CLI tools"
+      run: npm install -g @angular/cli@$ANGULAR_CLI_VERSION
+    - name: "Install application minimalistically"
+      run: |
+          npm install --ignore-scripts
+          cd frontend
+          npm install --ignore-scripts --legacy-peer-deps
     
-    # Add commands below to run SAST tests
-    # OWASP Dependency Check
-    # - '-s .' scans the current directory for a supported package list
-    # - '-o .comp4035/output' sets the location of the scan output file
-    - run: .comp4035/tools/dependency-check/bin/dependency-check.sh -s . -o .comp4035/output --disableAssembly
+    # SAST tests
+    - name: "OWASP Dependency Check"
+      run: |
+          chmod +x tools/dependency-check/bin/dependency-check.sh
+          tools/dependency-check/bin/dependency-check.sh -s . -o output --disableAssembly
 
-    # DevSkim
-    # - Some CI support inbuilt tasks and scans, for  ease of use
-    # - We could install and run DevSkim directly, but we can do it more easily using the DevSkim action
-    # - See docs at: https://github.com/microsoft/DevSkim-Action 
-    - uses: microsoft/devskim-action@v1
+    - name: DevSkim
+      uses: microsoft/devskim-action@v1
       with:
         directory-to-scan: /
         should-scan-archives: false
         output-filename: devskim-results.sarif
-        output-directory: .comp4035/output
+        output-directory: output
 
     # Publish the scan results as an artifact
     - uses: actions/upload-artifact@v2
       with: 
         name: scan-results
-        path: .comp4035/output
+        path: output
