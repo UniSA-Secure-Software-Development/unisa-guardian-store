@@ -1,0 +1,26 @@
+#Automated Security Testing
+
+name: Security Testing
+on: push
+
+jobs:
+  scan:
+    name: Run Security Scans
+    runs-on: ubuntu-latest
+
+    steps:
+
+    - uses: actions/checkout@v2
+    
+    - name: DevSkim
+      uses: microsoft/devskim-action@v1
+      with:
+        directory-to-scan: /
+        should-scan-archives: false
+        output-filename: devskim-results.sarif
+        output-directory: DevskimReports
+
+    - uses:  actions/upload-artifact@v2
+      with:
+        name: scan-results
+        path: DevskimReports
