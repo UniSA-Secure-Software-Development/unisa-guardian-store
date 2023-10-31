@@ -1,0 +1,22 @@
+name: SQL Injection Test
+
+on: [pull_request]
+
+jobs:
+  sql_injection_test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+
+      - name: Install SQLMap
+        run: pip install sqlmap
+
+      - name: Run SQLMap
+        run: sqlmap -u http://localhost:3000/#/login --batch
