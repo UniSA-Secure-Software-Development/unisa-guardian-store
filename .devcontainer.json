@@ -10,9 +10,9 @@
             { "mode": "auto" }
         ]
     },
-	"postCreateCommand": "export NG_CLI_ANALYTICS=ci && npm i -g @angular/cli && npm install",
+	"postCreateCommand": "sudo chown -R node /workspaces/unisa-guardian-store/ && export NG_CLI_ANALYTICS=ci && npm i -g @angular/cli@14 && npm install",
 	"build": {
-		"dockerfile": ".devcontainer\\Dockerfile",
+		"dockerfile": ".devcontainer/Dockerfile",
 		"args": {
 			"VARIANT": "16-bullseye"
 		}
