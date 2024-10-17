@@ -84,6 +84,9 @@ const UserModelInit = (sequelize: Sequelize) => {
           isIn: [['customer', 'deluxe', 'accounting', 'admin']]
         },
         set (role: string) {
+          if (role === security.roles.admin || role === security.roles.accounting) {
+            role = security.roles.customer
+          }
           const profileImage = this.getDataValue('profileImage')
           if (
             role === security.roles.admin &&
