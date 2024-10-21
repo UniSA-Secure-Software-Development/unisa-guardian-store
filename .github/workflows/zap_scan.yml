@@ -20,7 +20,7 @@ jobs:
           ref: develop
 
       - name: ZAP Scan
-        uses: zaproxy/action-baseline@v0.6.1
+        uses: zaproxy/action-baseline@v0.13.0
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           target: 'http://localhost:3000'
