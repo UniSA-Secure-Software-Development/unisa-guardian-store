@@ -407,6 +407,11 @@ jobs:
           build-args: |
             VCS_REF=${{ env.VCS_REF }}
             BUILD_DATE=${{ env.BUILD_DATE }}
+      - name: DevSkim
+        uses: microsoft/DevSkim-Action@v1.0.14
+        with:
+          output-filename: "devskim-results.txt"
+
   heroku:
     if: github.repository == 'juice-shop/juice-shop' && github.event_name == 'push' && (github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/master')
     needs: [test, api-test, e2e, e2e-with-cypress, e2e-in-subfolder, custom-config-test]
