@@ -6,5 +6,6 @@
 - Assignment specification
 - README
 - updated for upload testing
+- test zap scan
 
 ## Setting up
