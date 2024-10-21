@@ -23,5 +23,5 @@ jobs:
         uses: zaproxy/action-baseline@v0.13.0
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          target: 'http://localhost:3000'
+          target: 'http://localhost:4200'
           rules_file_name: '.zap/rules.tsv'
