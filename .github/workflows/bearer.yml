@@ -1,0 +1,14 @@
+name: "Bearer Scan"
+
+on: [push]
+
+jobs:
+    bearer_scan:
+        runs-on: ubuntu-latest
+        name: Bearer Scan of Guardian Store
+        steps:
+        - run: sudo apt-get install apt-transport-https
+        - run: echo "deb [trusted=yes] https://apt.fury.io/bearer/ /" | sudo tee -a /etc/apt/sources.list.d/fury.list
+        - run: sudo apt-get update
+        - run: sudo apt-get install bearer
+        - run: bearer scan /workspaces/unisa-guardian-store
