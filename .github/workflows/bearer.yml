@@ -11,4 +11,4 @@ jobs:
         - run: echo "deb [trusted=yes] https://apt.fury.io/bearer/ /" | sudo tee -a /etc/apt/sources.list.d/fury.list
         - run: sudo apt-get update
         - run: sudo apt-get install bearer
-        - run: bearer scan /workspaces/unisa-guardian-store
+        - run: bearer scan .
