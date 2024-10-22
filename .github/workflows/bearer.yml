@@ -10,3 +10,13 @@ jobs:
         - name: Run Report
           id: report
           uses: bearer/bearer-action@v2
+          with:
+            path: .
+            format: html
+        - name: Upload Report
+          uses: actions/upload-artifact@v3
+          with:
+            name: bearer-report
+            path: bearer-report.html
+
+          
