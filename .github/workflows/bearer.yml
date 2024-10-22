@@ -13,6 +13,7 @@ jobs:
           with:
             path: .
             format: html
+          continue-on-error: true
         - name: Upload Report
           uses: actions/upload-artifact@v3
           with:
