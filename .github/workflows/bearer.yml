@@ -14,10 +14,11 @@ jobs:
             path: .
             format: html
           continue-on-error: true
+        - run: cat bearer-scan.html
         - name: Upload Report
           uses: actions/upload-artifact@v3
           with:
             name: bearer-scan
-            path: /workspaces/unisa-guardian-store/bearer-scan.html
+            path: bearer-scan.html
 
           
