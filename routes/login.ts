@@ -33,7 +33,27 @@ module.exports = function login () {
 
   return (req: Request, res: Response, next: NextFunction) => {
     verifyPreLoginChallenges(req) // vuln-code-snippet hide-line
+
+    /*
+    this code can leading SQL injection such as  Email: admin' OR '1'='1
+    causing the query to return all users in the database.
+    potentially logging in as the first user returned (often an admin).
     models.sequelize.query(`SELECT * FROM Users WHERE email = '${req.body.email || ''}' AND password = '${security.hash(req.body.password || '')}' AND deletedAt IS NULL`, { model: UserModel, plain: true }) // vuln-code-snippet vuln-line loginAdminChallenge loginBenderChallenge loginJimChallenge
+    */
+    models.sequelize.query(
+      // This line of sql, not direct using "email" and "pasword"
+      'SELECT * FROM Users WHERE email = :email AND password = :password AND deletedAt IS NULL',
+      {
+        model: UserModel,
+        plain: true,
+        // replacements can auto replace/detect "Illegal symbols" and filting the input
+        replacements: {
+          email: req.body.email || '',
+          password: security.hash(req.body.password || '')
+        }
+      }
+    )
+
       .then((authenticatedUser: { data: User }) => { // vuln-code-snippet neutral-line loginAdminChallenge loginBenderChallenge loginJimChallenge
         const user = utils.queryResultToJson(authenticatedUser)
         if (user.data?.id && user.data.totpSecret !== '') {
