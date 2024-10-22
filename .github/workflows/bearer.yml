@@ -18,6 +18,6 @@ jobs:
           uses: actions/upload-artifact@v3
           with:
             name: bearer-report
-            path: bearer-report.html
+            path: .
 
           
