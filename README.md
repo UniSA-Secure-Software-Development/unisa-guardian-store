@@ -5,5 +5,7 @@
 - Theme
 - Assignment specification
 - README
+- updated for upload testing
+- test zap scan2
 
 ## Setting up
