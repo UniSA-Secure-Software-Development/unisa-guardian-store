@@ -1,20 +1,12 @@
-name: "Bearer Scan"
+name: Bearer Scan
 
 on: [push]
 
 jobs:
-    bearer_scan:
+    bearer-scan:
         runs-on: ubuntu-latest
-        name: Bearer Scan of Guardian Store
         steps:
-        - uses: actions/checkout@v4
-        - name: Bearer
+        - uses: actions/checkout@v3
+        - name: Run Report
+          id: report
           uses: bearer/bearer-action@v2
-          with:
-            format: sarif
-            output: results.sarif
-        - name: Upload SARIF file
-          if: always()
-          uses: github/codeql-action/upload-sarif@v2
-          with:
-            sarif_file: results.sarif
