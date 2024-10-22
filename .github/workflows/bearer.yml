@@ -12,7 +12,8 @@ jobs:
           id: report
           uses: bearer/bearer-action@v2
           with:
-            path: bearer-scan.html
+            path: .
+            output: bearer-scan.html
             format: html
           continue-on-error: true
         - name: Upload Report
