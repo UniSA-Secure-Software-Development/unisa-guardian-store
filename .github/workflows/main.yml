@@ -4,6 +4,7 @@ name: Continuous Integration (CI)
 # Run the workflow each time code is pushed, or when a pull-request is created
 on: [push, pull_request]
 
+
 jobs:
   # Build the app
   build:
