@@ -14,7 +14,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v1
         with:
-          node-version: '14' 
+          node-version: '14'
       - name: Install Node packages
         run: npm install  
 
@@ -25,26 +25,18 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+      
       - name: Set up Node.js
         uses: actions/setup-node@v1
         with:
-          node-version: '14' 
-      - name: Set up Java
-        uses: actions/setup-java@v2
+          node-version: '14'
+      
+      # Run the OWASP ZAP Baseline Scan
+      - name: Run OWASP ZAP Baseline Scan
+        uses: zaproxy/action-baseline@v0.13.0
         with:
-          java-version: '11'  
-          distribution: 'temurin'  
-      - run: npm install  
-
-      # Start OWASP ZAP in the background
-      - name: Start ZAP
-        run: |
-          docker run -u zap -p 8080:8080 -d owasp/zap2docker-stable zap.sh -daemon -host 0.0.0.0 -port 8080
-
-      # Run OWASP ZAP Baseline Scan
-      - name: Run ZAP Baseline Scan
-        run: |
-          docker run -u zap -t owasp/zap2docker-stable zap-baseline.py -t http://localhost:3000/#/ -g gen.conf -r zap_report.html
+          target: 'http://localhost:3000/#/'
+          output: 'zap_report.html'
 
       # Publish the scan results as an artifact
       - uses: actions/upload-artifact@v3
