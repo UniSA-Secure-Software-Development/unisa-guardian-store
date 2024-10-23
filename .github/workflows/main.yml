@@ -4,44 +4,47 @@ name: Continuous Integration (CI)
 # Run the workflow each time code is pushed, or when a pull-request is created
 on: [push, pull_request]
 
-
 jobs:
   # Build the app
   build:
-    # Configure the job 
     name: Build
     runs-on: ubuntu-latest
-    # Steps to run
     steps:
-      - run: echo "Build the app..."
-      - run: echo "Not implemented to save time when running the workflow"
+      - uses: actions/checkout@v2
+      - name: Set up Node.js
+        uses: actions/setup-node@v1
+        with:
+          node-version: '14' 
+      - name: Install Node packages
+        run: npm install  
 
   # Run security scans
   scan:
-    # Configure the job 
     name: Run security scans
     needs: build
     runs-on: ubuntu-latest
-
-    # Steps to run
     steps:
-      # Set up prerequisites for tests
       - uses: actions/checkout@v2
-      - uses: actions/setup-node@v1
-      - uses: actions/setup-java@v2
+      - name: Set up Node.js
+        uses: actions/setup-node@v1
         with:
-          node-version: '14'
-      # Install node packages
-      - run: npm install
-      
-      # Run OWASP ZAP Baseline Scan using the GitHub Action
-      - name: ZAP Baseline Scan
-        uses: zaproxy/action-baseline@v0.13.0
+          node-version: '14' 
+      - name: Set up Java
+        uses: actions/setup-java@v2
         with:
-          target: 'http://localhost:3000/#/' 
-          filters: 'gen.conf'
-          report_format: 'html'
-          fail_on_high_risk: false 
+          java-version: '11'  
+          distribution: 'temurin'  
+      - run: npm install  
+
+      # Start OWASP ZAP in the background
+      - name: Start ZAP
+        run: |
+          docker run -u zap -p 8080:8080 -d owasp/zap2docker-stable zap.sh -daemon -host 0.0.0.0 -port 8080
+
+      # Run OWASP ZAP Baseline Scan
+      - name: Run ZAP Baseline Scan
+        run: |
+          docker run -u zap -t owasp/zap2docker-stable zap-baseline.py -t http://localhost:3000/#/ -g gen.conf -r zap_report.html
 
       # Publish the scan results as an artifact
       - uses: actions/upload-artifact@v3
@@ -51,12 +54,9 @@ jobs:
 
   # Deploy the app
   deploy:
-    # Configure the job 
     name: Deploy
     needs: scan
     runs-on: ubuntu-latest
-
-    # Steps to run
     steps:
       - run: echo "Deploy the app..."
       - run: echo "Not implemented to save time when running the workflow"
