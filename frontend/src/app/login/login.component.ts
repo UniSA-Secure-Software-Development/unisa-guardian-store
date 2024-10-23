@@ -27,7 +27,12 @@ const oauthProviderUrl = 'https://accounts.google.com/o/oauth2/v2/auth'
   styleUrls: ['./login.component.scss']
 })
 export class LoginComponent implements OnInit {
-  public emailControl = new UntypedFormControl('', [Validators.required])
+  public emailControl = new UntypedFormControl('', [
+    Validators.required,
+    Validators.email,
+    Validators.pattern('^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,4}$')
+  ])
+
   public passwordControl = new UntypedFormControl('', [Validators.required])
   public hide = true
   public user: any
