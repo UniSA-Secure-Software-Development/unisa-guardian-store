@@ -1,0 +1,17 @@
+
+# name for workflow on Github
+name: Bearer Vulnerability Scan
+
+# Runs the workflow specified in this yaml file on these github actions
+on: [push, pull_request]
+
+permissions:
+  contents: read
+
+jobs:
+  rule_check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Bearer
+        uses: bearer/bearer-action@test/diff-changes
