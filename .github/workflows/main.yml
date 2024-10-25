@@ -13,6 +13,10 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - uses: actions/setup-node@v1
+    - run: npm install --ignore-scripts
+    - run: npm run secure-lint
     
-    - name: Run ESLint
-      run: npx eslint *.[jt]s --rulesdir eslint-rules --quiet --output-file scaninfo/output/eslint-report.json --format json
+    - uses: actions/upload-artifact@v3
+      with: 
+        name: scan-results
+        path: scaninfo/output
