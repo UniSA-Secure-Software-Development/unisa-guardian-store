@@ -74,23 +74,15 @@ jobs:
     - name: Check out repository code
       uses: actions/checkout@v2
 
-    - name: Set up .NET Core
-      uses: actions/setup-dotnet@v3
-      with:
-        dotnet-version: '7.x'
-
-    - name: Install DevSkim
-      run: dotnet tool install --global devskim
-
     - name: Run DevSkim Analysis
-      run: devskim analyze -I . --output-format json --output-file output.json
+      uses: microsoft/DevSkim-Action@v1
 
     - name: Upload DevSkim Analysis Results
       uses: actions/upload-artifact@v3
       with:
         name: DevSkim Report
-        path: output.json
-        
+        path: devskim.sarif
+
   test:
     runs-on: ${{ matrix.os }}
     strategy:
