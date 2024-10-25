@@ -67,6 +67,24 @@ jobs:
         run: npm install
       - name: "Check coding challenges for accidental code discrepancies"
         run: npm run rsn
+  dvskim:
+    name: Security Analysis with DevSkim
+    runs-on: ubuntu-latest
+    steps:
+    - name: Check out repository code
+      uses: actions/checkout@v2
+
+    - name: Set up .NET Core
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: '7.x'
+
+    - name: Install DevSkim
+      run: dotnet tool install --global devskim
+
+    - name: Run DevSkim Analysis
+      run: devskim analyze -I . --output-format json --output-file output.json
+
   test:
     runs-on: ${{ matrix.os }}
     strategy:
