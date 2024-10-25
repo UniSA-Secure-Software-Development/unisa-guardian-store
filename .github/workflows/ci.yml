@@ -85,6 +85,12 @@ jobs:
     - name: Run DevSkim Analysis
       run: devskim analyze -I . --output-format json --output-file output.json
 
+    - name: Upload DevSkim Analysis Results
+      uses: actions/upload-artifact@v3
+      with:
+        name: DevSkim Report
+        path: output.json
+        
   test:
     runs-on: ${{ matrix.os }}
     strategy:
