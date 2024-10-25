@@ -42,15 +42,17 @@ jobs:
       with:
         directory-to-scan: /
         should-scan-archives: false
-        output-filename: devskim-results.sarif
-        output-directory: ./
+        output-filename: devskim-results.txt
+        output-directory: .comp4035/output
+        output-format: text
+        output-options: "%F:%L:%C - %N" 
 
     # Publish the scan results as an artifact
     - name: Upload scan results
       uses: actions/upload-artifact@v3
       with: 
         name: scan-results
-        path: ./
+        path: .comp4035/output/devskim-results.txt 
 
   # Deploy the app
   deploy:
