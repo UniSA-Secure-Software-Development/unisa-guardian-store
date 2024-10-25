@@ -43,14 +43,14 @@ jobs:
         directory-to-scan: /
         should-scan-archives: false
         output-filename: devskim-results.sarif
-        output-directory: .comp4035/output
+        output-directory: ./
 
     # Publish the scan results as an artifact
     - name: Upload scan results
       uses: actions/upload-artifact@v3
       with: 
         name: scan-results
-        path: .comp4035/output
+        path: ./
 
   # Deploy the app
   deploy:
