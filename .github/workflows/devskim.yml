@@ -32,7 +32,3 @@ jobs:
         uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: devskim-results.sarif
-      - name: Upload a Build Artifact
-        uses: actions/upload-artifact@v4.4.3
-        with:
-          name: devskim-scan
