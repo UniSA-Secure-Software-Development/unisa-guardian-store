@@ -1,0 +1,18 @@
+# Give a name to our security scanner workflow 
+name: Security Scan Workflow
+# Run the workflow on push and pull
+on: [push, pull_request]
+
+jobs:
+  # Define the Scan Job
+  scan:
+    name: Run API Rate Limit security scans on Guardian Store
+    runs-on: ubuntu-latest
+
+    # Setup prerequisites that are going to be used in the tests
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-node@v1
+    
+    - name: Run ESLint
+      run: npx eslint *.[jt]s --rulesdir eslint-rules --quiet --output-file scaninfo/output/eslint-report.json --format json

@@ -39,7 +39,8 @@ module.exports = {
         '@typescript-eslint/restrict-plus-operands': 'off', // 250
         '@typescript-eslint/strict-boolean-expressions': 'off', // 337
         '@typescript-eslint/restrict-template-expressions': 'off', // 395
-        '@typescript-eslint/no-var-requires': 'off' // 509
+        '@typescript-eslint/no-var-requires': 'off', // 509
+        'require-rate-limit': 2 // Custom defined rule for rate limits
       }
     }
   ]

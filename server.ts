@@ -403,7 +403,11 @@ restoreOverwrittenFilesWithOriginals().then(() => {
     twoFactorAuth.verify()
   )
   /* Check 2FA Status for the current User */
-  app.get('/rest/2fa/status', security.isAuthorized(), twoFactorAuth.status())
+  app.get('/rest/2fa/status',
+    new RateLimit({ windowMs: 5 * 60 * 1000, max: 30 }),
+    security.isAuthorized(),
+    twoFactorAuth.status()
+  )
   /* Enable 2FA for the current User */
   app.post('/rest/2fa/setup',
     new RateLimit({ windowMs: 5 * 60 * 1000, max: 100 }),
@@ -525,12 +529,31 @@ restoreOverwrittenFilesWithOriginals().then(() => {
   }
 
   /* Custom Restful API */
-  app.post('/rest/user/login', login())
-  app.get('/rest/user/change-password', changePassword())
-  app.post('/rest/user/reset-password', resetPassword())
-  app.get('/rest/user/security-question', securityQuestion())
-  app.get('/rest/user/whoami', security.updateAuthenticatedUsers(), currentUser())
-  app.get('/rest/user/authentication-details', authenticatedUsers())
+  app.post('/rest/user/login',
+    new RateLimit({ windowMs: 3 * 60 * 1000, max: 10 }),
+    login()
+  )
+  app.get('/rest/user/change-password',
+    new RateLimit({ windowMs: 3 * 60 * 1000, max: 5 }),
+    changePassword()
+  )
+  app.post('/rest/user/reset-password',
+    new RateLimit({ windowMs: 3 * 60 * 1000, max: 5 }),
+    resetPassword()
+  )
+  app.get('/rest/user/security-question',
+    new RateLimit({ windowMs: 3 * 60 * 1000, max: 15 }),
+    securityQuestion()
+  )
+  app.get('/rest/user/whoami',
+    new RateLimit({ windowMs: 3 * 60 * 1000, max: 30 }),
+    security.updateAuthenticatedUsers(),
+    currentUser()
+  )
+  app.get('/rest/user/authentication-details',
+    new RateLimit({ windowMs: 3 * 60 * 1000, max: 30 }),
+    authenticatedUsers()
+  )
   app.get('/rest/products/search', search())
   app.get('/rest/basket/:id', basket())
   app.post('/rest/basket/:id/checkout', order())
@@ -550,8 +573,15 @@ restoreOverwrittenFilesWithOriginals().then(() => {
   app.get('/rest/track-order/:id', trackOrder())
   app.get('/rest/country-mapping', countryMapping())
   app.get('/rest/saveLoginIp', saveLoginIp())
-  app.post('/rest/user/data-export', security.appendUserId(), imageCaptcha.verifyCaptcha())
-  app.post('/rest/user/data-export', security.appendUserId(), dataExport())
+  app.post('/rest/user/data-export',
+    new RateLimit({ windowMs: 3 * 60 * 1000, max: 15 }),
+    security.appendUserId(),
+    imageCaptcha.verifyCaptcha())
+  app.post('/rest/user/data-export',
+    new RateLimit({ windowMs: 3 * 60 * 1000, max: 15 }),
+    security.appendUserId(),
+    dataExport()
+  )
   app.get('/rest/languages', languageList())
   app.get('/rest/order-history', orderHistory.orderHistory())
   app.get('/rest/order-history/orders', security.isAccounting(), orderHistory.allOrders())
