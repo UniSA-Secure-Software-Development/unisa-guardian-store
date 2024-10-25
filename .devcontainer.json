@@ -17,5 +17,5 @@
 			"VARIANT": "16-bullseye"
 		}
 	},
-	"remoteUser": "node"
+	"remoteUser": "root"
 }
