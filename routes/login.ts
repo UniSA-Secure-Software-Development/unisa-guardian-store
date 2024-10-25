@@ -40,6 +40,7 @@ module.exports = function login () {
     potentially logging in as the first user returned (often an admin).
     models.sequelize.query(`SELECT * FROM Users WHERE email = '${req.body.email || ''}' AND password = '${security.hash(req.body.password || '')}' AND deletedAt IS NULL`, { model: UserModel, plain: true }) // vuln-code-snippet vuln-line loginAdminChallenge loginBenderChallenge loginJimChallenge
     */
+
     models.sequelize.query(
       // This line of sql, not direct using "email" and "pasword"
       'SELECT * FROM Users WHERE email = :email AND password = :password AND deletedAt IS NULL',
