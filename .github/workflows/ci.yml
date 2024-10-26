@@ -446,3 +446,11 @@ jobs:
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
+  sqlmap:
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Run search SQLmap"
+        run: python3 sqlmap/sqlmap.py -u http://localhost:3000/rest/products/search?q=banana --level=2 --risk=3
+
+      - name: "Run login SQLmap"
+        run: python3 sqlmap/sqlmap.py -u http://localhost:3000/rest/user/login --data="email=test@test.com&password=test" --level=2 --risk=3 --ignore-code 401
