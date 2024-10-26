@@ -449,6 +449,9 @@ jobs:
   sqlmap:
     runs-on: ubuntu-latest
     steps:
+      - name: "Check out Git repository"
+        uses: actions/checkout@v3
+
       - name: "Run search SQLmap"
         run: python3 sqlmap/sqlmap.py -u http://localhost:3000/rest/products/search?q=banana --level=2 --risk=3
 
