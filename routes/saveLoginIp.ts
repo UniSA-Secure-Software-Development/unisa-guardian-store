@@ -27,7 +27,7 @@ module.exports = function saveLoginIp () {
       }
       UserModel.findByPk(loggedInUser.data.id).then((user: UserModel | null) => {
         user?.update({ lastLoginIp: lastLoginIp?.toString() }).then((user: UserModel) => {
-          res.json(user)
+          res.json('ok')
         }).catch((error: Error) => {
           next(error)
         })
