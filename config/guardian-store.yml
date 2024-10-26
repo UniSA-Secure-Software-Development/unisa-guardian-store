@@ -415,3 +415,4 @@ ctf:
   showFlagsInNotifications: false
   showCountryDetailsInNotifications: none # Options: none  name  flag  both
   countryMapping: ~
+
