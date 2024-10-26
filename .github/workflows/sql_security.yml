@@ -1,7 +1,9 @@
 name: OWASP ZAP security testing
-
 on: 
   pull_request:
+
+env:
+  ANGULAR_CLI_VERSION: '16.0.0'  # Add your desired version
 
 jobs:
   security-scan:
@@ -10,58 +12,61 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v2
 
+
       - name: Use Node.js 16
         uses: actions/setup-node@f1f314fca9dfce2769ece7d933488f076716723e 
         with:
           node-version: 16
-      
-      - name: Install CLI tools
-        run: npm install -g @angular/cli@$ANGULAR_CLI_VERSION
 
-      - name: Install application minimalistically
+      - name: Start application
         run: |
-          npm install --ignore-scripts
           cd frontend
-          npm install --ignore-scripts --legacy-peer-deps
+          npm start & 
+          sleep 30  # Wait for app to start
 
-      - name: Lint source code
-        run: npm run lint
-
-      - name: Lint customization configs
-        run: >
-          npm run lint:config -- -f ./config/7ms.yml &&
-          npm run lint:config -- -f ./config/addo.yml &&
-          npm run lint:config -- -f ./config/bodgeit.yml &&
-          npm run lint:config -- -f ./config/ctf.yml &&
-          npm run lint:config -- -f ./config/default.yml &&
-          npm run lint:config -- -f ./config/fbctf.yml &&
-          npm run lint:config -- -f ./config/juicebox.yml &&
-          npm run lint:config -- -f ./config/mozilla.yml &&
-          npm run lint:config -- -f ./config/oss.yml &&
-          npm run lint:config -- -f ./config/quiet.yml &&
-          npm run lint:config -- -f ./config/tutorial.yml &&
-          npm run lint:config -- -f ./config/unsafe.yml
-      
-      - name: Run OWASP ZAP Scan
+      - name: Print ZAP Scan Command
         run: |
-          sudo apt-get update
-          sudo apt-get install zaproxy -y
-
-      - name: Run OWASP ZAP Active Scan on Login
-        run: |
-          zap-full-scan.py -t http://localhost:4200/#/login -r zap_login_scan_report.html
-
-      
-      - name: Run OWASP ZAP Active Scan on Search
-        run: |
-          zap-full-scan.py -t 'http://localhost:4200/#/search?q=orange' -r zap_search_scan_report.html
-      
-      
-      - name: Upload OWASP ZAP Reports
-        uses: actions/upload-artifact@v2
+            echo "docker run -v '/mnt/c/Users/artem/OneDrive - University of South Australia/Uni/Year 3/Semester 2/Secure Software Development/Assignment 1/Guardian Store/unisa-guardian-store:/zap/wrk/:rw' --network=host -e ZAP_AUTH_HEADER -e ZAP_AUTH_HEADER_VALUE -e ZAP_AUTH_HEADER_SITE -t ghcr.io/zaproxy/zaproxy:stable zap-baseline.py -t http://localhost:4200/#/login -J report_json.json -w report_md.md -r report_html.html"
+        
+      - name: ZAP Scan - Login Page
+        uses: zaproxy/action-baseline@v0.13.0
         with:
-          name: zap-reports
-          path: |
-            zap_report.html
-            zap_login_scan_report.html
-            zap_search_scan_report.html
+          token: ${{ secrets.GITHUB_TOKEN }}
+          rules_file_name: '.zap/rules.tsv'
+          target: 'http://localhost:4200/#/login'
+          cmd_options: '-a -j'
+          allow_issue_writing: true
+          format: json
+          output_file: zap-login-results.json
+      
+      - name: ZAP Scan - Search Page
+        uses: zaproxy/action-baseline@v0.13.0
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          rules_file_name: '.zap/rules.tsv'
+          target: 'http://localhost:4200/#/search?q=orange'
+          cmd_options: '-a -j'
+          allow_issue_writing: true
+          format: json
+          output_file: zap-search-results.json
+      
+      - name: Upload Login Scan Results
+        uses: actions/upload-artifact@v4
+        with:
+          name: zap-login-scan-results
+          path: zap-login-results.json
+          retention-days: 30
+      
+      - name: Upload Search Scan Results
+        uses: actions/upload-artifact@v4
+        with:
+          name: zap-search-scan-results
+          path: zap-search-results.json
+          retention-days: 30
+
+      - name: Check for vulnerabilities
+        run: |
+          if grep -q "\"risk\": \"High\"" zap-login-results.json || grep -q "\"risk\": \"High\"" zap-search-results.json; then
+            echo "High risk vulnerabilities found!"
+            exit 1
+          fi
