@@ -40,6 +40,21 @@ describe('/rest/user/login', () => {
       })
   })
 
+  it('POST login with WHERE-clause diabling SQL injection attack', () => {
+    return frisby.post(REST_URL + '/user/login', {
+      headers: jsonHeader,
+      body: {
+        email: "' OR 1=1--",
+        password: 'anything'
+      }
+    })
+      .expect('status', 401)
+      .expect('header', 'content-type', /text\/html; charset=utf-8/)
+      .then((response) => {
+        expect(response.body).toContain('Invalid email or password')
+      })
+  })
+
   it('POST login non-existing user', () => {
     return frisby.post(REST_URL + '/user/login', {
       email: 'otto@mei.er',
