@@ -450,7 +450,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: "Check out Git repository"
-        uses: actions/checkout@v3
+        uses: actions/checkout@v2
+
+      - name: "Install latest version of SQLmap"
+        run: git clone https://github.com/sqlmapproject/sqlmap.git
 
       - name: "Run search SQLmap"
         run: python3 sqlmap/sqlmap.py -u http://localhost:3000/rest/products/search?q=banana --level=2 --risk=3
