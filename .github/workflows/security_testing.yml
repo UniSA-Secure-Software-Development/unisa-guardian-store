@@ -1,0 +1,34 @@
+name: SQL Injection Security Testing
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  sql-injection-scan:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checkout the repository code
+      - uses: actions/checkout@v4
+
+      # Step 2: Creates an output directory
+      - name: Create output directory
+        run: |
+          mkdir -p ./output
+
+      # Step 3: Runs DevSkim focusing on only SQL Injection vulnerabilities
+      - name: Run DevSkim for SQL Injection
+        uses: microsoft/DevSkim-Action@v1
+        with:
+          directory-to-scan: "./routes" #Scans only the routes folder as that's where most of the code is.
+          output-filename: devskim-results.json #Outputs the results as .json file
+          output-directory: "./output" #Store results locally in a output folder
+          should-scan-archives: false
+          ignore-globs: "**/.git/**,*.txt"    
+   
+
