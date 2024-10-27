@@ -1,0 +1,36 @@
+name: ZAP Authentication Scan
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  zap_scan:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Check out the code
+      - name: Check out code
+        uses: actions/checkout@v2
+
+      # Step 2: Start the Juice Shop application
+      - name: Start Juice Shop Application
+        run: |
+          npm install
+          npm start &
+          sleep 15 # Wait for the application to start
+
+      # Step 3: Run OWASP ZAP Full Scan
+      - name: Run OWASP ZAP Full Scan
+        uses: zaproxy/action-full-scan@v0.6.0
+        with:
+          target: 'http://localhost:3000/#/login http://localhost:3000/#/register'
+          cmd_options: '-config globalmode=attack -config api.disablekey=true'
+        
+      # Step 4: Upload ZAP report as an artifact
+      - name: Upload ZAP Report
+        uses: actions/upload-artifact@v2
+        with:
+          name: ZAP-Report
+          path: target/zap.out
