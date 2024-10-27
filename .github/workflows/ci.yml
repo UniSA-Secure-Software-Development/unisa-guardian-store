@@ -151,6 +151,11 @@ jobs:
           name: api-test-lcov
           path: |
             api-lcov.info
+      - name: "ZAP API Scan"
+        uses: zaproxy/action-api-scan@v0.8.0
+        with:
+          target: 'http:/localhost:4200'
+              
   coverage-report:
     needs: [test, api-test]
     runs-on: ubuntu-latest
