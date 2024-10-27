@@ -24,21 +24,13 @@ jobs:
     - name: Run OWASP Dependency-Check
       uses: jeremylong/dependency-check-action@v3
       with:
-        project: "auto testing"               
-        scan: "./"                         
-        format: "ALL"                       
+        project: "MyProject"  
+        scan: "./"           
+        format: "ALL"         
         outputDirectory: "./dependency-check-report" 
-       
-        updateOnly: true                  
-        failBuildOnCVSS: 7                
 
     - name: Archive results
       uses: actions/upload-artifact@v3
       with:
         name: dependency-check-report
         path: ./dependency-check-report
-
-    - name: Cleanup Docker Containers
-      run: |
-        docker container prune -f       # Remove all stopped containers
-        docker image prune -f            # Remove dangling images
