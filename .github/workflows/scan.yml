@@ -15,8 +15,8 @@ jobs:
         directory-to-scan: /
         should-scan-archives: false
         output-filename: devskim-results.sarif
-        output-directory: /.github/workflows
-        ignore-globs: "**/.git/**,*.txt"
+        output-directory: /
+
     
 
     
