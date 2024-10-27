@@ -23,7 +23,7 @@ jobs:
       - name: Set up JDK 11
         uses: actions/setup-java@v3
         with:
-          java-version: '11' # Required for SonarCloud Scanner; adjust if a different version is needed
+          java-version: '11'
 
       # Step 3: Cache SonarCloud packages to speed up workflow execution
       - name: Cache SonarCloud packages
