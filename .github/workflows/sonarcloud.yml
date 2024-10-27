@@ -1,0 +1,45 @@
+name: SonarCloud Analysis
+
+on:
+  push:
+    branches:
+      - main # Run workflow on pushes to the main branch
+  pull_request:
+    branches:
+      - main # Run workflow on pull requests to the main branch
+  workflow_dispatch: # Allows manual triggering of the workflow for testing
+
+jobs:
+  sonarcloud:
+    name: SonarCloud Code Analysis
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Check out the code from the repository
+      - name: Check out code
+        uses: actions/checkout@v3
+
+      # Step 2: Set up Java environment
+      - name: Set up JDK 11
+        uses: actions/setup-java@v3
+        with:
+          java-version: '11' # Required for SonarCloud Scanner; adjust if a different version is needed
+
+      # Step 3: Cache SonarCloud packages to speed up workflow execution
+      - name: Cache SonarCloud packages
+        uses: actions/cache@v3
+        with:
+          path: ~/.sonar/cache
+          key: ${{ runner.os }}-sonar
+
+      # Step 4: Run SonarCloud Scan
+      - name: Run SonarCloud Scan
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }} 
+        run: |
+          sonar-scanner \
+            -Dsonar.projectKey=yanyy124_unisa-guardian-store \ 
+            -Dsonar.organization=yanyy124 \ 
+            -Dsonar.host.url=https://sonarcloud.io \
+            -Dsonar.login=$SONAR_TOKEN
+
