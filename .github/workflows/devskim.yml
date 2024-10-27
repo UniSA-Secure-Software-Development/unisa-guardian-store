@@ -20,11 +20,14 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Create output directory if it does not exist
+        run: mkdir -p .github/scan-output
+
       - name: Run DevSkim scanner
         uses: microsoft/DevSkim-Action@v1
         with:
           directory-to-scan: routes
-          should-scan-archives: false
+          should-scan-archives: true
           output-filename: devskim-results.sarif
           output-directory: .github/scan-output
 
