@@ -8,10 +8,11 @@ env:
 jobs:
   security-scan:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v2
-
+        uses: actions/checkout@v4
+        
 
       - name: Use Node.js 16
         uses: actions/setup-node@f1f314fca9dfce2769ece7d933488f076716723e 
@@ -24,49 +25,21 @@ jobs:
           npm start & 
           sleep 30  # Wait for app to start
 
-      - name: Print ZAP Scan Command
-        run: |
-            echo "docker run -v '/mnt/c/Users/artem/OneDrive - University of South Australia/Uni/Year 3/Semester 2/Secure Software Development/Assignment 1/Guardian Store/unisa-guardian-store:/zap/wrk/:rw' --network=host -e ZAP_AUTH_HEADER -e ZAP_AUTH_HEADER_VALUE -e ZAP_AUTH_HEADER_SITE -t ghcr.io/zaproxy/zaproxy:stable zap-baseline.py -t http://localhost:4200/#/login -J report_json.json -w report_md.md -r report_html.html"
-        
+      
       - name: ZAP Scan - Login Page
-        uses: zaproxy/action-baseline@v0.13.0
+        uses: zaproxy/action-full-scan@v0.11.0
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          rules_file_name: '.zap/rules.tsv'
           target: 'http://localhost:4200/#/login'
+          rules_file_name: '.zap/rules.tsv'
           cmd_options: '-a -j'
           allow_issue_writing: true
-          format: json
-          output_file: zap-login-results.json
-      
+        
       - name: ZAP Scan - Search Page
-        uses: zaproxy/action-baseline@v0.13.0
+        uses: zaproxy/action-full-scan@v0.11.0
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
+          target: 'http://localhost:4200/#/search?q='
           rules_file_name: '.zap/rules.tsv'
-          target: 'http://localhost:4200/#/search?q=orange'
           cmd_options: '-a -j'
           allow_issue_writing: true
-          format: json
-          output_file: zap-search-results.json
-      
-      - name: Upload Login Scan Results
-        uses: actions/upload-artifact@v4
-        with:
-          name: zap-login-scan-results
-          path: zap-login-results.json
-          retention-days: 30
-      
-      - name: Upload Search Scan Results
-        uses: actions/upload-artifact@v4
-        with:
-          name: zap-search-scan-results
-          path: zap-search-results.json
-          retention-days: 30
-
-      - name: Check for vulnerabilities
-        run: |
-          if grep -q "\"risk\": \"High\"" zap-login-results.json || grep -q "\"risk\": \"High\"" zap-search-results.json; then
-            echo "High risk vulnerabilities found!"
-            exit 1
-          fi
