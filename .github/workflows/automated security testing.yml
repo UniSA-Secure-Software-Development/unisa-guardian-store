@@ -8,7 +8,6 @@ jobs:
   scan:
     # Configure the job 
     name: Run security scans
-    needs: build
     runs-on: ubuntu-latest
 
     # Steps to run
