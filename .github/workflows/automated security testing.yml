@@ -1,0 +1,35 @@
+name: Automated Security Testing 
+
+# Run the workflow each time code is pushed, or when a pull-request is created
+on: [push, pull_request]
+
+jobs:
+  # Run security scans
+  scan:
+    # Configure the job 
+    name: Run security scans
+    needs: build
+    runs-on: ubuntu-latest
+
+    # Steps to run
+    steps:
+    # Set up prerequisites for tests
+    - uses: actions/checkout@v2
+    - uses: actions/setup-node@v1
+    # Install node packages
+    - run: npm ci
+    
+    
+    # DevSkim scans overall codebase for potential issues
+    - uses: microsoft/devskim-action@v1
+      with:
+        directory-to-scan: /
+        should-scan-archives: false
+        output-filename: devskim-results.sarif
+        output-directory: logs
+
+    # Publish the scan results as an artifact
+    - uses: actions/upload-artifact@v4
+      with: 
+        name: scan-results
+        path: logs
