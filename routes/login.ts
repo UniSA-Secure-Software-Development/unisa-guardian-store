@@ -33,7 +33,21 @@ module.exports = function login () {
 
   return (req: Request, res: Response, next: NextFunction) => {
     verifyPreLoginChallenges(req) // vuln-code-snippet hide-line
-    models.sequelize.query(`SELECT * FROM Users WHERE email = '${req.body.email || ''}' AND password = '${security.hash(req.body.password || '')}' AND deletedAt IS NULL`, { model: UserModel, plain: true }) // vuln-code-snippet vuln-line loginAdminChallenge loginBenderChallenge loginJimChallenge
+    // This line is vulnerable to SQL Injection since user-supplied input (req.body.email and req.body.password) is directly inserted into the SQL query string.
+    // use parameterised queries to prevent SQL injection
+    // This query if used for authentication, checks if the user email and password are correct
+    // vuln-code-snippet vuln-line loginAdminChallenge loginBenderChallenge loginJimChallenge
+    // models.sequelize.query(`SELECT * FROM Users WHERE email = '${req.body.email || ''}' 
+    //   AND password = '${security.hash(req.body.password || '')}' 
+    //   AND deletedAt IS NULL`, { model: UserModel, plain: true }) 
+      models.sequelize.query(
+      'SELECT * FROM Users WHERE email = :email AND password = :password AND deletedAt IS NULL',
+      {
+        replacements: { email: req.body.email || '', password: security.hash(req.body.password || '') },
+        model: UserModel,
+        plain: true
+      }
+    )
       .then((authenticatedUser: { data: User }) => { // vuln-code-snippet neutral-line loginAdminChallenge loginBenderChallenge loginJimChallenge
         const user = utils.queryResultToJson(authenticatedUser)
         if (user.data?.id && user.data.totpSecret !== '') {
@@ -82,3 +96,4 @@ module.exports = function login () {
     }
   }
 }
+
