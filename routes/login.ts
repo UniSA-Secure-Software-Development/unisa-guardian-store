@@ -34,16 +34,8 @@ module.exports = function login () {
   return (req: Request, res: Response, next: NextFunction) => {
     verifyPreLoginChallenges(req) // vuln-code-snippet hide-line
 
-    // parameterised query approach to prevent SQL injection
-    const emailInput = req.body.email || ''
-    const passwordInput = security.hash(req.body.password || '')
-
-    // sanitise the user input
-    const sanitisedEmail = emailInput.replace(/[-']/g, '')
-    const sanitisedPassword = passwordInput.replace(/[-']/g, '')
-
     // the query binds emailInput and passwordInput instead of being directly on the SQL query leading to SQL injection
-    models.sequelize.query('SELECT * FROM Users WHERE email = :sanitisedEmail AND password = :sanitisedPassword AND deletedAt IS NULL', { model: UserModel, plain: true, replacements: { sanitisedEmail, sanitisedPassword } }) // vuln-code-snippet vuln-line loginAdminChallenge loginBenderChallenge loginJimChallenge
+    models.sequelize.query(`SELECT * FROM Users WHERE email = '${req.body.email || ''}' AND password = '${security.hash(req.body.password || '')}' AND deletedAt IS NULL`, { model: UserModel, plain: true }) // vuln-code-snippet vuln-line loginAdminChallenge loginBenderChallenge loginJimChallenge
       .then((authenticatedUser: { data: User }) => { // vuln-code-snippet neutral-line loginAdminChallenge loginBenderChallenge loginJimChallenge
         const user = utils.queryResultToJson(authenticatedUser)
         if (user.data?.id && user.data.totpSecret !== '') {
