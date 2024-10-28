@@ -30,7 +30,7 @@ jobs:
           java-version: '11'
 
       # Install node packages if required for your project
-      - run: npm ci
+      - run: npm install
       
       # Run OWASP Dependency Check
       - run: |
