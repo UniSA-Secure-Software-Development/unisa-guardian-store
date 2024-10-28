@@ -1,0 +1,26 @@
+name: Security scan
+
+on: [push, pull_request]
+
+jobs:
+
+    devskim-scan:
+        runs-on: ubuntu-latest
+        name: MS DevSkim scan
+        steps:
+            - uses: actions/checkout@v4
+            - name: Create output directory
+              run: mkdir -p reports
+            - uses: microsoft/DevSkim-Action@v1
+              with:
+                directory-to-scan: /
+                should-scan-archives: false
+                output-file: 'devskim-report.sarif'
+                output-directory: 'reports'
+            - uses: actions/upload-artifact@v4
+              with: 
+                name: devskim-report
+                path: reports
+            - uses: github/codeql-action/upload-sarif@v2
+              with:
+                sarif_file: reports/devskim-report.sarif
