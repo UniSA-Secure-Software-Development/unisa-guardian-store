@@ -1,4 +1,4 @@
-name: "Security Testing for SQL Injection"
+name: "Automated Security Testing for SQL Injection"
 
 on:
   pull_request:
