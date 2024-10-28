@@ -1,10 +1,12 @@
 {
+
     "extensions": [
-		"eg2.vscode-npm-script",
-		"angular.ng-template",
-		"dbaeumer.vscode-eslint",
-		"stylelint.vscode-stylelint"
-	],
+        "eg2.vscode-npm-script",
+        "angular.ng-template",
+        "dbaeumer.vscode-eslint",
+        "stylelint.vscode-stylelint",
+        "MS-CST-E.vscode-devskim"
+    ],
     "settings": {
         "eslint.workingDirectories": [
             { "mode": "auto" }
@@ -17,5 +19,7 @@
 			"VARIANT": "16-bullseye"
 		}
 	},
+    "runArgs": ["--init"],
+    "mounts": [ "source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind" ],
 	"remoteUser": "node"
 }

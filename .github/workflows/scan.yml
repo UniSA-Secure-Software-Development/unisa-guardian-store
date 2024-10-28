@@ -1,0 +1,21 @@
+# Friendly name for the workflow in GitHub
+name: Continuous Integration (CI)
+# Run the workflow each time code is pushed, or when a pull-request is created
+on: [push, pull_request]
+
+jobs:
+  
+  scan:
+    # Configure the job 
+    name: Run security scans
+    runs-on: ubuntu-latest
+    steps:
+    - uses: microsoft/devskim-action@v1
+      with:
+        directory-to-scan: /
+        should-scan-archives: false
+        output-filename: devskim-results.sarif
+        output-directory: /
+
+    
+
