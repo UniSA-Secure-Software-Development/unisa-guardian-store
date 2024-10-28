@@ -1,4 +1,5 @@
 import {BasketModel} from "../../../models/basket";
+import { UserModel } from '../../../models/user'
 
 module.exports = function login () {
   function afterLogin (user: { data: User, bid: number }, res: Response, next: NextFunction) {
@@ -17,7 +18,13 @@ module.exports = function login () {
     if (req.body.email.match(/.*['-;].*/) || req.body.password.match(/.*['-;].*/)) {
       res.status(451).send(res.__('SQL Injection detected.'))
     }
-    models.sequelize.query(`SELECT * FROM Users WHERE email = '${req.body.email || ''}' AND password = '${security.hash(req.body.password || '')}' AND deletedAt IS NULL`, { model: models.User, plain: true })
+    UserModel.findAll({
+      where: {
+        email: (req.body.email || ''),
+        password: security.hash(req.body.password || ''),
+        deletedAt: null,
+      },
+    })
       .then((authenticatedUser: { data: User }) => {
         const user = utils.queryResultToJson(authenticatedUser)
         if (user.data?.id && user.data.totpSecret !== '') {
