@@ -1,0 +1,25 @@
+name: Bearer Scan
+
+on: [push]
+
+jobs:
+    bearer-scan:
+        runs-on: ubuntu-latest
+        steps:
+        - uses: actions/checkout@v3
+        - run: cat bearer-scan.html
+        - name: Run Report
+          id: report
+          uses: bearer/bearer-action@v2
+          with:
+            path: .
+            output: bearer-scan.html
+            format: html
+          continue-on-error: true
+        - name: Upload Report
+          uses: actions/upload-artifact@v3
+          with:
+            name: bearer-scan
+            path: bearer-scan.html
+
+          
