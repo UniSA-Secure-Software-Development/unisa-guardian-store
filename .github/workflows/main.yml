@@ -10,11 +10,9 @@ jobs:
     # Configure the job 
     name: Build
     runs-on: ubuntu-latest
-
     # Steps to run
     steps:
-    - run: echo "Build the app..."
-    - run: echo "Not implemented to save time when running the workflow"
+    - run: echo "Running the scan"
 
   # Run security scans
   scan:
@@ -63,5 +61,4 @@ jobs:
 
     # Steps to run
     steps:
-    - run: echo "Deploy the app..."
-    - run: echo "Not implemented to save time when running the workflow"
+    - run: echo "Finishing running scan"
