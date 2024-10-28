@@ -8,7 +8,9 @@ import config = require('config')
 const path = require('path')
 const fs = require('fs')
 
-const jsonHeader = { 'content-type': 'application/json' }
+const CSP = "default-src 'none'; script-src 'self'; connect-src 'self'; img-src 'self'; style-src 'self';base-uri 'self';form-action 'self'"
+
+const jsonHeader = { 'content-type': 'application/json', 'Content-Security-Policy': CSP }
 const REST_URL = 'http://localhost:3000/rest'
 
 describe('/rest/memories', () => {
@@ -28,7 +30,7 @@ describe('/rest/memories', () => {
       .expect('status', 200)
       .then(({ json: jsonLogin }) => {
         return frisby.get(REST_URL + '/memories', {
-          headers: { Authorization: 'Bearer ' + jsonLogin.authentication.token, 'content-type': 'application/json' }
+          headers: { Authorization: 'Bearer ' + jsonLogin.authentication.token, 'content-type': 'application/json' , 'Content-Security-Policy': CSP }
         })
           .expect('status', 200)
       })

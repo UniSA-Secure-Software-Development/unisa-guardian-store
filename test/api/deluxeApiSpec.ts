@@ -6,7 +6,9 @@
 import frisby = require('frisby')
 import config = require('config')
 
-const jsonHeader = { 'content-type': 'application/json' }
+const CSP = "default-src 'none'; script-src 'self'; connect-src 'self'; img-src 'self'; style-src 'self';base-uri 'self';form-action 'self'"
+
+const jsonHeader = { 'content-type': 'application/json', 'Content-Security-Policy': CSP }
 const REST_URL = 'http://localhost:3000/rest'
 const API_URL = 'http://localhost:3000/api'
 
@@ -38,7 +40,7 @@ describe('/rest/deluxe-membership', () => {
       .expect('status', 200)
       .then(({ json: jsonLogin }) => {
         return frisby.get(REST_URL + '/deluxe-membership', {
-          headers: { Authorization: 'Bearer ' + jsonLogin.authentication.token, 'content-type': 'application/json' }
+          headers: { Authorization: 'Bearer ' + jsonLogin.authentication.token, 'content-type': 'application/json' , 'Content-Security-Policy': CSP }
         })
           .expect('status', 200)
           .expect('json', 'data', { membershipCost: 49 })
@@ -56,7 +58,7 @@ describe('/rest/deluxe-membership', () => {
       .expect('status', 200)
       .then(({ json: jsonLogin }) => {
         return frisby.get(REST_URL + '/deluxe-membership', {
-          headers: { Authorization: 'Bearer ' + jsonLogin.authentication.token, 'content-type': 'application/json' }
+          headers: { Authorization: 'Bearer ' + jsonLogin.authentication.token, 'content-type': 'application/json', 'Content-Security-Policy': CSP }
         })
           .expect('status', 400)
           .expect('json', 'error', 'You are already a deluxe member!')
@@ -74,7 +76,7 @@ describe('/rest/deluxe-membership', () => {
       .expect('status', 200)
       .then(({ json: jsonLogin }) => {
         return frisby.get(REST_URL + '/deluxe-membership', {
-          headers: { Authorization: 'Bearer ' + jsonLogin.authentication.token, 'content-type': 'application/json' }
+          headers: { Authorization: 'Bearer ' + jsonLogin.authentication.token, 'content-type': 'application/json', 'Content-Security-Policy': CSP }
         })
           .expect('status', 400)
           .expect('json', 'error', 'You are not eligible for deluxe membership!')
@@ -92,7 +94,7 @@ describe('/rest/deluxe-membership', () => {
       .expect('status', 200)
       .then(({ json: jsonLogin }) => {
         return frisby.get(REST_URL + '/deluxe-membership', {
-          headers: { Authorization: 'Bearer ' + jsonLogin.authentication.token, 'content-type': 'application/json' }
+          headers: { Authorization: 'Bearer ' + jsonLogin.authentication.token, 'content-type': 'application/json', 'Content-Security-Policy': CSP }
         })
           .expect('status', 400)
           .expect('json', 'error', 'You are not eligible for deluxe membership!')
@@ -106,12 +108,12 @@ describe('/rest/deluxe-membership', () => {
     })
 
     await void frisby.get(API_URL + '/Cards', {
-      headers: { Authorization: 'Bearer ' + token, 'content-type': 'application/json' }
+      headers: { Authorization: 'Bearer ' + token, 'content-type': 'application/json', 'Content-Security-Policy': CSP }
     })
       .expect('status', 200)
       .then(({ json }) => {
         return frisby.post(REST_URL + '/deluxe-membership', {
-          headers: { Authorization: 'Bearer ' + token, 'content-type': 'application/json' },
+          headers: { Authorization: 'Bearer ' + token, 'content-type': 'application/json', 'Content-Security-Policy': CSP },
           body: {
             paymentMode: 'card',
             paymentId: json.data[0].id.toString()
@@ -129,7 +131,7 @@ describe('/rest/deluxe-membership', () => {
     })
 
     await void frisby.post(REST_URL + '/deluxe-membership', {
-      headers: { Authorization: 'Bearer ' + token, 'content-type': 'application/json' },
+      headers: { Authorization: 'Bearer ' + token, 'content-type': 'application/json', 'Content-Security-Policy': CSP },
       body: {
         paymentMode: 'card',
         paymentId: 1337
@@ -150,7 +152,7 @@ describe('/rest/deluxe-membership', () => {
       .expect('status', 200)
       .then(({ json: jsonLogin }) => {
         return frisby.post(REST_URL + '/deluxe-membership', {
-          headers: { Authorization: 'Bearer ' + jsonLogin.authentication.token, 'content-type': 'application/json' },
+          headers: { Authorization: 'Bearer ' + jsonLogin.authentication.token, 'content-type': 'application/json', 'Content-Security-Policy': CSP },
           body: {
             paymentMode: 'wallet'
           }
@@ -171,7 +173,7 @@ describe('/rest/deluxe-membership', () => {
       .expect('status', 200)
       .then(({ json: jsonLogin }) => {
         return frisby.post(REST_URL + '/deluxe-membership', {
-          headers: { Authorization: 'Bearer ' + jsonLogin.authentication.token, 'content-type': 'application/json' },
+          headers: { Authorization: 'Bearer ' + jsonLogin.authentication.token, 'content-type': 'application/json', 'Content-Security-Policy': CSP },
           body: {
             paymentMode: 'wallet'
           }
@@ -192,7 +194,7 @@ describe('/rest/deluxe-membership', () => {
       .expect('status', 200)
       .then(({ json: jsonLogin }) => {
         return frisby.post(REST_URL + '/deluxe-membership', {
-          headers: { Authorization: 'Bearer ' + jsonLogin.authentication.token, 'content-type': 'application/json' },
+          headers: { Authorization: 'Bearer ' + jsonLogin.authentication.token, 'content-type': 'application/json', 'Content-Security-Policy': CSP },
           body: {
             paymentMode: 'wallet'
           }

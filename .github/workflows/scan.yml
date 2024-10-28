@@ -1,0 +1,38 @@
+name: Continuous Integration (CI)
+on: [pull_request]
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    container:
+      image: docker:4.32.0
+
+    #Steps to run
+    steps:
+    - uses: docker/build-push-action@v6
+      with:
+        context: .
+        push: false
+    - run: npm run serve
+  
+  scan:
+    name: Run security scans
+    needs: build
+    runs-on: ubuntu-latest
+
+    # Steps to run
+    steps:
+    - run: cd ./unisa-guardian-store/XSStrike
+    # Install node packages
+    - run: pip install -r requirements.txt
+
+    # Run scan 
+    - run: python xsstrike.py --seeds urls.txt --file-log-level INFO --log-file output.log
+    
+    # Publish the scan results as an artifact
+    - uses: actions/upload-artifact@v2
+      with: 
+        name: scan-results
+        path: .unisa-guardian.store/output.log
+
