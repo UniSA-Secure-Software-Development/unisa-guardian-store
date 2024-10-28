@@ -1,4 +1,4 @@
-name: ZAP Full Scan
+name: OWASP ZAP Full Scan
 
 on:
   pull_request:
@@ -9,7 +9,7 @@ on:
 
 jobs:
   zap-full-scan:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     steps:
       - name: Check out code
         uses: actions/checkout@v2
@@ -17,13 +17,12 @@ jobs:
       - name: Run OWASP ZAP Full Scan
         uses: zaproxy/action-full-scan@v0.7.0
         with:
-          target: 'https://juice-shop.herokuapp.com'
-          format: 'html'
-          report: 'zap_report.html'
+          target: 'https://localhost:3000'
           cmd_options: '-config api.disablekey=true -config scanner.attackOnStart=true'
+          artifact_name: 'zap_scan'
 
-      - name: Upload ZAP Report
+      - name: Upload ZAP Scan Report
         uses: actions/upload-artifact@v3
         with:
           name: ZAP_Scan_Report
-          path: zap_report.html
+          path: zap_scan
