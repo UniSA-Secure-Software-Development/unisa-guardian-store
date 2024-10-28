@@ -54,7 +54,7 @@ module.exports = function getUserProfile () {
           template = template.replace(/_primDark_/g, theme.primDark)
           template = template.replace(/_logo_/g, utils.extractFilename(config.get('application.logo')))
           const fn = pug.compile(template)
-          const CSP = `img-src 'self' ${user?.profileImage}; script-src 'self' 'unsafe-eval' https://code.getmdl.io http://ajax.googleapis.com`
+          const CSP = `img-src 'self' ${user?.profileImage}; script-src 'self'`
           challengeUtils.solveIf(challenges.usernameXssChallenge, () => { return user?.profileImage.match(/;[ ]*script-src(.)*'unsafe-inline'/g) !== null && utils.contains(username, '<script>alert(`xss`)</script>') })
 
           res.set({

@@ -13,6 +13,8 @@ const REST_URL = 'http://localhost:3000/rest/'
 const API_URL = 'http://localhost:3000/api/'
 let trainingData: { data: any[] }
 
+const CSP = "default-src 'none'; script-src 'self'; connect-src 'self'; img-src 'self'; style-src 'self';base-uri 'self';form-action 'self'"
+
 async function login ({ email, password }: { email: string, password: string }) {
   // @ts-expect-error
   const loginRes = await frisby
@@ -58,7 +60,8 @@ describe('/chatbot', () => {
         request: {
           headers: {
             Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'Content-Security-Policy': CSP 
           }
         }
       }, true).get(REST_URL + 'chatbot/status')
@@ -80,7 +83,8 @@ describe('/chatbot', () => {
         request: {
           headers: {
             Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+
           }
         }
       }, true)
@@ -242,7 +246,8 @@ describe('/chatbot', () => {
         request: {
           headers: {
             Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'Content-Security-Policy': CSP 
           }
         }
       }, true)

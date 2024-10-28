@@ -5,7 +5,7 @@
 
 import { ActivatedRoute } from '@angular/router'
 import { MatTableDataSource } from '@angular/material/table'
-import { Component, OnInit } from '@angular/core'
+import { Component, OnInit, SecurityContext } from '@angular/core'
 import { TrackOrderService } from '../Services/track-order.service'
 import { DomSanitizer } from '@angular/platform-browser'
 import { dom, library } from '@fortawesome/fontawesome-svg-core'
@@ -36,10 +36,11 @@ export class TrackResultComponent implements OnInit {
   constructor (private readonly route: ActivatedRoute, private readonly trackOrderService: TrackOrderService, private readonly sanitizer: DomSanitizer) {}
 
   ngOnInit () {
-    this.orderId = this.route.snapshot.queryParams.id
+    this.orderId = this.sanitizer.sanitize(SecurityContext.HTML, this.route.snapshot.queryParams.id)
+
     this.trackOrderService.find(this.orderId).subscribe((results) => {
       // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-      this.results.orderNo = this.sanitizer.bypassSecurityTrustHtml(`<code>${results.data[0].orderId}</code>`)
+      this.results.orderNo = results.data[0].orderId
       this.results.email = results.data[0].email
       this.results.totalPrice = results.data[0].totalPrice
       this.results.products = results.data[0].products

@@ -9,7 +9,9 @@ import config = require('config')
 const API_URL = 'http://localhost:3000/api'
 const REST_URL = 'http://localhost:3000/rest'
 
-const jsonHeader = { 'content-type': 'application/json' }
+const CSP = "default-src 'none'; script-src 'self'; connect-src 'self'; img-src 'self'; style-src 'self';base-uri 'self';form-action 'self'"
+
+const jsonHeader = { 'content-type': 'application/json',  'Content-Security-Policy': CSP }
 let authHeader: { Authorization: string, 'content-type': string }
 
 describe('/api/Deliverys', () => {
@@ -24,7 +26,7 @@ describe('/api/Deliverys', () => {
       })
         .expect('status', 200)
         .then(({ json }) => {
-          authHeader = { Authorization: 'Bearer ' + json.authentication.token, 'content-type': 'application/json' }
+          authHeader = { Authorization: 'Bearer ' + json.authentication.token, 'content-type': 'application/json'}
         })
     })
 

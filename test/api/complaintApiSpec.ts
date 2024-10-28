@@ -20,7 +20,7 @@ describe('/api/Complaints', () => {
       }
     })
       .expect('status', 201)
-      .expect('header', 'content-type', /application\/json/)
+      .expect('header', 'content-type', 'application/json')
       .expect('jsonTypes', 'data', {
         id: Joi.number(),
         createdAt: Joi.string(),
