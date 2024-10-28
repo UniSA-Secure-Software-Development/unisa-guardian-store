@@ -1,31 +1,28 @@
-name: "Automated Security Testing for SQL Injection"
+name: Automated security testing for SQL injection
 
 on:
   pull_request:
     branches: [ main, develop ]
-  workflow_dispatch:
 
 jobs:
-  sql_injection_scan:
-    runs-on: ubuntu-latest
+  zap-sql-injection-scan:
+    runs-on: self-hosted
 
     steps:
-      - name: Check out the code
-        uses: actions/checkout@v2
+      - name: "Check out Git repository"
+        uses: actions/checkout@v3
 
-      - name: Set up Docker environment
+      - name: "Set up OWASP ZAP on local machine"
         run: |
-          # Pull and start OWASP ZAP targeting localhost
           docker pull ghcr.io/zaproxy/zaproxy
           docker run -d -u zap -p 8080:8080 --name zap ghcr.io/zaproxy/zaproxy zap.sh -daemon -port 8080 -config api.disablekey=true
 
-      - name: Run OWASP ZAP SQL Injection Test
+      - name: "Run OWASP ZAP SQL Injection Test"
         run: |
-          # Run OWASP ZAP scan targeting the Juice Shop instance on localhost:3000
           docker exec zap zap-cli quick-scan --self-contained --start-options '-config api.disablekey=true' http://localhost:3000
         continue-on-error: true
 
-      - name: Process ZAP Results
+      - name: "Process ZAP Results"
         run: |
           docker exec zap zap-cli report -o zap_report.html -f html
           docker cp zap:/zap/zap_report.html .
