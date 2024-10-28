@@ -282,12 +282,12 @@ jobs:
           CYPRESS_CACHE_FOLDER: /Users/runner/Library/Caches/Cypress
           CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         if: failure()
         with:
           name: cypress-screenshots
           path: cypress/screenshots
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         if: always()
         with:
           name: cypress-videos
@@ -446,3 +446,17 @@ jobs:
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
+  sqlmap:
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Check out Git repository"
+        uses: actions/checkout@v2
+
+      - name: "Install latest version of SQLmap"
+        run: git clone https://github.com/sqlmapproject/sqlmap.git
+
+      - name: "Run search SQLmap"
+        run: python3 sqlmap/sqlmap.py -u http://localhost:3000/rest/products/search?q=banana --level=2 --risk=3
+
+      - name: "Run login SQLmap"
+        run: python3 sqlmap/sqlmap.py -u http://localhost:3000/rest/user/login --data="email=test@example.com&password=test" --level=2 --risk=3 --ignore-code 401
