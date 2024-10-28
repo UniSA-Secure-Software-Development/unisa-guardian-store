@@ -34,7 +34,7 @@ jobs:
       
       # Run OWASP Dependency Check
       - run: |
-          mkdir -p .comp4035/output
+          mkdir -p .comp4035/tools 
           curl -L https://github.com/jeremylong/DependencyCheck/releases/download/v6.1.6/dependency-check-6.1.6-release.zip -o dependency-check.zip
           unzip dependency-check.zip -d .comp4035/tools/dependency-check
           .comp4035/tools/dependency-check/bin/dependency-check.sh -s . -o .comp4035/output --disableAssembly
