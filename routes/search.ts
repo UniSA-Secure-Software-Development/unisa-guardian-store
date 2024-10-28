@@ -21,8 +21,14 @@ module.exports = function searchProducts () {
     let criteria: any = req.query.q === 'undefined' ? '' : req.query.q ?? ''
     criteria = (criteria.length <= 200) ? criteria : criteria.substring(0, 200)
 
+    // parameterised query approach
+    const searchParams = `%${criteria}%`
+
+    // sanitise the search criteria
+    const sanitisedSearchParams = searchParams.replace(/[-']/g, '')
+
     // below is the code that queries the database for items related to that search query. regrg
-    models.sequelize.query(`SELECT * FROM Products WHERE ((name LIKE '%${criteria}%' OR description LIKE '%${criteria}%') AND deletedAt IS NULL) ORDER BY name`) // vuln-code-snippet vuln-line unionSqlInjectionChallenge dbSchemaChallenge
+    models.sequelize.query('SELECT * FROM Products WHERE ((name LIKE :sanitisedSearchParams OR description LIKE :sanitisedSearchParams) AND deletedAt IS NULL) ORDER BY name', { replacements: { sanitisedSearchParams } }) // vuln-code-snippet vuln-line unionSqlInjectionChallenge dbSchemaChallenge
       .then(([products]: any) => {
         const dataString = JSON.stringify(products)
         if (challengeUtils.notSolved(challenges.unionSqlInjectionChallenge)) { // vuln-code-snippet hide-start
