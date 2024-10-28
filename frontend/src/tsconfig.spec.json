@@ -8,6 +8,7 @@
       "node"
     ]
   },
+  
   "files": [
     "test.ts",
     "polyfills.ts"
