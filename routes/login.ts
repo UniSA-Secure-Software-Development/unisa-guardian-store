@@ -1,8 +1,3 @@
-/*
- * Copyright (c) 2014-2022 Bjoern Kimminich & the OWASP Juice Shop contributors.
- * SPDX-License-Identifier: MIT
- */
-
 import models = require('../models/index')
 import { Request, Response, NextFunction } from 'express'
 import { User } from '../data/types'
@@ -15,8 +10,15 @@ const security = require('../lib/insecurity')
 const challenges = require('../data/datacache').challenges
 const users = require('../data/datacache').users
 const config = require('config')
+const rateLimit = require('express-rate-limit')
 
-// vuln-code-snippet start loginAdminChallenge loginBenderChallenge loginJimChallenge
+// Rate limiter for login to prevent brute force attacks
+const loginRateLimiter = rateLimit({
+  windowMs: 900000, // 15 minutes in milliseconds
+  max: 5, // limit each IP address to 5 requests per 15 minutes
+  message: 'Too many login attempts from this IP address, please try again after 15 minutes.'
+})
+
 module.exports = function login () {
   function afterLogin (user: { data: User, bid: number }, res: Response, next: NextFunction) {
     verifyPostLoginChallenges(user) // vuln-code-snippet hide-line
@@ -31,7 +33,7 @@ module.exports = function login () {
       })
   }
 
-  return (req: Request, res: Response, next: NextFunction) => {
+  return [loginRateLimiter, (req: Request, res: Response, next: NextFunction) => {
     verifyPreLoginChallenges(req) // vuln-code-snippet hide-line
     models.sequelize.query(`SELECT * FROM Users WHERE email = '${req.body.email || ''}' AND password = '${security.hash(req.body.password || '')}' AND deletedAt IS NULL`, { model: UserModel, plain: true }) // vuln-code-snippet vuln-line loginAdminChallenge loginBenderChallenge loginJimChallenge
       .then((authenticatedUser: { data: User }) => { // vuln-code-snippet neutral-line loginAdminChallenge loginBenderChallenge loginJimChallenge
@@ -54,7 +56,8 @@ module.exports = function login () {
       }).catch((error: Error) => {
         next(error)
       })
-  }
+  }]
+
   // vuln-code-snippet end loginAdminChallenge loginBenderChallenge loginJimChallenge
 
   function verifyPreLoginChallenges (req: Request) {
@@ -62,7 +65,7 @@ module.exports = function login () {
     challengeUtils.solveIf(challenges.loginSupportChallenge, () => { return req.body.email === 'support@' + config.get('application.domain') && req.body.password === 'J6aVjTgOpRs@?5l!Zkq2AYnCE@RF$P' })
     challengeUtils.solveIf(challenges.loginRapperChallenge, () => { return req.body.email === 'mc.safesearch@' + config.get('application.domain') && req.body.password === 'Mr. N00dles' })
     challengeUtils.solveIf(challenges.loginAmyChallenge, () => { return req.body.email === 'amy@' + config.get('application.domain') && req.body.password === 'K1f.....................' })
-    challengeUtils.solveIf(challenges.dlpPasswordSprayingChallenge, () => { return req.body.email === 'J12934@' + config.get('application.domain') && req.body.password === '0Y8rMnww$*9VFYE§59-!Fg1L6t&6lB' })
+    challengeUtils.solveIf(challenges.dlpPasswordSprayingChallenge, () => { return req.body.email === 'J12934@' + config.get('application.domain') && req.body.password === '0Y8rMnww$*9VFYEÂ§59-!Fg1L6t&6lB' })
     challengeUtils.solveIf(challenges.oauthUserPasswordChallenge, () => { return req.body.email === 'bjoern.kimminich@gmail.com' && req.body.password === 'bW9jLmxpYW1nQGhjaW5pbW1pay5ucmVvamI=' })
   }
 

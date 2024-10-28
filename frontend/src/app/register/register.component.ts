@@ -54,36 +54,52 @@ export class RegisterComponent implements OnInit {
     this.formSubmitService.attachEnterKeyHandler('registration-form', 'registerButton', () => this.save())
   }
 
-  save () {
-    const user = {
-      email: this.emailControl.value,
-      password: this.passwordControl.value,
-      passwordRepeat: this.repeatPasswordControl.value,
-      securityQuestion: this.securityQuestions.find((question) => question.id === this.securityQuestionControl.value),
-      securityAnswer: this.securityAnswerControl.value
+  isStrongPassword () {
+    const strongPassword = /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-§~=]).{8,}$/
+    if (!strongPassword.test(this.passwordControl.value)) {
+      throw new Error('Password must be 8 characters long and contain at least one uppercase letter, one lowercase letter, one number, and one special character.')
     }
+    return this.passwordControl.value
+  }
 
-    this.userService.save(user).subscribe((response: any) => {
-      this.securityAnswerService.save({
-        UserId: response.id,
-        answer: this.securityAnswerControl.value,
-        SecurityQuestionId: this.securityQuestionControl.value
-      }).subscribe(() => {
-        this.ngZone.run(async () => await this.router.navigate(['/login']))
-        this.snackBarHelperService.open('CONFIRM_REGISTER')
-      })
-    }, (err) => {
-      console.log(err)
-      if (err.error?.errors) {
-        const error = err.error.errors[0]
-        if (error.message) {
-          // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
-          this.error = error.message[0].toUpperCase() + error.message.slice(1)
-        } else {
-          this.error = error
-        }
+  save () {
+    try {
+      // Validate password strength before proceeding
+      this.isStrongPassword()
+
+      const user = {
+        email: this.emailControl.value,
+        password: this.passwordControl.value,
+        passwordRepeat: this.repeatPasswordControl.value,
+        securityQuestion: this.securityQuestions.find((question) => question.id === this.securityQuestionControl.value),
+        securityAnswer: this.securityAnswerControl.value
       }
-    })
+
+      this.userService.save(user).subscribe((response: any) => {
+        this.securityAnswerService.save({
+          UserId: response.id,
+          answer: this.securityAnswerControl.value,
+          SecurityQuestionId: this.securityQuestionControl.value
+        }).subscribe(() => {
+          this.ngZone.run(async () => await this.router.navigate(['/login']))
+          this.snackBarHelperService.open('CONFIRM_REGISTER')
+        })
+      }, (err) => {
+        console.log(err)
+        if (err.error?.errors) {
+          const error = err.error.errors[0]
+          if (error.message) {
+            // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
+            this.error = error.message[0].toUpperCase() + error.message.slice(1)
+          } else {
+            this.error = error
+          }
+        }
+      })
+    } catch (error) {
+      // Handle the password strength error here
+      this.error = error.message
+    }
   }
 }
 

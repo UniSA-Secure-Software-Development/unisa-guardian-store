@@ -60,7 +60,7 @@ describe('ChangePasswordComponent', () => {
     expect(component.passwordControl.valid).toBe(true)
   })
 
-  it('length of new password must be 5-40 characters', () => {
+  it('length of new password must be 8-40 characters', () => {
     component.newPasswordControl.setValue('old')
     expect(component.newPasswordControl.valid).toBeFalsy()
     component.newPasswordControl.setValue('new password')

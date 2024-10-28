@@ -20,12 +20,15 @@ module.exports = function resetPassword () {
     const answer = body.answer
     const newPassword = body.new
     const repeatPassword = body.repeat
+    const strongPassword = /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-§~=]).{8,}$/
     if (!email || !answer) {
       next(new Error('Blocked illegal activity by ' + connection.remoteAddress))
     } else if (!newPassword || newPassword === 'undefined') {
       res.status(401).send(res.__('Password cannot be empty.'))
     } else if (newPassword !== repeatPassword) {
       res.status(401).send(res.__('New and repeated password do not match.'))
+    } else if (!strongPassword.test(newPassword.toString())) {
+      res.status(401).send(res.__('Password must be 8 characters long and contain at least one uppercase letter, one lowercase letter, one number, and one special character.'))
     } else {
       SecurityAnswerModel.findOne({
         include: [{
