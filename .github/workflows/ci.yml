@@ -456,9 +456,7 @@ jobs:
         run: git clone https://github.com/sqlmapproject/sqlmap.git
 
       - name: "Run search SQLmap"
-        #run: python3 sqlmap/sqlmap.py -u http://localhost:3000/rest/products/search?q=banana --level=2 --risk=3
-        run: python3 sqlmap/sqlmap.py -u ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}/rest/products/search?q=banana --level=2 --risk=3
+        run: python3 sqlmap/sqlmap.py -u http://localhost:3000/rest/products/search?q=banana --level=2 --risk=3
 
       - name: "Run login SQLmap"
-        #run: python3 sqlmap/sqlmap.py -u http://localhost:3000/rest/user/login --data="email=test@test.com&password=test" --level=2 --risk=3 --ignore-code 401
-        run: python3 sqlmap/sqlmap.py -u ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}/rest/user/login --data="email=test@test.com&password=test" --level=2 --risk=3 --ignore-code 401
+        run: python3 sqlmap/sqlmap.py -u http://localhost:3000/rest/user/login --data="email=test@test.com&password=test" --level=2 --risk=3 --ignore-code 401
