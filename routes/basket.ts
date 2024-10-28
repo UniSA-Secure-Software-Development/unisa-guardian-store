@@ -22,6 +22,12 @@ module.exports = function retrieveBasket () {
           const user = security.authenticatedUsers.from(req)
           return user && id && id !== 'undefined' && id !== 'null' && id !== 'NaN' && user.bid && user.bid != id // eslint-disable-line eqeqeq
         })
+        const user = security.authenticatedUsers.from(req)
+        // check if the correct user is making the request
+        if (user && id && id !== 'undefined' && id !== 'null' && id !== 'NaN' && user.bid && user.bid != id) { // eslint-disable-line eqeqeq
+          res.status(403).send({ error: 'wrong user' })
+          return
+        }
         if (basket?.Products && basket.Products.length > 0) {
           for (let i = 0; i < basket.Products.length; i++) {
             basket.Products[i].name = req.__(basket.Products[i].name)

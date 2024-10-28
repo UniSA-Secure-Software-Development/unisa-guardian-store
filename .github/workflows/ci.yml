@@ -151,6 +151,39 @@ jobs:
           name: api-test-lcov
           path: |
             api-lcov.info
+  security-api-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@develop
+
+      - name: Install HTTPie
+        run:  |
+          sudo apt-get update
+          sudo apt-get install -y httpie
+
+      - name: Run the Web App
+        run: |
+          npm run serve
+
+      - name: Test for authentication requirement on POST for basket
+        run: |
+          http POST http://localhost:3000/rest/basket
+            --expect '401 Unauthorized'
+
+      - name: Test for authentication requirement on PUT for basket
+        run: |
+          http PUT http://localhost:3000/rest/basket/4
+            --expect '401 Unauthorized'
+
+      - name: Test for authentication requirement on GET for basket
+        run: |
+          http GET http://localhost:3000/rest/basket/4
+            --expect '401 Unauthorized'
+
+      - name: Test for authentication requirement on POST for feedback
+        run: |
+          http POST http://localhost:3000/rest/feedbacks
+            --expect '401 Unauthorized'
   coverage-report:
     needs: [test, api-test]
     runs-on: ubuntu-latest
