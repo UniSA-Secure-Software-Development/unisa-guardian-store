@@ -3,11 +3,10 @@ name: Local SQL Injection Testing
 on:
   pull_request:
     branches: [ main, develop ]
-
 jobs:
   zap-sql-injection-scan:
     runs-on: self-hosted
-
+  workflow_dispatch:
     steps:
       - name: "Check out Git repository"
         uses: actions/checkout@v3
