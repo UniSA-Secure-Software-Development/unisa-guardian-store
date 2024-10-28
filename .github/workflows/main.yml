@@ -7,51 +7,61 @@ on: [push, pull_request]
 jobs:
   # Build the app
   build:
-    # Configure the job
+    # Configure the job 
     name: Build
     runs-on: ubuntu-latest
 
+    # Steps to run
+    steps:
+    - run: echo "Build the app..."
+    - run: echo "Not implemented to save time when running the workflow"
+
   # Run security scans
   scan:
-    # Configure the job
+    # Configure the job 
     name: Run security scans
     needs: build
     runs-on: ubuntu-latest
 
     # Steps to run
     steps:
-      # Checkout code
-      - name: Checkout code
-        uses: actions/checkout@v2
+    # Checkout code
+    - name: Checkout code
+      uses: actions/checkout@v2
 
-      # Create output directory
-      - name: Create output directory
-        run: mkdir -p .comp4035/output
+    # Create output directory
+    - name: Create output directory
+      run: mkdir -p .comp4035/output
 
-      # Set up prerequisites for tests
-      - uses: actions/setup-node@v1
+    # Set up prerequisites for tests
+    - uses: actions/setup-node@v1
 
-      # DevSkim
-      - name: Run DevSkim
-        uses: microsoft/devskim-action@v1
-        with:
-          directory-to-scan: /
-          should-scan-archives: false
-          output-filename: devskim-results.txt
-          output-directory: .comp4035/output
-          output-format: text
-          output-options: "%F:%L:%C - %N"
+    # DevSkim
+    - name: Run DevSkim
+      uses: microsoft/devskim-action@v1
+      with:
+        directory-to-scan: /
+        should-scan-archives: false
+        output-filename: devskim-results.txt
+        output-directory: .comp4035/output
+        output-format: text
+        output-options: "%F:%L:%C - %N" 
 
-      # Publish the scan results as an artifact
-      - name: Upload scan results
-        uses: actions/upload-artifact@v3
-        with:
-          name: scan-results
-          path: .comp4035/output/devskim-results.txt
+    # Publish the scan results as an artifact
+    - name: Upload scan results
+      uses: actions/upload-artifact@v3
+      with: 
+        name: scan-results
+        path: .comp4035/output/devskim-results.txt 
 
   # Deploy the app
   deploy:
-    # Configure the job
+    # Configure the job 
     name: Deploy
     needs: scan
     runs-on: ubuntu-latest
+
+    # Steps to run
+    steps:
+    - run: echo "Deploy the app..."
+    - run: echo "Not implemented to save time when running the workflow"
