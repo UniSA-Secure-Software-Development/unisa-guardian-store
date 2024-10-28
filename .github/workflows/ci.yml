@@ -430,6 +430,22 @@ jobs:
           heroku_app_name: ${{ env.HEROKU_APP }}
           heroku_email: bjoern.kimminich@owasp.org
           branch: ${{ env.HEROKU_BRANCH }}
+
+zap-scan:
+  runs-on: self-hosted
+  needs: [test, api-test, e2e, e2e-with-cypress, e2e-in-subfolder, custom-config-test]
+  steps:
+    - name: "Check out Git repository"
+      uses: actions/checkout@v2
+
+    - name: "Run OWASP ZAP Full Scan"
+      uses: zaproxy/action-full-scan@v0.7.0
+      with:
+        target: 'https://localhost:3000'
+        cmd_options: '-config api.disablekey=true -config scanner.attackOnStart=true'
+        artifact_name: 'zap_scan'
+        fail_action: true
+
   notify-slack:
     if: github.repository == 'juice-shop/juice-shop' && github.event_name == 'push' && (success() || failure())
     needs:
