@@ -1,49 +1,28 @@
-name: "Local SQL Injection Testing"
-
+name: ZAP Full Scan
 
 on:
   pull_request:
-    branches: [ main, develop ]
-  workflow_dispatch:
-
+    branches:
+      - main
+      - develop
 
 jobs:
-  zap-sql-injection-scan:
-    runs-on: self-hosted
+  zap-full-scan:
+    runs-on: ubuntu-latest
     steps:
-      - name: "Check out Git repository"
-        uses: actions/checkout@v3
+      - name: Check out code
+        uses: actions/checkout@v2
 
-      - name: "Set up OWASP ZAP in Docker"
-        shell: pwsh
-        run: |
-          if (!(docker ps -q -f name=zap)) {
-            if (docker ps -aq -f status=exited -f name=zap) {
-              docker rm zap
-            }
-            docker run -d -u zap -p 8080:8080 --name zap ghcr.io/zaproxy/zaproxy zap.sh -daemon -port 8080 -config api.disablekey=true
-          } else {
-            Write-Output "ZAP container is already running."
-          }
+      - name: Run OWASP ZAP Full Scan
+        uses: zaproxy/action-full-scan@v0.7.0
+        with:
+          target: 'https://juice-shop.herokuapp.com'
+          format: 'html'
+          report: 'zap_report.html'
+          cmd_options: '-config api.disablekey=true -config scanner.attackOnStart=true'
 
-      - name: "Run OWASP ZAP SQL Injection Test"
-        shell: pwsh
-        run: |
-          Invoke-RestMethod -Uri "http://localhost:8080/JSON/ascan/action/scan/?url=http://localhost:3000"
-          Write-Output "Waiting for scan to complete..."
-          do {
-            $status = (Invoke-RestMethod -Uri "http://localhost:8080/JSON/ascan/view/status/?scanId=0").status
-            Start-Sleep -Seconds 10
-          } until ($status -eq "100")
-          Write-Output "Scan completed."
-
-      - name: "Generate ZAP HTML Report"
-        shell: pwsh
-        run: |
-          Invoke-RestMethod -Uri "http://localhost:8080/
-
-      - name: "Upload Report"
+      - name: Upload ZAP Report
         uses: actions/upload-artifact@v3
         with:
-          name: zap_report
+          name: ZAP_Scan_Report
           path: zap_report.html
