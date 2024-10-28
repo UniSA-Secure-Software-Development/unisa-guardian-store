@@ -12,10 +12,16 @@ jobs:
       - name: "Check out Git repository"
         uses: actions/checkout@v3
 
-      - name: "Set up OWASP ZAP on local machine"
+      - name: "Set up OWASP ZAP in Docker"
         run: |
-          docker pull ghcr.io/zaproxy/zaproxy
-          docker run -d -u zap -p 8080:8080 --name zap ghcr.io/zaproxy/zaproxy zap.sh -daemon -port 8080 -config api.disablekey=true
+          if [ ! "$(docker ps -q -f name=zap)" ]; then
+            if [ "$(docker ps -aq -f status=exited -f name=zap)" ]; then
+              docker rm zap
+            fi
+            docker run -d -u zap -p 8080:8080 --name zap ghcr.io/zaproxy/zaproxy zap.sh -daemon -port 8080 -config api.disablekey=true
+          else
+            echo "ZAP container is already running."
+          fi
 
       - name: "Run OWASP ZAP SQL Injection Test"
         run: |
