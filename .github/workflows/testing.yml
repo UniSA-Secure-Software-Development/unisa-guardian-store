@@ -1,0 +1,35 @@
+name: Guardian-Store-Develop
+
+on:
+  push:  # Trigger on push eventss
+
+permissions:
+  contents: write 
+  pages: write
+  id-token: write
+
+jobs:
+  devskim-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Create output directory
+        run: mkdir -p output
+
+      - name: Set up DevSkim
+        uses: microsoft/devskim-action@v1
+        with:
+          directory-to-scan: /
+          should-scan-archives: false
+          output-filename: devskim-results.sarif
+          output-directory: output
+          name: devskim-results
+          path: output/devskim-results.sarif
+
+      - name: Upload DevSkim results
+        uses: actions/upload-artifact@v3
+        with:
+          name: devskim-results
+          path: output/devskim-results.sarif
