@@ -142,6 +142,7 @@ export class SearchResultComponent implements OnDestroy, AfterViewInit {
 
   // vuln-code-snippet start localXssChallenge xssBonusChallenge
   filterTable () {
+    console.log('In filterTable()')
     let queryParam: string = this.route.snapshot.queryParams.q
     if (queryParam) {
       queryParam = queryParam.trim()
