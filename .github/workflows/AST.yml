@@ -15,31 +15,32 @@ jobs:
         uses: actions/checkout@v3
 
       - name: "Set up OWASP ZAP in Docker"
-        shell: bash
+        shell: pwsh
         run: |
-          if [ ! "$(docker ps -q -f name=zap)" ]; then
-            if [ "$(docker ps -aq -f status=exited -f name=zap)" ]; then
+          if (!(docker ps -q -f name=zap)) {
+            if (docker ps -aq -f status=exited -f name=zap) {
               docker rm zap
-            fi
+            }
             docker run -d -u zap -p 8080:8080 --name zap ghcr.io/zaproxy/zaproxy zap.sh -daemon -port 8080 -config api.disablekey=true
-          else
-            echo "ZAP container is already running."
-          fi
+          } else {
+            Write-Output "ZAP container is already running."
+          }
 
       - name: "Run OWASP ZAP SQL Injection Test"
-        shell: bash
+        shell: pwsh
         run: |
-          curl "http://localhost:8080/JSON/ascan/action/scan/?url=http://localhost:3000"
-          echo "Waiting for scan to complete..."
-          while [ "$(curl -s http://localhost:8080/JSON/ascan/view/status/?scanId=0 | jq -r '.status')" != "100" ]; do
-            sleep 10
-          done
-          echo "Scan completed."
+          Invoke-RestMethod -Uri "http://localhost:8080/JSON/ascan/action/scan/?url=http://localhost:3000"
+          Write-Output "Waiting for scan to complete..."
+          do {
+            $status = (Invoke-RestMethod -Uri "http://localhost:8080/JSON/ascan/view/status/?scanId=0").status
+            Start-Sleep -Seconds 10
+          } until ($status -eq "100")
+          Write-Output "Scan completed."
 
       - name: "Generate ZAP HTML Report"
-        shell: bash
+        shell: pwsh
         run: |
-          curl "http://localhost:8080/OTHER/core/other/htmlreport/" -o zap_report.html
+          Invoke-RestMethod -Uri "http://localhost:8080/
 
       - name: "Upload Report"
         uses: actions/upload-artifact@v3
