@@ -23,7 +23,7 @@ jobs:
 
     # Steps to run
     steps:
-    # Set up prerequisites for tests
+    # Set up prerequisites for tests 
     - uses: actions/checkout@v2
 
     # DevSkim
@@ -38,8 +38,8 @@ jobs:
         output-directory: .comp4035/output
 
     # Publish the scan results as an artifact
-    # Update artifact to v4, latest verison
-    - uses: actions/upload-artifact@v4
+    # Update artifact to v3, next avaliable verison
+    - uses: actions/upload-artifact@v3
       with: 
         name: scan-results
         path: .comp4035/output
