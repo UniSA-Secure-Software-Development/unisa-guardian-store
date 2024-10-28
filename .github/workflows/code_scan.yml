@@ -24,7 +24,12 @@ jobs:
     # Steps to run
     steps:
     # Set up prerequisites for tests 
-    - uses: actions/checkout@v2
+    # Update checkout to v4, Github Action requires node16 or node20 which v2 doesnt support
+    - uses: actions/checkout@v4
+
+    # Create the directory for output
+    - name: Create output directory
+      run: mkdir -p .comp4035/output
 
     # DevSkim
     # - Some CI support inbuilt tasks and scans, for  ease of use
