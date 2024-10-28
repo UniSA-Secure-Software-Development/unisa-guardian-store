@@ -15,12 +15,31 @@ class ErrorWithParent extends Error {
   parent: Error | undefined
 }
 
+// Boolean function to check for valid input
+function isValidInput(input: string): boolean {
+  // Expression lowercase (a-z), uppercase (A-Z), and numbers (0-9) accepted
+  const validCharacters = /^[a-zA-Z0-9\s%]*$/
+  return validCharacters.test(input)
+}
+
 // vuln-code-snippet start unionSqlInjectionChallenge dbSchemaChallenge
 module.exports = function searchProducts () {
   return (req: Request, res: Response, next: NextFunction) => {
     let criteria: any = req.query.q === 'undefined' ? '' : req.query.q ?? ''
     criteria = (criteria.length <= 200) ? criteria : criteria.substring(0, 200)
-    models.sequelize.query(`SELECT * FROM Products WHERE ((name LIKE '%${criteria}%' OR description LIKE '%${criteria}%') AND deletedAt IS NULL) ORDER BY name`) // vuln-code-snippet vuln-line unionSqlInjectionChallenge dbSchemaChallenge
+    // Check if valid input
+    if (!isValidInput(criteria)) {
+      // If not valid, send a Bad Request status
+      return res.status(400).json({ error: 'Invalid characters in search criteria' })
+    }
+    // 3.	Parameterized Query
+    // eslint-disable-next-line @typescript-eslint/quotes
+    models.sequelize.query(`SELECT * FROM Products WHERE ((name LIKE ? OR description LIKE ?) AND deletedAt IS NULL) ORDER BY name`,
+      {
+        // eslint-disable-next-line no-template-curly-in-string
+        replacements: [`%${criteria}%`, `%${criteria}%`]
+      }
+    ) // vuln-code-snippet vuln-line unionSqlInjectionChallenge dbSchemaChallenge
       .then(([products]: any) => {
         const dataString = JSON.stringify(products)
         if (challengeUtils.notSolved(challenges.unionSqlInjectionChallenge)) { // vuln-code-snippet hide-start
