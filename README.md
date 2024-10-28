@@ -5,5 +5,5 @@
 - Theme
 - Assignment specification
 - README
-
+- Testing
 ## Setting up
