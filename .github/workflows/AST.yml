@@ -1,9 +1,9 @@
-name: Automated security testing for SQL injection
+name: Local SQL Injection Testing
 
 on:
   pull_request:
     branches: [ main, develop ]
-  workflow_dispatch:
+
 jobs:
   zap-sql-injection-scan:
     runs-on: self-hosted
@@ -25,14 +25,16 @@ jobs:
 
       - name: "Run OWASP ZAP SQL Injection Test"
         run: |
-          docker exec zap zap-cli quick-scan --self-contained --start-options '-config api.disablekey=true' http://localhost:3000
-        continue-on-error: true
+          curl "http://localhost:8080/JSON/ascan/action/scan/?url=http://localhost:3000"
+          echo "Waiting for scan to complete..."
+          while [ "$(curl -s http://localhost:8080/JSON/ascan/view/status/?scanId=0 | jq -r '.status')" != "100" ]; do
+            sleep 10
+          done
+          echo "Scan completed."
 
-      - name: "Process ZAP Results"
+      - name: "Generate ZAP HTML Report"
         run: |
-          docker exec zap zap-cli report -o zap_report.html -f html
-          docker cp zap:/zap/zap_report.html .
-        continue-on-error: true
+          curl "http://localhost:8080/OTHER/core/other/htmlreport/" -o zap_report.html
 
       - name: "Upload Report"
         uses: actions/upload-artifact@v3
