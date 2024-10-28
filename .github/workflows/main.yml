@@ -16,7 +16,7 @@ jobs:
       # Check out the repository
       - uses: actions/checkout@v3
 
-      - run: mkdir .comp4035/output
+      - run: mkdir -p .comp4035/output
 
       # Run DevSkim
       - name: Run DevSkim Security Scan
