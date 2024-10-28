@@ -15,6 +15,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: "Set up OWASP ZAP in Docker"
+        shell: bash
         run: |
           if [ ! "$(docker ps -q -f name=zap)" ]; then
             if [ "$(docker ps -aq -f status=exited -f name=zap)" ]; then
@@ -26,6 +27,7 @@ jobs:
           fi
 
       - name: "Run OWASP ZAP SQL Injection Test"
+        shell: bash
         run: |
           curl "http://localhost:8080/JSON/ascan/action/scan/?url=http://localhost:3000"
           echo "Waiting for scan to complete..."
@@ -35,6 +37,7 @@ jobs:
           echo "Scan completed."
 
       - name: "Generate ZAP HTML Report"
+        shell: bash
         run: |
           curl "http://localhost:8080/OTHER/core/other/htmlreport/" -o zap_report.html
 
