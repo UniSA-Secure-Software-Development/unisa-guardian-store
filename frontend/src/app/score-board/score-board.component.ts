@@ -7,7 +7,7 @@ import { MatTableDataSource } from '@angular/material/table'
 import { DomSanitizer } from '@angular/platform-browser'
 import { ChallengeService } from '../Services/challenge.service'
 import { ConfigurationService } from '../Services/configuration.service'
-import { Component, NgZone, OnInit } from '@angular/core'
+import { Component, NgZone, OnInit, SecurityContext } from '@angular/core'
 import { SocketIoService } from '../Services/socket-io.service'
 import { NgxSpinnerService } from 'ngx-spinner'
 
@@ -179,7 +179,7 @@ export class ScoreBoardComponent implements OnInit {
   }
 
   trustDescriptionHtml (challenge: Challenge) {
-    challenge.description = this.sanitizer.bypassSecurityTrustHtml(challenge.description as string)
+    challenge.description = this.sanitizer.sanitize(SecurityContext.HTML, challenge.description as string)
   }
 
   calculateCodingProgressPercentage () {
