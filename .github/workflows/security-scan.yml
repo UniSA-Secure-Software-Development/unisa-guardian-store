@@ -15,7 +15,7 @@ jobs:
               with:
                 directory-to-scan: /
                 should-scan-archives: false
-                output-file: 'devskim-report.sarif'
+                output-filename: 'devskim-report.sarif'
                 output-directory: 'reports'
             - uses: actions/upload-artifact@v4
               with: 
