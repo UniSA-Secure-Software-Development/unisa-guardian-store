@@ -61,4 +61,4 @@ WalletModelInit(sequelize)
 
 relationsInit(sequelize)
 
-export { sequelize }
+export { sequelize}
