@@ -1,0 +1,70 @@
+name: Vulnerability Discovery
+
+on:
+  pull_request:
+    branches: [develop]
+  push:
+    branches: [develop]
+
+jobs:
+  codeql-analysis:
+    name: CodeQL Analysis
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [ 'typescript' ]  
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up CodeQL
+        uses: github/codeql-action/init@v2
+        with:
+          languages: ${{ matrix.language }}
+
+      - name: Install dependencies
+        run: |
+          npm install
+
+      - name: Build application
+        run: |
+          npm run build  # Adjust if your build command differs
+
+      - name: Run CodeQL Analysis
+        uses: github/codeql-action/analyze@v2
+
+  zap-scan:
+    name: OWASP ZAP Scan
+    runs-on: ubuntu-latest
+    needs: codeql-analysis  
+
+    steps:
+      - name: Start OWASP ZAP Docker container
+        run: docker run -d --name zap -u zap -p 8080:8080 owasp/zap2docker-stable zap.sh -daemon -host 0.0.0.0 -port 8080
+
+      - name: Run ZAP Active Scan
+        env:
+          TARGET_URL: ${{ secrets.STAGING_URL }}  # Set your staging URL as a GitHub Secret
+        run: |
+          docker exec zap zap-cli quick-scan --self-contained $TARGET_URL
+
+      - name: Generate ZAP Report
+        run: |
+          docker exec zap zap-cli report -o /zap/reports/zap-report.html -f html
+          docker cp zap:/zap/reports/zap-report.html .
+
+      - name: Upload ZAP Report as Artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: zap-report
+          path: zap-report.html
+
+      - name: Stop ZAP container
+        run: docker stop zap
