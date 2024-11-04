@@ -1,0 +1,40 @@
+name: OWASP ZAP Scan
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  zap-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16.20.0'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Start the web application
+        run: npm start serve &
+      - name: Wait for server to start
+        run: sleep 40  #Need to adjust the time
+
+      - name: Run OWASP ZAP Baseline Scan
+        uses: zaproxy/action-baseline@v0.5.0
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          target: 'http://localhost:3000'
+          fail_action: true  # Fail the job if high-risk vulnerabilities are found
+
+      - name: Upload ZAP Report
+        uses: actions/upload-artifact@v3
+        with:
+          name: zap-report
+          path: zap.out
