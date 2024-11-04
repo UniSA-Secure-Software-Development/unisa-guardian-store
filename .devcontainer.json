@@ -17,5 +17,8 @@
 			"VARIANT": "16-bullseye"
 		}
 	},
-	"remoteUser": "node"
+	"remoteUser": "node",
+	"runArgs": [
+        "--network", "zap-network"
+    ]
 }
