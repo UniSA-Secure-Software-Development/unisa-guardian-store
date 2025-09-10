@@ -17,5 +17,11 @@
 			"VARIANT": "16-bullseye"
 		}
 	},
-	"remoteUser": "node"
+	"remoteUser": "node",
+
+	"forwardPorts": [3000, 4200],
+  	"portsAttributes": {
+    "3000": { "label": "Juice Shop API" },
+    "4200": { "label": "Angular Dev Server" }
+	}
 }
