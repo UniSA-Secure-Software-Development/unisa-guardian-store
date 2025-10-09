@@ -5,5 +5,6 @@
 
 export const environment = {
   production: true,
-  hostServer: '.'
+  hostServer: '.',
+  enableAdmin: false // ← public/prod build: NO admin route
 }
