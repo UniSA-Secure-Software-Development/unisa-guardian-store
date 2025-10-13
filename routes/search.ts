@@ -15,12 +15,28 @@ class ErrorWithParent extends Error {
   parent: Error | undefined
 }
 
+// appends an escape char (\) before any potentially harmful characters (\, %, _)
+function escapeLike (str: string) {
+  return str.replace(/([\\%_])/g, '\\$1')
+}
+
 // vuln-code-snippet start unionSqlInjectionChallenge dbSchemaChallenge
 module.exports = function searchProducts () {
   return (req: Request, res: Response, next: NextFunction) => {
     let criteria: any = req.query.q === 'undefined' ? '' : req.query.q ?? ''
     criteria = (criteria.length <= 200) ? criteria : criteria.substring(0, 200)
-    models.sequelize.query(`SELECT * FROM Products WHERE ((name LIKE '%${criteria}%' OR description LIKE '%${criteria}%') AND deletedAt IS NULL) ORDER BY name`) // vuln-code-snippet vuln-line unionSqlInjectionChallenge dbSchemaChallenge
+
+    // sends search query as bound var instead of concatenation
+    const safeCriteria = `%${escapeLike(String(criteria))}`
+    const sql = `SELECT *
+      FROM Products
+      WHERE (
+        name LIKE :crit ESCAPE '\\' OR
+        description LIKE :crit ESCAPE '\\'
+      ) AND deletedAt IS NULL
+      ORDER BY name`
+
+    models.sequelize.query(sql, { replacements: { crit: safeCriteria } })
       .then(([products]: any) => {
         const dataString = JSON.stringify(products)
         if (challengeUtils.notSolved(challenges.unionSqlInjectionChallenge)) { // vuln-code-snippet hide-start
