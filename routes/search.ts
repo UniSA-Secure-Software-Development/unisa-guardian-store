@@ -1,11 +1,7 @@
-/*
- * Copyright (c) 2014-2022 Bjoern Kimminich & the OWASP Juice Shop contributors.
- * SPDX-License-Identifier: MIT
- */
-
-import models = require('../models/index')
 import { Request, Response, NextFunction } from 'express'
-import { UserModel } from '../models/user'
+import { sequelize } from '../models/index'
+import { ProductModelInit } from '../models/product'
+import Sequelize from 'sequelize'
 
 const utils = require('../lib/utils')
 const challengeUtils = require('../lib/challengeUtils')
@@ -15,17 +11,38 @@ class ErrorWithParent extends Error {
   parent: Error | undefined
 }
 
-// vuln-code-snippet start unionSqlInjectionChallenge dbSchemaChallenge
-module.exports = function searchProducts () {
+// Initialize the Product model (ensures sequelize.models.Product is available)
+ProductModelInit(sequelize)
+
+// Define a regex pattern to validate input and prevent SQL injection
+const validInputPattern = /^[a-zA-Z0-9\s]*$/
+
+module.exports = function searchProducts() {
   return (req: Request, res: Response, next: NextFunction) => {
     let criteria: any = req.query.q === 'undefined' ? '' : req.query.q ?? ''
     criteria = (criteria.length <= 200) ? criteria : criteria.substring(0, 200)
-    models.sequelize.query(`SELECT * FROM Products WHERE ((name LIKE '%${criteria}%' OR description LIKE '%${criteria}%') AND deletedAt IS NULL) ORDER BY name`) // vuln-code-snippet vuln-line unionSqlInjectionChallenge dbSchemaChallenge
-      .then(([products]: any) => {
+
+    // Check if the input is valid; if not, block the request
+    if (!validInputPattern.test(criteria)) {
+      return res.status(403).json({ status: 'error', message: 'Access Denied' })
+    }
+
+    sequelize.models.Product.findAll({
+      where: {
+        [Sequelize.Op.or]: [
+          { name: { [Sequelize.Op.like]: `%${criteria}%` } },
+          { description: { [Sequelize.Op.like]: `%${criteria}%` } }
+        ],
+        deletedAt: null
+      },
+      order: [['name', 'ASC']]
+    })
+      .then((products: any) => {
         const dataString = JSON.stringify(products)
-        if (challengeUtils.notSolved(challenges.unionSqlInjectionChallenge)) { // vuln-code-snippet hide-start
+
+        if (challengeUtils.notSolved(challenges.unionSqlInjectionChallenge)) {
           let solved = true
-          UserModel.findAll().then(data => {
+          sequelize.models.User.findAll().then((data: any) => {
             const users = utils.queryResultToJson(data)
             if (users.data?.length) {
               for (let i = 0; i < users.data.length; i++) {
@@ -42,9 +59,10 @@ module.exports = function searchProducts () {
             next(error)
           })
         }
+
         if (challengeUtils.notSolved(challenges.dbSchemaChallenge)) {
           let solved = true
-          models.sequelize.query('SELECT sql FROM sqlite_master').then(([data]: any) => {
+          sequelize.query('SELECT sql FROM sqlite_master').then(([data]: any) => {
             const tableDefinitions = utils.queryResultToJson(data)
             if (tableDefinitions.data?.length) {
               for (let i = 0; i < tableDefinitions.data.length; i++) {
@@ -58,15 +76,16 @@ module.exports = function searchProducts () {
               }
             }
           })
-        } // vuln-code-snippet hide-end
+        }
+
         for (let i = 0; i < products.length; i++) {
           products[i].name = req.__(products[i].name)
           products[i].description = req.__(products[i].description)
         }
+
         res.json(utils.queryResultToJson(products))
       }).catch((error: ErrorWithParent) => {
         next(error.parent)
       })
   }
 }
-// vuln-code-snippet end unionSqlInjectionChallenge dbSchemaChallenge
