@@ -6,24 +6,39 @@
 import models = require('../models/index')
 import { Request, Response, NextFunction } from 'express'
 import { UserModel } from '../models/user'
+import { ProductModel } from '../models/product'
 
 const utils = require('../lib/utils')
 const challengeUtils = require('../lib/challengeUtils')
 const challenges = require('../data/datacache').challenges
 
-class ErrorWithParent extends Error {
-  parent: Error | undefined
-}
-
+const { Op } = require('sequelize')
 // vuln-code-snippet start unionSqlInjectionChallenge dbSchemaChallenge
 module.exports = function searchProducts () {
   return (req: Request, res: Response, next: NextFunction) => {
-    let criteria: any = req.query.q === 'undefined' ? '' : req.query.q ?? ''
-    criteria = (criteria.length <= 200) ? criteria : criteria.substring(0, 200)
-    models.sequelize.query(`SELECT * FROM Products WHERE ((name LIKE '%${criteria}%' OR description LIKE '%${criteria}%') AND deletedAt IS NULL) ORDER BY name`) // vuln-code-snippet vuln-line unionSqlInjectionChallenge dbSchemaChallenge
-      .then(([products]: any) => {
+    let criteria: string = ''
+    if (typeof req.query.q === 'string') {
+      criteria = req.query.q === 'undefined' ? '' : req.query.q
+      criteria = (criteria.length <= 200) ? criteria : criteria.substring(0, 200)
+    }
+    ProductModel.findAll({
+      where: {
+        [Op.and]: [
+          {
+            [Op.or]: [
+              { name: { [Op.like]: `%${criteria}%` } },
+              { description: { [Op.like]: `%${criteria}%` } }
+            ]
+          },
+          { deletedAt: null }
+        ]
+      },
+      order: [['name', 'ASC']]
+    })
+      .then((products: any[]) => {
         const dataString = JSON.stringify(products)
-        if (challengeUtils.notSolved(challenges.unionSqlInjectionChallenge)) { // vuln-code-snippet hide-start
+
+        if (challengeUtils.notSolved(challenges.unionSqlInjectionChallenge)) {
           let solved = true
           UserModel.findAll().then(data => {
             const users = utils.queryResultToJson(data)
@@ -42,29 +57,35 @@ module.exports = function searchProducts () {
             next(error)
           })
         }
+
         if (challengeUtils.notSolved(challenges.dbSchemaChallenge)) {
           let solved = true
-          models.sequelize.query('SELECT sql FROM sqlite_master').then(([data]: any) => {
-            const tableDefinitions = utils.queryResultToJson(data)
-            if (tableDefinitions.data?.length) {
-              for (let i = 0; i < tableDefinitions.data.length; i++) {
-                solved = solved && utils.containsOrEscaped(dataString, tableDefinitions.data[i].sql)
-                if (!solved) {
-                  break
+          models.sequelize.query('SELECT sql FROM sqlite_master')
+            .then(([data]: any) => {
+              const tableDefinitions = utils.queryResultToJson(data)
+              if (tableDefinitions.data?.length) {
+                for (let i = 0; i < tableDefinitions.data.length; i++) {
+                  solved = solved && utils.containsOrEscaped(dataString, tableDefinitions.data[i].sql)
+                  if (!solved) {
+                    break
+                  }
+                }
+                if (solved) {
+                  challengeUtils.solve(challenges.dbSchemaChallenge)
                 }
               }
-              if (solved) {
-                challengeUtils.solve(challenges.dbSchemaChallenge)
-              }
-            }
-          })
-        } // vuln-code-snippet hide-end
+            }).catch((error: Error) => {
+              next(error)
+            })
+        }
+
         for (let i = 0; i < products.length; i++) {
           products[i].name = req.__(products[i].name)
           products[i].description = req.__(products[i].description)
         }
         res.json(utils.queryResultToJson(products))
-      }).catch((error: ErrorWithParent) => {
+      })
+      .catch((error: any) => {
         next(error.parent)
       })
   }
