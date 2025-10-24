@@ -13,8 +13,14 @@ const security = require('../lib/insecurity')
 
 module.exports = function productReviews () {
   return (req: Request, res: Response, next: NextFunction) => {
-    const id = req.body.id
+    const rawId = req.body.id
     const user = security.authenticatedUsers.from(req)
+
+    // Reject objects to stop injection
+    if (rawId === undefined || rawId === null || typeof rawId === 'object') {
+      return res.status(400).json({ error: 'Invalid review id' })
+    }
+    const id = String(rawId).trim() // Convert to string
     db.reviews.findOne({ _id: id }).then((review: Review) => {
       if (!review) {
         res.status(404).json({ error: 'Not found' })
@@ -63,3 +69,5 @@ module.exports = function productReviews () {
     })
   }
 }
+
+// PATCHED

@@ -14,10 +14,33 @@ const security = require('../lib/insecurity')
 module.exports = function productReviews () {
   return (req: Request, res: Response, next: NextFunction) => {
     const user = security.authenticatedUsers.from(req) // vuln-code-snippet vuln-line forgedReviewChallenge
+
+    const rawId = req.body?.id
+    if (rawId === undefined || rawId === null) {
+      return res.status(400).json({ error: 'Missing review id' })
+    }
+    // Reject objects to avoid injection
+    if (typeof rawId === 'object') {
+      return res.status(400).json({ error: 'Invalid review id' })
+    }
+    const safeId = String(rawId).trim()
+
+    // Ensure message is a string
+    const rawMessage = req.body?.message
+    if (rawMessage === undefined || rawMessage === null) {
+      return res.status(400).json({ error: 'Missing review message' })
+    }
+    if (typeof rawMessage === 'object') {
+      return res.status(400).json({ error: 'Invalid review message' })
+    }
+    const safeMessage = String(rawMessage)
+
+    // Build safe query
+    const query: any = { _id: safeId }
     db.reviews.update( // vuln-code-snippet neutral-line forgedReviewChallenge
-      { _id: req.body.id }, // vuln-code-snippet vuln-line noSqlReviewsChallenge forgedReviewChallenge
-      { $set: { message: req.body.message } },
-      { multi: true } // vuln-code-snippet vuln-line noSqlReviewsChallenge
+      query,
+      { $set: { message: safeMessage } },
+      { multi: false }
     ).then(
       (result: { modified: number, original: Array<{ author: any }> }) => {
         challengeUtils.solveIf(challenges.noSqlReviewsChallenge, () => { return result.modified > 1 }) // vuln-code-snippet hide-line
@@ -29,3 +52,5 @@ module.exports = function productReviews () {
   }
 }
 // vuln-code-snippet end noSqlReviewsChallenge forgedReviewChallenge
+
+// PATCHED
