@@ -326,10 +326,22 @@ restoreOverwrittenFilesWithOriginals().then(() => {
     .get(security.isAuthorized())
     .put(security.denyAll())
     .delete(security.denyAll())
-  /* Products: Only GET is allowed in order to view products */ // vuln-code-snippet neutral-line changeProductChallenge
-  app.post('/api/Products', security.isAuthorized()) // vuln-code-snippet neutral-line changeProductChallenge
-  // app.put('/api/Products/:id', security.isAuthorized()) // vuln-code-snippet vuln-line changeProductChallenge
+
+  /* Products: Only GET is allowed in order to view products */
+  // Safe Code
+  app.post('/api/Products', security.denyAll())
+  app.put('/api/Products/:id', security.denyAll())
   app.delete('/api/Products/:id', security.denyAll())
+
+  // Unsafe Code
+  // app.post('/api/Products', security.isAuthorized()) // vuln-code-snippet neutral-line changeProductChallenge
+  // // app.put('/api/Products/:id', security.isAuthorized()) // vuln-code-snippet vuln-line changeProductChallenge
+  // // The above line of code was commented out originally so put requests did not need to be from an authorised user
+  // app.delete('/api/Products/:id', security.denyAll())
+
+  // This fix ensures that the only product API command that can be used is GET. Any manipulation commands such as POST, PUT, DELETE should
+  // not be accessible via the client app
+
   /* Challenges: GET list of challenges allowed. Everything else forbidden entirely */
   app.post('/api/Challenges', security.denyAll())
   app.use('/api/Challenges/:id', security.denyAll())
