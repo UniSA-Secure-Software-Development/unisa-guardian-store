@@ -12,6 +12,7 @@ import { dom, library } from '@fortawesome/fontawesome-svg-core'
 import { faFacebook, faReddit, faSlack, faTwitter } from '@fortawesome/free-brands-svg-icons'
 import { faNewspaper, faStar } from '@fortawesome/free-regular-svg-icons'
 import { faStar as fasStar } from '@fortawesome/free-solid-svg-icons'
+import { SecurityHelper } from '../helpers/security-helper'
 
 library.add(faFacebook, faTwitter, faSlack, faReddit, faNewspaper, faStar, fasStar)
 dom.watch()
@@ -78,7 +79,7 @@ export class AboutComponent implements OnInit {
       for (let i = 0; i < feedbacks.length; i++) {
         // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
         feedbacks[i].comment = `<span style="width: 90%; display:block;">${feedbacks[i].comment}<br/> (${this.stars[feedbacks[i].rating]})</span>`
-        feedbacks[i].comment = this.sanitizer.bypassSecurityTrustHtml(feedbacks[i].comment)
+        feedbacks[i].comment = SecurityHelper.sanitizeAndEncodeInputForHTML(this.sanitizer, feedbacks[i].comment)
         this.slideshowDataSource.push({ url: this.images[i % this.images.length], caption: feedbacks[i].comment })
       }
     }, (err) => {

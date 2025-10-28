@@ -14,6 +14,7 @@ import { DomSanitizer } from '@angular/platform-browser'
 import { dom, library } from '@fortawesome/fontawesome-svg-core'
 import { faArchive, faEye, faHome, faTrashAlt, faUser } from '@fortawesome/free-solid-svg-icons'
 import { MatPaginator } from '@angular/material/paginator'
+import { SecurityHelper } from '../helpers/security-helper'
 
 library.add(faUser, faEye, faHome, faArchive, faTrashAlt)
 dom.watch()
@@ -47,8 +48,7 @@ export class AdministrationComponent implements OnInit {
       this.userDataSource = users
       this.userDataSourceHidden = users
       for (const user of this.userDataSource) {
-        // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-        user.email = this.sanitizer.bypassSecurityTrustHtml(`<span class="${user.token ? 'confirmation' : 'error'}">${user.email}</span>`)
+        user.email = `<span class="${user.token ? 'confirmation' : 'error'}">${SecurityHelper.sanitizeAndEncodeInputForHTML(this.sanitizer, user.email)}</span>`
       }
       this.userDataSource = new MatTableDataSource(this.userDataSource)
       this.userDataSource.paginator = this.paginatorUsers
@@ -63,7 +63,7 @@ export class AdministrationComponent implements OnInit {
     this.feedbackService.find().subscribe((feedbacks) => {
       this.feedbackDataSource = feedbacks
       for (const feedback of this.feedbackDataSource) {
-        feedback.comment = this.sanitizer.bypassSecurityTrustHtml(feedback.comment)
+        feedback.comment = SecurityHelper.sanitizeAndEncodeInputForHTML(this.sanitizer, feedback.comment)
       }
       this.feedbackDataSource = new MatTableDataSource(this.feedbackDataSource)
       this.feedbackDataSource.paginator = this.paginatorFeedb
