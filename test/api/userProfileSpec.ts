@@ -8,7 +8,9 @@ import config = require('config')
 
 const URL = 'http://localhost:3000'
 
-const jsonHeader = { 'content-type': 'application/json' }
+const CSP = "default-src 'none'; script-src 'self'; connect-src 'self'; img-src 'self'; style-src 'self';base-uri 'self';form-action 'self'"
+
+const jsonHeader = { 'content-type': 'application/json', 'Content-Security-Policy': CSP  }
 let authHeader: { Cookie: any }
 
 beforeAll(() => {

@@ -12,8 +12,9 @@ const security = require('../../lib/insecurity')
 const http = require('http')
 
 const REST_URL = 'http://localhost:3000/rest'
+const CSP = "default-src 'none'; script-src 'self'; connect-src 'self'; img-src 'self'; style-src 'self';base-uri 'self';form-action 'self'"
 
-const jsonHeader = { 'content-type': 'application/json' }
+const jsonHeader = { 'content-type': 'application/json', 'Content-Security-Policy': CSP }
 const authHeader = { Authorization: `Bearer ${security.authorize()}`, 'content-type': 'application/json' }
 
 describe('/rest/products/:id/reviews', () => {

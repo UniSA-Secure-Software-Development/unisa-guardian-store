@@ -11,8 +11,10 @@ const security = require('../../lib/insecurity')
 const API_URL = 'http://localhost:3000/api'
 const REST_URL = 'http://localhost:3000/rest'
 
-const authHeader = { Authorization: 'Bearer ' + security.authorize(), 'content-type': /application\/json/ }
-const jsonHeader = { 'content-type': 'application/json' }
+const CSP = "default-src 'none'; script-src 'self'; connect-src 'self'; img-src 'self'; style-src 'self';base-uri 'self';form-action 'self'"
+
+const authHeader = { Authorization: 'Bearer ' + security.authorize(), 'content-type': 'application/json' }
+const jsonHeader = { 'content-type': 'application/json' , 'Content-Security-Policy': CSP }
 
 describe('/api/Feedbacks', () => {
   it('GET all feedback', () => {
