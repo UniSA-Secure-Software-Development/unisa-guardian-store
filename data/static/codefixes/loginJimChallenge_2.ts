@@ -1,4 +1,5 @@
 import {BasketModel} from "../../../models/basket";
+import { UserModel } from '../../../models/user'
 
 module.exports = function login () {
   function afterLogin (user: { data: User, bid: number }, res: Response, next: NextFunction) {
@@ -14,7 +15,13 @@ module.exports = function login () {
   }
 
   return (req: Request, res: Response, next: NextFunction) => {
-    models.sequelize.query(`SELECT * FROM Users WHERE email = '${req.body.email || ''}' AND password = '${security.hash(req.body.password || '')}' AND deletedAt IS NULL`, { model: models.User, plain: false })
+    UserModel.findAll({
+      where: {
+        email: (req.body.email  || ''),
+        password: security.hash(req.body.password || ''),
+        deletedAt: null,
+      },
+    })
       .then((authenticatedUser: { data: User }) => {
         const user = utils.queryResultToJson(authenticatedUser)
         if (user.data?.id && user.data.totpSecret !== '') {
