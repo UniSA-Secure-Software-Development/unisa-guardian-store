@@ -1,0 +1,63 @@
+# Friendly name for the workflow in GitHub
+name: Continuous Integration (CI)
+
+# Run the workflow each time code is pushed, or when a pull-request is created
+on: [push, pull_request]
+
+jobs:
+  # Build the app
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "Build the app..."
+      - run: echo "Not implemented to save time when running the workflow"
+
+  # Run security scans
+  scan:
+    name: Run security scans
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      # Set up prerequisites for tests
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+
+      # Java is required to run OWASP Dependency Check
+      - uses: actions/setup-java@v2
+        with:
+          distribution: 'temurin'
+          java-version: '11'
+
+      # Install node packages if required for your project
+      - run: npm install
+      
+      # Run OWASP Dependency Check
+      - run: |
+          mkdir -p .comp4035/tools 
+          curl -L https://github.com/jeremylong/DependencyCheck/releases/download/v6.1.6/dependency-check-6.1.6-release.zip -o dependency-check.zip
+          unzip dependency-check.zip -d .comp4035/tools/dependency-check
+          .comp4035/tools/dependency-check/bin/dependency-check.sh -s . -o .comp4035/output --disableAssembly
+
+      # Run DevSkim using the GitHub Action
+      - uses: microsoft/devskim-action@v1
+        with:
+          directory-to-scan: /
+          should-scan-archives: false
+          output-filename: devskim-results.sarif
+          output-directory: .comp4035/output
+
+      # Publish the scan results as an artifact
+      - uses: actions/upload-artifact@v3
+        with: 
+          name: scan-results
+          path: .comp4035/output
+
+  # Deploy the app
+  deploy:
+    name: Deploy
+    needs: scan
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "Deploy the app..."
+      - run: echo "Not implemented to save time when running the workflow"
