@@ -1,0 +1,35 @@
+# Friendly name for the workflow in GitHub
+name: Continuous Integration (CI)
+
+# Run the workflow each time code is pushed, or when a pull-request is created
+on: [push, pull_request]
+
+jobs:
+  # Run security scans
+  scan:
+    # Configure the job 
+    name: Run security scans
+    runs-on: ubuntu-latest
+
+    # Steps to run
+    steps:
+      # Check out the repository
+      - uses: actions/checkout@v3
+
+      - run: mkdir -p .comp4035/output
+
+      # Run DevSkim
+      - name: Run DevSkim Security Scan
+        uses: microsoft/devskim-action@v1
+        with:
+          directory-to-scan: /
+          should-scan-archives: false
+          output-filename: devskim-results.sarif
+          output-directory: .comp4035/output
+
+      # Publish the scan results as an artifact
+      - name: Upload Scan Results
+        uses: actions/upload-artifact@v3
+        with: 
+          name: scan-results
+          path: .comp4035/output
