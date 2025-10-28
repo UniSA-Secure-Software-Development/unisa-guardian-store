@@ -24,7 +24,7 @@ dom.watch()
 export class ForgotPasswordComponent {
   public emailControl: UntypedFormControl = new UntypedFormControl('', [Validators.required, Validators.email])
   public securityQuestionControl: UntypedFormControl = new UntypedFormControl({ disabled: true, value: '' }, [Validators.required])
-  public passwordControl: UntypedFormControl = new UntypedFormControl({ disabled: true, value: '' }, [Validators.required, Validators.minLength(5)])
+  public passwordControl: UntypedFormControl = new UntypedFormControl({ disabled: true, value: '' }, [Validators.required, Validators.minLength(13)])
   public repeatPasswordControl: UntypedFormControl = new UntypedFormControl({ disabled: true, value: '' }, [Validators.required, matchValidator(this.passwordControl)])
   public securityQuestion?: string
   public error?: string

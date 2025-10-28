@@ -1,0 +1,42 @@
+name: ZAP Full Scan on Repository Project
+
+on:
+  pull_request:
+    branches:
+      - main # Runs automatically when a pull request is made to the main branch
+  workflow_dispatch: # Allows manual trigger for testing purposes
+
+jobs:
+  zap_scan:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Check out the code from the repository
+      - name: Check out code
+        uses: actions/checkout@v3
+
+      # Step 2: Build Docker image from repository code
+      - name: Build Docker image
+        run: |
+          docker build -t juice-shop-app . # Build Docker image using the Dockerfile in the repository
+
+      # Step 3: Run the Docker container
+      - name: Start Docker container
+        run: |
+          docker run -d -p 3000:3000 --name juice-shop-app juice-shop-app # Run the container and map to localhost port 3000
+          sleep 300 # Wait at least 5 minutes to ensure the application fully starts
+
+      # Step 4: Run OWASP ZAP Full Scan on the running application
+      - name: Run OWASP ZAP Full Scan
+        uses: zaproxy/action-full-scan@v0.6.0
+        with:
+          target: 'http://localhost:3000' # Set the target to the running application URL
+          cmd_options: '-config globalmode=attack -config api.disablekey=true'
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      # Step 5: Upload ZAP report as an artifact
+      - name: Upload ZAP Report
+        uses: actions/upload-artifact@v3
+        with:
+          name: ZAP-Full-Report
+          path: zap/results/ # Upload ZAP report files

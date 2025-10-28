@@ -1,8 +1,3 @@
-/*
- * Copyright (c) 2014-2022 Bjoern Kimminich & the OWASP Juice Shop contributors.
- * SPDX-License-Identifier: MIT
- */
-
 import { SecurityAnswerService } from '../Services/security-answer.service'
 import { UserService } from '../Services/user.service'
 import { AbstractControl, UntypedFormControl, Validators } from '@angular/forms'
@@ -28,15 +23,26 @@ dom.watch()
 })
 export class RegisterComponent implements OnInit {
   public emailControl: UntypedFormControl = new UntypedFormControl('', [Validators.required, Validators.email])
-  public passwordControl: UntypedFormControl = new UntypedFormControl('', [Validators.required, Validators.minLength(5), Validators.maxLength(40)])
+  public passwordControl: UntypedFormControl = new UntypedFormControl('', [
+    Validators.required,
+    Validators.minLength(13),
+    Validators.maxLength(40),
+    Validators.pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>]).+$/) // Password complexity pattern
+  ])
+
   public repeatPasswordControl: UntypedFormControl = new UntypedFormControl('', [Validators.required, matchValidator(this.passwordControl)])
   public securityQuestionControl: UntypedFormControl = new UntypedFormControl('', [Validators.required])
-  public securityAnswerControl: UntypedFormControl = new UntypedFormControl('', [Validators.required])
+  public securityAnswerControl: UntypedFormControl = new UntypedFormControl('', [
+    Validators.required,
+    Validators.minLength(6) // Minimum length requirement for security answer
+  ])
+
   public securityQuestions!: SecurityQuestion[]
   public selected?: number
   public error: string | null = null
 
-  constructor (private readonly securityQuestionService: SecurityQuestionService,
+  constructor (
+    private readonly securityQuestionService: SecurityQuestionService,
     private readonly userService: UserService,
     private readonly securityAnswerService: SecurityAnswerService,
     private readonly router: Router,
@@ -44,7 +50,8 @@ export class RegisterComponent implements OnInit {
     private readonly translateService: TranslateService,
     private readonly snackBar: MatSnackBar,
     private readonly snackBarHelperService: SnackBarHelperService,
-    private readonly ngZone: NgZone) { }
+    private readonly ngZone: NgZone
+  ) {}
 
   ngOnInit () {
     this.securityQuestionService.find(null).subscribe((securityQuestions: any) => {
@@ -61,6 +68,11 @@ export class RegisterComponent implements OnInit {
       passwordRepeat: this.repeatPasswordControl.value,
       securityQuestion: this.securityQuestions.find((question) => question.id === this.securityQuestionControl.value),
       securityAnswer: this.securityAnswerControl.value
+    }
+
+    if (this.passwordControl.invalid) {
+      this.error = 'Password must be at least 13 characters long and contain uppercase, lowercase, numbers, and special characters.'
+      return
     }
 
     this.userService.save(user).subscribe((response: any) => {
@@ -87,6 +99,7 @@ export class RegisterComponent implements OnInit {
   }
 }
 
+// Password and Repeat Password match validator function
 function matchValidator (passwordControl: AbstractControl) {
   return function matchOtherValidate (repeatPasswordControl: UntypedFormControl) {
     const password = passwordControl.value
