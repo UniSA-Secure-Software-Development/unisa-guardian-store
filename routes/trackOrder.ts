@@ -12,7 +12,10 @@ const db = require('../data/mongodb')
 
 module.exports = function trackOrder () {
   return (req: Request, res: Response) => {
-    const id = utils.disableOnContainerEnv() ? String(req.params.id).replace(/[^\w-]+/g, '') : req.params.id
+    const id = String(req.params.id).replace(/[^\w-]+/g, '')
+    if (!id || id.length === 0) {
+      return res.status(400).json({ error: 'Invalid order ID format' })
+    }
 
     challengeUtils.solveIf(challenges.reflectedXssChallenge, () => { return utils.contains(id, '<iframe src="javascript:alert(`xss`)">') })
     db.orders.find({ $where: `this.orderId === '${id}'` }).then((order: any) => {
