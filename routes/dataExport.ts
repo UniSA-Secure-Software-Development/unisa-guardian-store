@@ -98,7 +98,7 @@ module.exports = function dataExport () {
           for (const order of userData.orders) {
             challengeUtils.solveIf(challenges.dataExportChallenge, () => { return order.orderId.split('-')[0] !== emailHash })
           }
-          res.status(200).send({ userData: JSON.stringify(userData, null, 2), confirmation: 'Your data export will open in a new Browser window.' })
+          res.status(200).json({ userData, confirmation: 'Your data export will open in a new Browser window.' })
         },
         () => {
           next(new Error(`Error retrieving reviews for ${email}`))
