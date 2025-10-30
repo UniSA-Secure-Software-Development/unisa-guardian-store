@@ -1,21 +1,40 @@
 rules:
   - id: express-unsafe-route-missing-csrf
     languages: [javascript, typescript]
-    message: "Express 路由为有副作用的 HTTP 方法但缺少 CSRF 校验中间件（verify/csurf）。"
+    message: "Express 路由为有副作用的 HTTP 方法但缺少 CSRF 校验中间件（如 csrfProtection, verifyCsrfToken, 或 csurf）。"
     severity: ERROR
     patterns:
       - pattern-either:
-          - pattern: |
-              app.$METHOD($ROUTE, ...)
-          - pattern: |
-              router.$METHOD($ROUTE, ...)
-    metavariable-regex:
-      METHOD: "(post|put|patch|delete)"
-    # Heuristic: require that one of middlewares includes csrf keyword; otherwise flag
-    # Use negation with pattern-not to approximate
-    pattern-not: |
-      $SOMETHING(csrf, ...)
+          - pattern: app.post($ROUTE, ...)
+          - pattern: router.post($ROUTE, ...)
+          - pattern: app.put($ROUTE, ...)
+          - pattern: router.put($ROUTE, ...)
+          - pattern: app.patch($ROUTE, ...)
+          - pattern: router.patch($ROUTE, ...)
+          - pattern: app.delete($ROUTE, ...)
+          - pattern: router.delete($ROUTE, ...)
+
+    # "patterns-not" 块定义了我们想要排除的"好"模式：
+  
+    patterns-not:
+      - pattern-either:
+          # --- 匹配 post ---
+          - pattern: $APP.post($ROUTE, ..., csrfProtection, ...)
+          - pattern: $APP.post($ROUTE, ..., verifyCsrfToken, ...)
+          - pattern: $APP.post($ROUTE, ..., csurf( ... ), ...)
+          # --- 匹配 put ---
+          - pattern: $APP.put($ROUTE, ..., csrfProtection, ...)
+          - pattern: $APP.put($ROUTE, ..., verifyCsrfToken, ...)
+          - pattern: $APP.put($ROUTE, ..., csurf( ... ), ...)
+          # --- 匹配 patch ---
+          - pattern: $APP.patch($ROUTE, ..., csrfProtection, ...)
+          - pattern: $APP.patch($ROUTE, ..., verifyCsrfToken, ...)
+          - pattern: $APP.patch($ROUTE, ..., csurf( ... ), ...)
+          # --- 匹配 delete ---
+          - pattern: $APP.delete($ROUTE, ..., csrfProtection, ...)
+          - pattern: $APP.delete($ROUTE, ..., verifyCsrfToken, ...)
+          - pattern: $APP.delete($ROUTE, ..., csurf( ... ), ...)
+
     metadata:
       category: security
       technology: [express]
-
