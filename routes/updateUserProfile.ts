@@ -28,7 +28,7 @@ module.exports = function updateUserProfile () {
             savedUser = utils.queryResultToJson(savedUser)
             const updatedToken = security.authorize(savedUser)
             security.authenticatedUsers.put(updatedToken, savedUser)
-            const isSecure = (req.secure === true) || (req.headers['x-forwarded-proto'] === 'https')
+            const isSecure = (req.secure) || (req.headers['x-forwarded-proto'] === 'https')
             res.cookie('token', updatedToken, { sameSite: 'lax', httpOnly: true, secure: isSecure, path: '/' })
             res.location(process.env.BASE_PATH + '/profile')
             res.redirect(process.env.BASE_PATH + '/profile')
