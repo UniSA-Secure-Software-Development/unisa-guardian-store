@@ -1,0 +1,21 @@
+rules:
+  - id: express-unsafe-route-missing-csrf
+    languages: [javascript, typescript]
+    message: "Express 路由为有副作用的 HTTP 方法但缺少 CSRF 校验中间件（verify/csurf）。"
+    severity: ERROR
+    patterns:
+      - pattern-either:
+          - pattern: |
+              app.$METHOD($ROUTE, ...)
+          - pattern: |
+              router.$METHOD($ROUTE, ...)
+    metavariable-regex:
+      METHOD: "(post|put|patch|delete)"
+    # Heuristic: require that one of middlewares includes csrf keyword; otherwise flag
+    # Use negation with pattern-not to approximate
+    pattern-not: |
+      $SOMETHING(csrf, ...)
+    metadata:
+      category: security
+      technology: [express]
+

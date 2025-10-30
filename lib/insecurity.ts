@@ -208,7 +208,8 @@ exports.updateAuthenticatedUsers = () => (req: Request, res: Response, next: Nex
       if (err === null) {
         if (authenticatedUsers.get(token) === undefined) {
           authenticatedUsers.put(token, decoded)
-          res.cookie('token', token)
+          const isSecure = (req.secure === true) || (req.headers['x-forwarded-proto'] === 'https')
+          res.cookie('token', token, { sameSite: 'lax', httpOnly: true, secure: isSecure, path: '/' })
         }
       }
     })

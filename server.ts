@@ -256,6 +256,10 @@ restoreOverwrittenFilesWithOriginals().then(() => {
 
   app.use(express.static(path.resolve('frontend/dist/frontend')))
   app.use(cookieParser('kekse'))
+  /* CSRF protection: set token cookie and verify unsafe methods */
+  const { csrfProtection, issueCsrfToken } = require('./middleware/csrf')
+  app.use(csrfProtection())
+  app.get('/rest/csrf-token', issueCsrfToken())
   // vuln-code-snippet end directoryListingChallenge accessLogDisclosureChallenge
 
   /* Configure and enable backend-side i18n */

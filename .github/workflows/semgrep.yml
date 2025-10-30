@@ -1,0 +1,36 @@
+name: Semgrep Security Scan
+
+on:
+  pull_request:
+  push:
+    branches: [ develop, main ]
+
+jobs:
+  semgrep:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Install Semgrep
+        run: |
+          python -m pip install --upgrade pip
+          pip install semgrep
+
+      - name: Run Semgrep
+        run: |
+          semgrep --config ./.semgrep --error --json > semgrep-report.json || exit_code=$?; \
+          echo "Semgrep exit code: ${exit_code:-0}"; \
+          if [ "${exit_code:-0}" -ne 0 ]; then exit 1; fi
+
+      - name: Upload Semgrep report
+        uses: actions/upload-artifact@v4
+        with:
+          name: semgrep-report
+          path: semgrep-report.json
+
