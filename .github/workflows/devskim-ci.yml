@@ -1,10 +1,10 @@
 name: Guardian-Store-Develop
 
 on:
-  push:     # Trigger on push events
+  push:     
     branches: [ main, develop ]
   pull_request:
-    branches: [ main ]
+    branches: [ develop ]
 
 permissions:
   contents: write
