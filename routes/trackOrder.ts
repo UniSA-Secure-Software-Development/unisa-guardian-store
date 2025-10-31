@@ -4,10 +4,7 @@
  */
 
 import utils = require('../lib/utils')
-import challengeUtils = require('../lib/challengeUtils')
 import { Request, Response } from 'express'
-
-const challenges = require('../data/datacache').challenges
 const db = require('../data/mongodb')
 
 module.exports = function trackOrder () {
@@ -27,7 +24,6 @@ module.exports = function trackOrder () {
       return res.status(400).json({ error: 'Invalid email format' })
     }
 
-  
     db.orders.find({
       orderId: id,
       email: email

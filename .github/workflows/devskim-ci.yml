@@ -55,7 +55,7 @@ jobs:
           if [ -f reports/devskim-results.json ]; then
             CRITICAL=$(jq '[.[] | select(.severity == "Critical")] | length' reports/devskim-results.json)
             if [ "$CRITICAL" -gt 0 ]; then
-              echo "❌ Found $CRITICAL critical vulnerabilities"
+              echo " Found $CRITICAL critical vulnerabilities"
               exit 1
             fi
           fi
