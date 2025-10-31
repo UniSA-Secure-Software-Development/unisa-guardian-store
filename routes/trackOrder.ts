@@ -27,7 +27,7 @@ module.exports = function trackOrder () {
       return res.status(400).json({ error: 'Invalid email format' })
     }
 
-    challengeUtils.solveIf(challenges.reflectedXssChallenge, () => { return utils.contains(id, '<iframe src="javascript:alert(`xss`)">') })
+  
     db.orders.find({
       orderId: id,
       email: email
