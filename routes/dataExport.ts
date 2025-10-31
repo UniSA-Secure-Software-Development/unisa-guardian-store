@@ -18,7 +18,6 @@ module.exports = function dataExport () {
     if (loggedInUser?.data?.email && loggedInUser.data.id) {
       const username = loggedInUser.data.username
       const email = loggedInUser.data.email
-      const updatedEmail = email.replace(/[aeiou]/gi, '*')
       const userData:
       {
         username: string
@@ -58,7 +57,7 @@ module.exports = function dataExport () {
         })
       })
 
-      db.orders.find({ email: updatedEmail }).then((orders: Array<{
+      db.orders.find({ email: email }).then((orders: Array<{
         orderId: string
         totalPrice: number
         products: ProductModel[]
@@ -99,14 +98,14 @@ module.exports = function dataExport () {
           for (const order of userData.orders) {
             challengeUtils.solveIf(challenges.dataExportChallenge, () => { return order.orderId.split('-')[0] !== emailHash })
           }
-          res.status(200).send({ userData: JSON.stringify(userData, null, 2), confirmation: 'Your data export will open in a new Browser window.' })
+          res.status(200).json({ userData, confirmation: 'Your data export will open in a new Browser window.' })
         },
         () => {
-          next(new Error(`Error retrieving reviews for ${updatedEmail}`))
+          next(new Error(`Error retrieving reviews for ${email}`))
         })
       },
       () => {
-        next(new Error(`Error retrieving orders for ${updatedEmail}`))
+        next(new Error(`Error retrieving orders for ${email}`))
       })
     } else {
       next(new Error('Blocked illegal activity by ' + req.connection.remoteAddress))

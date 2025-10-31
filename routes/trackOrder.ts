@@ -4,26 +4,54 @@
  */
 
 import utils = require('../lib/utils')
-import challengeUtils = require('../lib/challengeUtils')
 import { Request, Response } from 'express'
-
-const challenges = require('../data/datacache').challenges
 const db = require('../data/mongodb')
 
 module.exports = function trackOrder () {
   return (req: Request, res: Response) => {
-    const id = utils.disableOnContainerEnv() ? String(req.params.id).replace(/[^\w-]+/g, '') : req.params.id
+    const id = String(req.params.id).replace(/[^\w-]+/g, '')
+    if (!id || id.length === 0) {
+      return res.status(400).json({ error: 'Invalid order ID format' })
+    }
 
-    challengeUtils.solveIf(challenges.reflectedXssChallenge, () => { return utils.contains(id, '<iframe src="javascript:alert(`xss`)">') })
-    db.orders.find({ $where: `this.orderId === '${id}'` }).then((order: any) => {
-      const result = utils.queryResultToJson(order)
-      challengeUtils.solveIf(challenges.noSqlOrdersChallenge, () => { return result.data.length > 1 })
-      if (result.data[0] === undefined) {
-        result.data[0] = { orderId: id }
+    const email = req.body?.email || req.query?.email
+    if (!email || typeof email !== 'string') {
+      return res.status(400).json({ error: 'Email parameter required' })
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!emailRegex.test(email)) {
+      return res.status(400).json({ error: 'Invalid email format' })
+    }
+
+    db.orders.find({
+      orderId: id,
+      email: email
+    }).then((order: any) => {
+      if (!order || order.length === 0) {
+        return res.status(404).json({ error: 'Order not found' })
       }
-      res.json(result)
-    }, () => {
-      res.status(400).json({ error: 'Wrong Param' })
+
+      if (order.length > 1) {
+        console.error('Multiple orders found for single orderId - potential injection attempt')
+        return res.status(400).json({ error: 'Invalid request' })
+      }
+
+      const result = utils.queryResultToJson(order)
+
+      const sanitizedData = result.data.map((orderItem: any) => ({
+        orderId: orderItem.orderId,
+        totalPrice: orderItem.totalPrice,
+        products: orderItem.products,
+        eta: orderItem.eta,
+        delivered: orderItem.delivered,
+        bonus: orderItem.bonus
+      }))
+
+      res.json({ status: 'success', data: sanitizedData })
+    }, (error: any) => {
+      console.error('Database error:', error)
+      res.status(500).json({ error: 'Unable to retrieve order' })
     })
   }
 }

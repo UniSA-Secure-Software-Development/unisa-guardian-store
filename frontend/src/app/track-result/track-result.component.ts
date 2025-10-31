@@ -39,7 +39,8 @@ export class TrackResultComponent implements OnInit {
     this.orderId = this.route.snapshot.queryParams.id
     this.trackOrderService.find(this.orderId).subscribe((results) => {
       // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-      this.results.orderNo = this.sanitizer.bypassSecurityTrustHtml(`<code>${results.data[0].orderId}</code>`)
+      // Remove bypassSecurityTrustHtml let Angular handle sanitization naturally
+      this.results.orderNo = results.data[0].orderId
       this.results.email = results.data[0].email
       this.results.totalPrice = results.data[0].totalPrice
       this.results.products = results.data[0].products
