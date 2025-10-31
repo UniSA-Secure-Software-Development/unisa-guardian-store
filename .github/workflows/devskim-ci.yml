@@ -1,0 +1,62 @@
+name: Guardian-Store-Develop 
+
+on:
+  push:
+    branches: [ develop ]
+  pull_request:
+    branches: [ develop ]
+
+jobs:
+  security-scan:
+    name: Security Testing
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        
+      - name: Setup .NET for DevSkim
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '7.0.x'
+          
+      - name: Install DevSkim
+        run: dotnet tool install --global Microsoft.CST.DevSkim.CLI
+        
+      - name: Run DevSkim Scan
+        continue-on-error: true
+        run: |
+          mkdir -p reports
+          devskim analyze . \
+            --severity-threshold moderate \
+            --file-format json \
+            --output-file reports/devskim-results.json
+            
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+          
+      - name: Run Security Tests
+        run: |
+          pip install requests
+          python tests/security_tests.py
+          
+      - name: Upload Results
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: security-reports
+          path: reports/
+          retention-days: 30
+          
+      - name: Check Results
+        run: |
+          if [ -f reports/devskim-results.json ]; then
+            CRITICAL=$(jq '[.[] | select(.severity == "Critical")] | length' reports/devskim-results.json)
+            if [ "$CRITICAL" -gt 0 ]; then
+              echo "❌ Found $CRITICAL critical vulnerabilities"
+              exit 1
+            fi
+          fi
+          echo " Security scan passed"
