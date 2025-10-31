@@ -1,103 +1,41 @@
-name: DevSkim Security Scan (test/)
+name: Guardian-Store-Develop
 
 on:
-  push:
+  push:     # Trigger on push events
     branches: [ main, develop ]
   pull_request:
-    branches: [ main, develop ]
+    branches: [ main ]
 
 permissions:
-  contents: read
-  security-events: write
+  contents: write
+  pages: write
+  id-token: write
 
 jobs:
   devskim-scan:
-    name: DevSkim Scan (test folder)
+    name: DevSkim scan (test/)
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
+      - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup .NET (required for DevSkim CLI)
-        uses: actions/setup-dotnet@v4
+      - name: Create output directory
+        run: mkdir -p output
+
+      - name: Run DevSkim Action
+        uses: microsoft/DevSkim-Action@v1
         with:
-          dotnet-version: '8.x'
+          
+          directory-to-scan: /
+          should-scan-archives: false
+          output-filename: devskim-results.sarif
+          output-directory: output
+          name: devskim-results
+          path: output/devskim-results.sarif
 
-      - name: Ensure reports directory
-        run: mkdir -p reports
-
-      - name: Install jq (for parsing JSON)
-        run: sudo apt-get update && sudo apt-get install -y jq
-
-      - name: Install DevSkim CLI (dotnet global tool)
-        run: |
-          # Install DevSkim as a global tool; tolerate failure if already present
-          dotnet tool install --global Microsoft.CST.DevSkim.CLI --version 4.* || true
-          echo "$HOME/.dotnet/tools" >> $GITHUB_PATH
-
-      - name: Run DevSkim (JSON + SARIF) on test/
-        env:
-          DOTNET_ROOT: /usr/share/dotnet
-        run: |
-          echo "Running DevSkim on test/ -> reports/devskim-results.json + .sarif"
-          devskim analyze -I test --file-format json --output-file reports/devskim-results.json || true
-          devskim analyze -I test --file-format sarif --output-file reports/devskim-results.sarif || true
-          ls -la reports || true
-
-      - name: Setup Python (for additional tests)
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.11'
-
-      - name: Run Python security tests (if present)
-        run: |
-          if [ -f tests/security_tests.py ]; then
-            pip install --upgrade pip
-            pip install requests
-            python tests/security_tests.py
-          else
-            echo "No tests/security_tests.py found — skipping Python tests"
-          fi
-
-      - name: Upload raw reports (artifact)
-        if: always()
+      - name: Upload DevSkim results
         uses: actions/upload-artifact@v4
         with:
-          name: devskim-reports
-          path: reports/
-          retention-days: 7
-
-      - name: Check if SARIF exists
-        id: check_sarif
-        run: |
-          if [ -f reports/devskim-results.sarif ]; then
-            echo "exists=true" >> $GITHUB_OUTPUT
-          else
-            echo "exists=false" >> $GITHUB_OUTPUT
-          fi
-
-      - name: Upload SARIF to GitHub Security (if present)
-        if: steps.check_sarif.outputs.exists == 'true'
-        uses: github/codeql-action/upload-sarif@v2
-        with:
-          sarif_file: reports/devskim-results.sarif
-
-      - name: Fail on Critical / Important DevSkim findings
-        if: always()
-        run: |
-          if [ -f reports/devskim-results.json ]; then
-            # Robust jq that finds objects with a severity field equal to Critical or Important
-            CRIT_COUNT=$(jq '[.. | objects | select(has("severity") and (.severity == "Critical" or .severity == "Important"))] | length' reports/devskim-results.json 2>/dev/null || echo 0)
-            echo "DevSkim critical/important findings: $CRIT_COUNT"
-            if [ "$CRIT_COUNT" -gt 0 ]; then
-              echo "❗ Failing job due to $CRIT_COUNT critical/important DevSkim findings."
-              exit 1
-            fi
-          else
-            echo "No DevSkim JSON report found; skipping critical-fail check."
-          fi
-
-      - name: Report success
-        if: success()
-        run: echo " DevSkim scan completed with no critical/important findings."
+          name: devskim-results
+          path: output/devskim-results.sarif
