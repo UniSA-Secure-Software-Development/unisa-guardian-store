@@ -18,10 +18,12 @@ jobs:
         with:
           directory-to-scan: .
           should-scan-archives: false
+          output-filename: devskim-results.sarif
+          output-directory: ./devskim-output
 
       - name: Upload results
         uses: actions/upload-artifact@v4
         if: always()
         with:
           name: devskim-results
-          path: .devskim/
+          path: ./devskim-output
