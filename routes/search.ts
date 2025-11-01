@@ -21,7 +21,7 @@ module.exports = function searchProducts () {
     let criteria: any = req.query.q === 'undefined' ? '' : req.query.q ?? ''
     criteria = (criteria.length <= 200) ? criteria : criteria.substring(0, 200)
     const searchCriteria = `%${criteria}%`
-    models.sequelize.query('SELECT * FROM Products WHERE ((name LIKE :searchCriteria OR description LIKE :searchCriteria AND deletedAt IS NULL) ORDER BY name',
+    models.sequelize.query('SELECT * FROM Products WHERE ((name LIKE :searchCriteria OR description LIKE :searchCriteria) AND deletedAt IS NULL) ORDER BY name',
       {
         replacements: { searchCriteria }
       }
