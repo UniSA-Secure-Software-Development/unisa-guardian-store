@@ -1,9 +1,9 @@
 name: Security Scan - DOM XSS Detection
 on:
   pull_request:
-    branches: [desktop]
+    branches: [develop]
   push:
-    branches: [desktop]
+    branches: [develop]
 
 jobs:
   devskim-scan:
