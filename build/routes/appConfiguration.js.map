@@ -1,0 +1,1 @@
+{"version":3,"file":"appConfiguration.js","sourceRoot":"","sources":["../../routes/appConfiguration.ts"],"names":[],"mappings":";AAAA;;;GAGG;;AAEH,iCAAiC;AAGjC,MAAM,CAAC,OAAO,GAAG,SAAS,wBAAwB;IAChD,OAAO,CAAC,IAAa,EAAE,GAAa,EAAE,EAAE;QACtC,GAAG,CAAC,IAAI,CAAC,EAAE,MAAM,EAAE,CAAC,CAAA;IACtB,CAAC,CAAA;AACH,CAAC,CAAA"}
