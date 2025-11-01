@@ -1,0 +1,17 @@
+name: SQL Injection Detection
+
+on: [pull_request]
+
+jobs:
+  security:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - run: |
+        if grep -r "sequelize.query.*\`.*\${" routes/ 2>/dev/null; then
+          echo "Not Safe: SQL Injection found (sequelize.query with string concatenation)"
+          exit 1
+        else
+          echo "Safe: No patterns of SQL concatenation detected"
+          exit 0
+        fi
