@@ -2,8 +2,8 @@ name: Semgrep scan
 
 on:
   push:
-    branches: [ main ]
-  pull_request:
+    branches: ["**"]   
+  pull_request:  
 
 jobs:
   semgrep:
