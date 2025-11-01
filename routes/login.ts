@@ -32,9 +32,8 @@ module.exports = function login () {
   }
 
   return (req: Request, res: Response, next: NextFunction) => {
-    let criteria: any = req.query.q === 'undefined' ? '' : req.query.q ?? ''
-    criteria = (criteria.length <= 200) ? criteria : criteria.substring(0, 200)
-    models.sequelize.query(`SELECT * FROM Products WHERE ((name LIKE '%${criteria}%' OR description LIKE '%${criteria}%') AND deletedAt IS NULL) ORDER BY name`)
+    verifyPreLoginChallenges(req) // vuln-code-snippet hide-line
+    models.sequelize.query('SELECT * FROM Users WHERE email = ? AND password = ? AND deletedAt IS NULL', { replacements: [req.body.email || '', security.hash(req.body.password || '')], model: UserModel, plain: true, type: models.sequelize.QueryTypes.SELECT }) // vuln-code-snippet vuln-line loginAdminChallenge loginBenderChallenge loginJimChallenge
       .then((authenticatedUser: { data: User }) => { // vuln-code-snippet neutral-line loginAdminChallenge loginBenderChallenge loginJimChallenge
         const user = utils.queryResultToJson(authenticatedUser)
         if (user.data?.id && user.data.totpSecret !== '') {
