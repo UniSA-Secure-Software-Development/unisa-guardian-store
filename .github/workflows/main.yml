@@ -16,7 +16,7 @@ jobs:
       - name: Run DevSkim scanner
         uses: microsoft/devskim-action@v1
         with:
-          directory-to-scan: src/
+          directory-to-scan: .
           should-scan-archives: false
 
       - name: Upload results
