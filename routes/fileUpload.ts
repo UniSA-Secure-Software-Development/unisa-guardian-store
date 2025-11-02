@@ -56,16 +56,33 @@ function handleZipFileUpload ({ file }: Request, res: Response, next: NextFuncti
 
 function checkUploadSize ({ file }: Request, res: Response, next: NextFunction) {
   if (file) {
-    challengeUtils.solveIf(challenges.uploadSizeChallenge, () => { return file?.size > 100000 })
+    // firstly we have to check if the file exceeds the limit of 100kb
+    // in bytes
+    if (file.size > 100000) {
+      challengeUtils.solveIf(challenges.uploadSizeChallenge, () => { return true })
+      // important! reject files that are over 100kb
+      res.status(400).json({
+        error: 'File exceeds size limit. Maximum file size is 100KB.'
+      })
+      return
+    }
   }
   next()
 }
-
 function checkFileType ({ file }: Request, res: Response, next: NextFunction) {
-  const fileType = file?.originalname.substr(file.originalname.lastIndexOf('.') + 1).toLowerCase()
-  challengeUtils.solveIf(challenges.uploadTypeChallenge, () => {
-    return !(fileType === 'pdf' || fileType === 'xml' || fileType === 'zip')
-  })
+  if (file) {
+    const fileType = file.originalname.substr(file.originalname.lastIndexOf('.') + 1).toLowerCase()
+    // check if what is uploaded is of an expected file type (pdf, xml or zip)
+    const isValidType = fileType === 'pdf' || fileType === 'xml' || fileType === 'zip'
+    if (!isValidType) {
+      challengeUtils.solveIf(challenges.uploadTypeChallenge, () => { return true })
+      // reject files with an unexpected file type
+      res.status(400).json({
+        error: 'Invalid file type. Only PDF, XML, and ZIP files are accepted.'
+      })
+      return
+    }
+  }
   next()
 }
 
