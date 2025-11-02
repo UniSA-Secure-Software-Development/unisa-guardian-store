@@ -28,4 +28,4 @@ jobs:
     
     # run the file security test
     - name: Run file upload security tests
-      run: npx jest test/api/fileUploadSecuritySpec.ts
+      run: npx jest test/api/fileUploadSecuritySpec.ts --forceExit

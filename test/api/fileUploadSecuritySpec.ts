@@ -30,7 +30,6 @@ describe('/file-upload - Security Fix Validation', () => {
     form.append('file', fs.createReadStream(file))
     
     //send the file to the server api
-    // @ts-expect-error
     return frisby.post(URL + '/file-upload', { 
       headers: { 'Content-Type': form.getHeaders()['content-type'] }, 
       body: form
@@ -50,7 +49,6 @@ describe('/file-upload - Security Fix Validation', () => {
     form.append('file', fs.createReadStream(file))
     
     //send the file to the server api
-    // @ts-expect-error
     return frisby.post(URL + '/file-upload', { 
       headers: { 'Content-Type': form.getHeaders()['content-type'] }, 
       body: form 
@@ -71,7 +69,6 @@ describe('/file-upload - Security Fix Validation', () => {
     form.append('file', fs.createReadStream(file))
     
     //send the file to the server api
-    // @ts-expect-error
     return frisby.post(URL + '/file-upload', { 
       headers: { 'Content-Type': form.getHeaders()['content-type'] }, 
       body: form 
@@ -82,6 +79,7 @@ describe('/file-upload - Security Fix Validation', () => {
 
   // test 4: accept valid zip files
   it('Should accept valid ZIP files', () => {
+    
     //find the test file (zip files are allowed)
     const file = path.resolve(__dirname, '../files/arbitraryFileWrite.zip')
     
@@ -90,7 +88,6 @@ describe('/file-upload - Security Fix Validation', () => {
     form.append('file', fs.createReadStream(file))
     
     //send the file to the server api
-    // @ts-expect-error
     return frisby.post(URL + '/file-upload', { 
       headers: { 'Content-Type': form.getHeaders()['content-type'] }, 
       body: form 
