@@ -1,0 +1,70 @@
+name: Security Scan
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+  security-events: write
+ 
+jobs:
+  devskim:
+    name: DevSkim (Static Analysis)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run DevSkim
+        uses: microsoft/DevSkim-Action@v1
+        with:
+          directory-to-scan: .
+          output-filename: devskim-results.sarif
+
+      - name: Upload SARIF to Code Scanning
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: devskim-results.sarif
+
+      - name: Upload DevSkim artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: devskim-results
+          path: devskim-results.sarif
+
+  dependencycheck:
+    name: OWASP Dependency Check (Frontend)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Java (required by Dependency Check)
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Cache DC data
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2/repository/org/owasp/dependency-check-data
+          key: dependencycheck-${{ runner.os }}
+          restore-keys: dependencycheck-
+
+      - name: Run OWASP Dependency Check
+        uses: dependency-check/Dependency-Check_Action@main
+        continue-on-error: true
+        with:
+          project: "Guardian Store - frontend"
+          path: "./frontend"
+          format: "HTML"
+          out: "reports"
+          args: "--failOnCVSS 11"
+
+      - name: Upload Dependency Check report
+        uses: actions/upload-artifact@v4
+        with:
+          name: dependency-check-report
+          path: reports/**
