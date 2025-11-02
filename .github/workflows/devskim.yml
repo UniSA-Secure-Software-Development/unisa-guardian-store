@@ -1,10 +1,14 @@
 name: DevSkim Security Scan
 
 on:
-  pull_request:
-    types: [opened, synchronize, reopened]
   push:
-    branches: [ main ]
+    branches: [ develop, main ]
+  pull_request:
+    branches: [ develop, main ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
 
 jobs:
   devskim-scan:
@@ -13,13 +17,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      
       - name: Run DevSkim
         uses: microsoft/devskim-action@v1
         with:
           scan-paths: |
-            routes/login.ts
-            routes/search.ts
+            routes
           output-format: json
           output-file: devskim-results.json
 
