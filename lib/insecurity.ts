@@ -16,6 +16,7 @@ const sanitizeFilename = require('sanitize-filename')
 const z85 = require('z85')
 const utils = require('./utils')
 const fs = require('fs')
+const { BasketModel } = require('../models/basket')
 
 const publicKey = fs.readFileSync('encryptionkeys/jwt.pub', 'utf8')
 module.exports.publicKey = publicKey
@@ -236,6 +237,37 @@ exports.isAdmin = () => {
         return next()
       }
       return res.status(401).json({ status: 'error', message: 'Admin privileges required' })
+    } catch (error: any) {
+      res.status(401).json({ status: 'error', message: error })
+    }
+  }
+}
+
+exports.ownBasketOnly = () => {
+  return async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const token = req.cookies.token || utils.jwtFrom(req)
+
+      if (!token) {
+        return res.status(401).json({ status: 'error', message: 'Unauthorized: missing token' })
+      }
+
+      if (!verify(token)) {
+        return res.status(401).json({ status: 'error', message: 'Unauthorized: missing token' })
+      }
+
+      const decoded: any = decode(token)
+      const userId = decoded?.data?.id
+      const basketId = req.params.id
+
+      const basket = await BasketModel.findByPk(basketId)
+      if (!basket) {
+        return res.status(404).json({ status: 'error', message: 'Basket not found' })
+      }
+      if (basket.UserId !== userId && decoded?.data?.role !== exports.roles.admin) {
+        return res.status(403).json({ status: 'error', message: 'Forbidden: not your basket bud' })
+      }
+      return next()
     } catch (error: any) {
       res.status(401).json({ status: 'error', message: error })
     }
