@@ -139,6 +139,11 @@ const UserModelInit = (sequelize: Sequelize) => {
       )
     }
   })
+
+  // defaults created user to customer. Defence in depth
+  User.addHook('afterValidate', (user: User) => {
+    user.role = 'customer'
+  })
 }
 
 export { User as UserModel, UserModelInit }
