@@ -219,7 +219,7 @@ exports.updateAuthenticatedUsers = () => (req: Request, res: Response, next: Nex
 exports.isAdmin = () => {
   return (req: Request, res: Response, next: NextFunction) => {
     try {
-      const token = utils.jwtFrom(req)
+      const token = req.cookies.token || utils.jwtFrom(req)
 
       if (!token) {
         return res.status(401).json({ status: 'error', message: 'Unauthorized: missing token' })
