@@ -215,3 +215,29 @@ exports.updateAuthenticatedUsers = () => (req: Request, res: Response, next: Nex
   }
   next()
 }
+
+exports.isAdmin = () => {
+  return (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const token = utils.jwtFrom(req)
+
+      if (!token) {
+        return res.status(401).json({ status: 'error', message: 'Unauthorized: missing token' })
+      }
+
+      if (!verify(token)) {
+        return res.status(401).json({ status: 'error', message: 'Unauthorized: missing token' })
+      }
+
+      const decoded: any = decode(token)
+      const role = decoded?.data?.role
+
+      if (role === exports.roles.admin) {
+        return next()
+      }
+      return res.status(401).json({ status: 'error', message: 'Admin privileges required' })
+    } catch (error: any) {
+      res.status(401).json({ status: 'error', message: error })
+    }
+  }
+}
