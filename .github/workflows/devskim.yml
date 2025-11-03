@@ -1,0 +1,32 @@
+name: DevSkim Security Scan
+
+on:
+  push:
+    branches: [ develop, main ]
+  pull_request:
+    branches: [ develop, main ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  devskim-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run DevSkim
+        uses: microsoft/devskim-action@v1
+        with:
+          scan-paths: |
+            routes
+          output-format: json
+          output-file: devskim-results.json
+
+      - name: Upload DevSkim results
+        uses: actions/upload-artifact@v4
+        with:
+          name: devskim-results
+          path: devskim-results.json
