@@ -6,6 +6,7 @@
 import { Request, Response, NextFunction } from 'express'
 import { BasketItemModel } from '../models/basketitem'
 import { QuantityModel } from '../models/quantity'
+import { ProductModel } from '../models/product'
 import challengeUtils = require('../lib/challengeUtils')
 
 const utils = require('../lib/utils')
@@ -17,7 +18,7 @@ interface RequestWithRawBody extends Request {
 }
 
 module.exports.addBasketItem = function addBasketItem () {
-  return (req: RequestWithRawBody, res: Response, next: NextFunction) => {
+  return async (req: RequestWithRawBody, res: Response, next: NextFunction) => {
     const result = utils.parseJsonCustom(req.rawBody)
     const productIds = []
     const basketIds = []
@@ -33,24 +34,46 @@ module.exports.addBasketItem = function addBasketItem () {
       }
     }
 
-    const user = security.authenticatedUsers.from(req)
-    if (user && basketIds[0] && basketIds[0] !== 'undefined' && Number(user.bid) != Number(basketIds[0])) { // eslint-disable-line eqeqeq
-      res.status(401).send('{\'error\' : \'Invalid BasketId\'}')
-    } else {
-      const basketItem = {
-        ProductId: productIds[productIds.length - 1],
-        BasketId: basketIds[basketIds.length - 1],
-        quantity: quantities[quantities.length - 1]
-      }
-      challengeUtils.solveIf(challenges.basketManipulateChallenge, () => { return user && basketItem.BasketId && basketItem.BasketId !== 'undefined' && user.bid != basketItem.BasketId }) // eslint-disable-line eqeqeq
-
-      const basketItemInstance = BasketItemModel.build(basketItem)
-      basketItemInstance.save().then((addedBasketItem: BasketItemModel) => {
-        res.json({ status: 'success', data: addedBasketItem })
-      }).catch((error: Error) => {
-        next(error)
-      })
+    const basketItem = { // Gotta move this before doing the check for basketId and such to actually make the proper checks
+      ProductId: productIds[productIds.length - 1],
+      BasketId: basketIds[basketIds.length - 1],
+      quantity: quantities[quantities.length - 1]
     }
+
+    const user = security.authenticatedUsers.from(req)
+    if (user && basketItem.BasketId && basketItem.BasketId !== 'undefined' && Number(user.bid) !== Number(basketItem.BasketId)) { // New (Adding products into another's basket exploit)
+      return res.status(401).send('{\'error\' : \'Invalid BasketId\'}')
+    }
+
+    try { // New (Christmas Special Exploit Fix)
+      const product: any = await ProductModel.findOne({
+        where: { id: basketItem.ProductId },
+        paranoid: false
+      })
+
+      if (!product) {
+        return res.status(404).json({
+          error: 'Product not found'
+        })
+      }
+
+      if (product.deletedAt !== null) {
+        return res.status(400).json({
+          error: 'This product is no longer availablem woops!'
+        })
+      }
+    } catch (error) {
+      return next(error)
+    }
+
+    challengeUtils.solveIf(challenges.basketManipulateChallenge, () => { return user && basketItem.BasketId && basketItem.BasketId !== 'undefined' && user.bid != basketItem.BasketId }) // eslint-disable-line eqeqeq
+
+    const basketItemInstance = BasketItemModel.build(basketItem)
+    basketItemInstance.save().then((addedBasketItem: BasketItemModel) => {
+      res.json({ status: 'success', data: addedBasketItem })
+    }).catch((error: Error) => {
+      next(error)
+    })
   }
 }
 
