@@ -20,6 +20,8 @@ import { BasketItemModel } from './models/basketitem'
 import { FeedbackModel } from './models/feedback'
 import { ProductModel } from './models/product'
 import { WalletModel } from './models/wallet'
+import isEmail from 'validator/lib/isEmail'
+import { isStrongPassword } from 'validator'
 const startTime = Date.now()
 const path = require('path')
 const morgan = require('morgan')
@@ -321,13 +323,13 @@ restoreOverwrittenFilesWithOriginals().then(() => {
   /* Feedbacks: GET allowed for feedback carousel, POST allowed in order to provide feedback without being logged in */
   app.use('/api/Feedbacks/:id', security.isAuthorized())
   /* Users: Only POST is allowed in order to register a new user */
-  app.get('/api/Users', security.isAuthorized())
+  app.get('/api/Users', security.isAdmin())
   app.route('/api/Users/:id')
     .get(security.isAuthorized())
     .put(security.denyAll())
     .delete(security.denyAll())
   /* Products: Only GET is allowed in order to view products */ // vuln-code-snippet neutral-line changeProductChallenge
-  app.post('/api/Products', security.isAuthorized()) // vuln-code-snippet neutral-line changeProductChallenge
+  app.post('/api/Products', security.isAdmin()) // vuln-code-snippet neutral-line changeProductChallenge
   // app.put('/api/Products/:id', security.isAuthorized()) // vuln-code-snippet vuln-line changeProductChallenge
   app.delete('/api/Products/:id', security.denyAll())
   /* Challenges: GET list of challenges allowed. Everything else forbidden entirely */
@@ -448,7 +450,57 @@ restoreOverwrittenFilesWithOriginals().then(() => {
 
     // create a wallet when a new user is registered using API
     if (name === 'User') { // vuln-code-snippet neutral-line registerAdminChallenge
-      resource.create.send.before((req: Request, res: Response, context: { instance: { id: any }, continue: any }) => { // vuln-code-snippet vuln-line registerAdminChallenge
+      resource.create.write.before((req: Request, res: Response, context: any) => { // vuln-code-snippet vuln-line registerAdminChallenge
+        try {
+          let { email, password, passwordRepeat } = req.body || {}
+
+          email = typeof email === 'string' ? email.trim().toLowerCase() : ''
+          password = typeof password === 'string' ? password : ''
+          passwordRepeat = typeof passwordRepeat === 'string' ? passwordRepeat : undefined
+
+          if (!email || !password) {
+            return context.error(400, new Error('Missing email or password'))
+          }
+
+          if (!isEmail(email)) {
+            return context.error(400, ('Invalid email format'))
+          }
+
+          if (typeof passwordRepeat !== 'undefined' && password !== passwordRepeat) {
+            return context.error(400, ('Passwords do not match'))
+          }
+
+          if (!isStrongPassword(password)) {
+            return context.error(400, ('Need stronger password!!'))
+          }
+          // Whitelist allowed fields and enforce role server-side so cant register as admin!!!
+          context.attributes = {
+            email,
+            password,
+            role: 'customer'
+          }
+        } catch (err: any) {
+          return context.error(500, ('server error :('))
+        }
+
+        return context.continue // vuln-code-snippet neutral-line registerAdminChallenge
+      }) // vuln-code-snippet neutral-line registerAdminChallenge
+
+      // Disallow privileged field changes via update (prevent escalation via PUT/PATCH)
+      resource.update.write.before((_req: Request, _res: Response, context: any) => {
+        if (context.attributes) {
+          delete context.attributes.role
+          delete context.attributes.isAdmin
+          delete context.attributes.deluxeToken
+          delete context.attributes.totpSecret
+          delete context.attributes.isActive
+          delete context.attributes.passwordRepeat
+        }
+        return context.continue
+      })
+
+      // create a wallet
+      resource.create.send.before((req: Request, res: Response, context: any) => { // vuln-code-snippet vuln-line registerAdminChallenge
         WalletModel.create({ UserId: context.instance.id }).catch((err: unknown) => {
           console.log(err)
         })
@@ -456,34 +508,6 @@ restoreOverwrittenFilesWithOriginals().then(() => {
       }) // vuln-code-snippet neutral-line registerAdminChallenge
     } // vuln-code-snippet neutral-line registerAdminChallenge
     // vuln-code-snippet end registerAdminChallenge
-
-    // translate challenge descriptions and hints on-the-fly
-    if (name === 'Challenge') {
-      resource.list.fetch.after((req: Request, res: Response, context: { instance: string | any[], continue: any }) => {
-        for (let i = 0; i < context.instance.length; i++) {
-          let description = context.instance[i].description
-          if (utils.contains(description, '<em>(This challenge is <strong>')) {
-            const warning = description.substring(description.indexOf(' <em>(This challenge is <strong>'))
-            description = description.substring(0, description.indexOf(' <em>(This challenge is <strong>'))
-            context.instance[i].description = req.__(description) + req.__(warning)
-          } else {
-            context.instance[i].description = req.__(description)
-          }
-          if (context.instance[i].hint) {
-            context.instance[i].hint = req.__(context.instance[i].hint)
-          }
-        }
-        return context.continue
-      })
-      resource.read.send.before((req: Request, res: Response, context: { instance: { description: string, hint: string }, continue: any }) => {
-        context.instance.description = req.__(context.instance.description)
-        if (context.instance.hint) {
-          context.instance.hint = req.__(context.instance.hint)
-        }
-        return context.continue
-      })
-    }
-
     // translate security questions on-the-fly
     if (name === 'SecurityQuestion') {
       resource.list.fetch.after((req: Request, res: Response, context: { instance: string | any[], continue: any }) => {
@@ -532,8 +556,8 @@ restoreOverwrittenFilesWithOriginals().then(() => {
   app.get('/rest/user/whoami', security.updateAuthenticatedUsers(), currentUser())
   app.get('/rest/user/authentication-details', authenticatedUsers())
   app.get('/rest/products/search', search())
-  app.get('/rest/basket/:id', basket())
-  app.post('/rest/basket/:id/checkout', order())
+  app.get('/rest/basket/:id', security.isAuthorized, security.ownBasketOnly, basket())
+  app.post('/rest/basket/:id/checkout', security.isAuthorized, security.ownBasketOnly, order())
   app.put('/rest/basket/:id/coupon/:coupon', coupon())
   app.get('/rest/admin/application-version', appVersion())
   app.get('/rest/admin/application-configuration', appConfiguration())
