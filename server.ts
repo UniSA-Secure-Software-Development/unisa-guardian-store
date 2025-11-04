@@ -89,7 +89,7 @@ const utils = require('./lib/utils')
 const security = require('./lib/insecurity')
 const datacreator = require('./data/datacreator')
 const app = express()
-const server = require('http').Server(app)
+const server = require('https').Server(app)
 const appConfiguration = require('./routes/appConfiguration')
 const captcha = require('./routes/captcha')
 const trackOrder = require('./routes/trackOrder')
@@ -135,6 +135,14 @@ void collectDurationPromise('validatePreconditions', require('./lib/startup/vali
 void collectDurationPromise('cleanupFtpFolder', require('./lib/startup/cleanupFtpFolder'))()
 void collectDurationPromise('validateConfig', require('./lib/startup/validateConfig'))()
 
+// Create Server
+const https = require('https')
+const certificate = {
+  key: fs.readFileSync('./certificates/certificate.key'),
+  cert: fs.readFileSync('./certificates/certificate.crt')
+}
+https.createServer(certificate, app).listen(3000)
+
 // Reloads the i18n files in case of server restarts or starts.
 async function restoreOverwrittenFilesWithOriginals () {
   await collectDurationPromise('restoreOverwrittenFilesWithOriginals', require('./lib/startup/restoreOverwrittenFilesWithOriginals'))()
@@ -156,8 +164,15 @@ restoreOverwrittenFilesWithOriginals().then(() => {
   app.use(compression())
 
   /* Bludgeon solution for possible CORS problems: Allow everything! */
+  // app.options('*', cors())
+  // app.use(cors())
+
+  // Setup cross-origin resource sharing between Juice Shop API and Angular Dev Server
   app.options('*', cors())
-  app.use(cors())
+  app.use(cors({
+    credentials: true,
+    origin: ['https://localhost:4200', 'https://localhost:3000']
+  }))
 
   /* Security middleware */
   app.use(helmet.noSniff())

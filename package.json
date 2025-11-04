@@ -48,6 +48,8 @@
     "..."
   ],
   "scripts": {
+    "preinstall": "npm run generate_certificates",
+    "generate_certificates": "bash ./certificates/create_certificate.sh",
     "build:frontend": "cd frontend && node ./node_modules/@angular/cli/bin/ng build --aot --configuration production --output-hashing=none --vendor-chunk=true --source-map=false",
     "build:server": "tsc",
     "cypress:open": "cypress open",
@@ -158,6 +160,7 @@
     "juicy-chat-bot": "~0.6.5",
     "libxmljs2": "^0.30.1",
     "marsdb": "^0.6.11",
+    "mkcert": "^3.2.0",
     "morgan": "^1.10.0",
     "multer": "^1.4.2",
     "node-pre-gyp": "^0.15.0",
@@ -262,7 +265,7 @@
     "webdriver-manager": "^13.0.0"
   },
   "engines": {
-    "node": "14 - 18"
+    "node": "14 - 20"
   },
   "os": [
     "win32",
