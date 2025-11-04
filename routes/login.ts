@@ -37,18 +37,26 @@ module.exports = function login () {
     const email = req.body.email
     const password = req.body.password
 
-    // Input validation
+    // Input validation, keeping same error message to reduce information leaked
     // Check for empty fields
     if (!email || !password) {
       res.status(401).send(res.__('Invalid email or password.'))
     }
     // Check for SQL injection characters, cannot test this on email as some emails can contain these characters
     if (/[-';]/.test(req.body.password)) {
-      res.status(401).send(res.__('Invalid email or password. Fields cannot contain these characters: -, \', ;')) //TODO check if need to check during register
+      res.status(401).send(res.__('Invalid email or password.')) // TODO check if need to check during register
     }
 
-    models.sequelize.query('SELECT * FROM Users WHERE email = $1 AND password = $2 AND deletedAt IS NULL', 
-      { bind: [req.body.email, security.hash(req.body.password)], model: UserModel, plain: true }) // vuln-code-snippet vuln-line loginAdminChallenge loginBenderChallenge loginJimChallenge
+    models.sequelize.query(
+      `SELECT id, totpSecret 
+      FROM Users 
+      WHERE email = $1 AND password = $2 AND deletedAt IS NULL
+      LIMIT 1`,
+      {
+        bind: [req.body.email, security.hash(req.body.password)],
+        model: UserModel,
+        plain: true
+      })// vuln-code-snippet vuln-line loginAdminChallenge loginBenderChallenge loginJimChallenge
       .then((authenticatedUser: { data: User }) => { // vuln-code-snippet neutral-line loginAdminChallenge loginBenderChallenge loginJimChallenge
         const user = utils.queryResultToJson(authenticatedUser)
         if (user.data?.id && user.data.totpSecret !== '') {
@@ -66,7 +74,8 @@ module.exports = function login () {
         } else {
           res.status(401).send(res.__('Invalid email or password.'))
         }
-      }).catch((error: Error) => {
+      })
+      .catch((error: Error) => {
         next(error)
       })
   }
