@@ -16,6 +16,36 @@ const challenges = require('../data/datacache').challenges
 const users = require('../data/datacache').users
 const config = require('config')
 
+// Email character allow list, using pointers from https://cheatsheetseries.owasp.org/cheatsheets/Input_Validation_Cheat_Sheet.html
+function isValidEmail (email: string): boolean {
+  if (!email || typeof email !== 'string') return false
+
+  // Check total length
+  if (email.length > 254) return false
+
+  // Email can't begin or end with hypen
+  if (/^-|-$/.test(email)) return false
+
+  // Split into local and domain parts
+  const parts = email.split('@')
+  if (parts.length !== 2) return false
+
+  const [local, domain] = parts
+
+  // Local part length check
+  if (local.length === 0 || local.length > 63) return false
+
+  // Allowed characters in local part
+  // Alphanumeric, dot, underscore, hyphen, plus
+  if (!/^[a-zA-Z0-9._+-]+$/.test(local)) return false
+
+  // Allowed characters in domain
+  // Alphanumeric, hyphens, dots
+  if (!/^[a-zA-Z0-9.-]+$/.test(domain)) return false
+
+  return true
+}
+
 // vuln-code-snippet start loginAdminChallenge loginBenderChallenge loginJimChallenge
 module.exports = function login () {
   function afterLogin (user: { data: User, bid: number }, res: Response, next: NextFunction) {
@@ -32,18 +62,23 @@ module.exports = function login () {
   }
 
   return (req: Request, res: Response, next: NextFunction) => {
-    verifyPreLoginChallenges(req) // vuln-code-snippet hide-line
+    // Cast to string to prevent non string types (allow list technically??)
+    const email = String(req.body.email || '')
+    const password = String(req.body.password || '')
 
-    const email = req.body.email
-    const password = req.body.password
+    verifyPreLoginChallenges(req) // vuln-code-snippet hide-line
 
     // Input validation, keeping same error message to reduce information leaked
     // Check for empty fields
     if (!email || !password) {
+      res.status(401).send(res.__('Invalid email or password.')) // TODO need returns??
+    }
+    // Check email for invalid characters and other
+    if (!isValidEmail(email)) {
       res.status(401).send(res.__('Invalid email or password.'))
     }
-    // Check for SQL injection characters, cannot test this on email as some emails can contain these characters
-    if (/[-';]/.test(req.body.password)) {
+    // Check for SQL injection characters
+    if (/[-';]/.test(password)) {
       res.status(401).send(res.__('Invalid email or password.')) // TODO check if need to check during register
     }
 
@@ -53,7 +88,7 @@ module.exports = function login () {
       WHERE email = $1 AND password = $2 AND deletedAt IS NULL
       LIMIT 1`,
       {
-        bind: [req.body.email, security.hash(req.body.password)],
+        bind: [email, security.hash(password)],
         model: UserModel,
         plain: true
       })// vuln-code-snippet vuln-line loginAdminChallenge loginBenderChallenge loginJimChallenge
