@@ -56,16 +56,38 @@ function handleZipFileUpload ({ file }: Request, res: Response, next: NextFuncti
 
 function checkUploadSize ({ file }: Request, res: Response, next: NextFunction) {
   if (file) {
-    challengeUtils.solveIf(challenges.uploadSizeChallenge, () => { return file?.size > 100000 })
+    // detects if the file is over the limit (100kb)
+    if (file.size > 100000) {
+      challengeUtils.solveIf(challenges.uploadSizeChallenge, () => { return true })
+      // now will reject the file and infer a 400 error and stop processing
+      res.status(400).json({
+        error: 'File exceeds size limit. Maximum file size is 100KB.'
+      })
+      // this return will prevent next() from being called
+      return
+    }
   }
+  // this will only call if the above conditions are met (file size < 100kb)
   next()
 }
 
 function checkFileType ({ file }: Request, res: Response, next: NextFunction) {
-  const fileType = file?.originalname.substr(file.originalname.lastIndexOf('.') + 1).toLowerCase()
-  challengeUtils.solveIf(challenges.uploadTypeChallenge, () => {
-    return !(fileType === 'pdf' || fileType === 'xml' || fileType === 'zip')
-  })
+  if (file) {
+    // grab the file extension from the filename
+    const fileType = file.originalname.substr(file.originalname.lastIndexOf('.') + 1).toLowerCase()
+    // now detects that the file type upload is an accepted type (pdf, xml or zip)
+    const isValidType = fileType === 'pdf' || fileType === 'xml' || fileType === 'zip'
+    if (!isValidType) {
+      challengeUtils.solveIf(challenges.uploadTypeChallenge, () => { return true })
+      // reject files with an unexpected file type and stop processing (return 400 and error description)
+      res.status(400).json({
+        error: 'Invalid file type. Only PDF, XML, and ZIP files are accepted.'
+      })
+      // prevent next() from being called
+      return
+    }
+  }
+  // only called if the file type is ALSO valid
   next()
 }
 
@@ -82,7 +104,7 @@ function handleXmlUpload ({ file }: Request, res: Response, next: NextFunction) 
         challengeUtils.solveIf(challenges.xxeFileDisclosureChallenge, () => { return (utils.matchesSystemIniFile(xmlString) ?? utils.matchesEtcPasswdFile(xmlString)) })
         res.status(410)
         next(new Error('B2B customer complaints via file upload have been deprecated for security reasons: ' + utils.trunc(xmlString, 400) + ' (' + file.originalname + ')'))
-      } catch (err: any) { // TODO: Remove any
+      } catch (err: any) {
         if (utils.contains(err.message, 'Script execution timed out')) {
           if (challengeUtils.notSolved(challenges.xxeDosChallenge)) {
             challengeUtils.solve(challenges.xxeDosChallenge)
