@@ -59,7 +59,7 @@ export const serveCodeFixes = () => (req: Request<FixesRequestParams, {}, {}>, r
   const fixData = readFixes(key)
   if (fixData.fixes.length === 0) {
     res.status(404).json({
-      error: 'No fixes found for the snippet!'
+      error: 'No  fixes found for the snippet!'
     })
     return
   }
@@ -92,7 +92,6 @@ export const checkCorrectFix = () => async (req: Request<{}, {}, VerdictRequestB
     } else {
       accuracy.storeFixItVerdict(key, false)
       res.status(200).json({
-        verdict: false,
         explanation
       })
     }

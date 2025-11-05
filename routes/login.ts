@@ -9,6 +9,10 @@ import { User } from '../data/types'
 import { BasketModel } from '../models/basket'
 import { UserModel } from '../models/user'
 import challengeUtils = require('../lib/challengeUtils')
+import { authenticator } from 'otplib'
+import e = require('express')
+import { QueryTypes } from 'sequelize'
+import sequelize = require('sequelize')
 
 const utils = require('../lib/utils')
 const security = require('../lib/insecurity')
@@ -25,7 +29,8 @@ module.exports = function login () {
         const token = security.authorize(user)
         user.bid = basket.id // keep track of original basket
         security.authenticatedUsers.put(token, user)
-        res.json({ authentication: { token, bid: basket.id, umail: user.data.email } })
+        // was umail for some reason
+        res.json({ authentication: { token, bid: basket.id, email: user.data.email } })
       }).catch((error: Error) => {
         next(error)
       })
@@ -33,9 +38,23 @@ module.exports = function login () {
 
   return (req: Request, res: Response, next: NextFunction) => {
     verifyPreLoginChallenges(req) // vuln-code-snippet hide-line
-    models.sequelize.query(`SELECT * FROM Users WHERE email = '${req.body.email || ''}' AND password = '${security.hash(req.body.password || '')}' AND deletedAt IS NULL`, { model: UserModel, plain: true }) // vuln-code-snippet vuln-line loginAdminChallenge loginBenderChallenge loginJimChallenge
+    // sql injection vulnerabilities
+    // gets the email and password from forms and puts them into variables
+    const email = (req.body.email || '').toString().trim()
+    const hashPassword = security.hash(req.body.password || '')
+    // sql statement to get passwrod and stuff
+    const sql = 'SELECT * FROM Users WHERE email = :email AND password = :password AND deletedAt IS NULL'
+    // models.sequelize.query(`SELECT * FROM Users WHERE email = '${email}' AND password = '${security.hash(hashPassword)}' AND deletedAt IS NULL`, { model: UserModel, plain: true }) // vuln-code-snippet vuln-line loginAdminChallenge loginBenderChallenge loginJimChallenge
+    // parameterised sql query
+    models.sequelize.query(sql, {
+      replacements: { email: email, password: hashPassword },
+      type: QueryTypes.SELECT,
+      model: UserModel,
+      plain: true
+    })
       .then((authenticatedUser: { data: User }) => { // vuln-code-snippet neutral-line loginAdminChallenge loginBenderChallenge loginJimChallenge
         const user = utils.queryResultToJson(authenticatedUser)
+
         if (user.data?.id && user.data.totpSecret !== '') {
           res.status(401).json({
             status: 'totp_token_required',
