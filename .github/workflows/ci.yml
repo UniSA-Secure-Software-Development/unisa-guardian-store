@@ -142,11 +142,16 @@ jobs:
           max_attempts: 3
           command: |
             if [ "$RUNNER_OS" == "Windows" ]; then
-            set NODE_ENV=test
+              set NODE_ENV=test
+              start /B cmd /C "npm start"
+              timeout /T 30
             else
-            export NODE_ENV=test
+              export NODE_ENV=test
+              (npm start &) 
+              for i in {1..60}; do curl -sf http://localhost:3000/ && break || sleep 2; done
             fi
             npm run frisby
+            if [ "$RUNNER_OS" != "Windows" ]; then pkill -f "node build/app" || true; fi
           shell: bash
       - name: "Copy API test coverage data"
         run: cp build/reports/coverage/api-tests/lcov.info api-lcov.info
@@ -266,7 +271,7 @@ jobs:
           browser: ${{ matrix.browser }}
           start: npm start
           wait-on: http://localhost:3000
-          record: true
+          record: false
           group: ${{ matrix.browser }} @ ${{ matrix.os }}
         env:
           CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
@@ -279,7 +284,7 @@ jobs:
           browser: ${{ matrix.browser }}
           start: npm start
           wait-on: http://localhost:3000
-          record: true
+          record: false
           group: ${{ matrix.browser }} @ ${{ matrix.os }}
         env:
           CYPRESS_CACHE_FOLDER: /Users/runner/Library/Caches/Cypress
