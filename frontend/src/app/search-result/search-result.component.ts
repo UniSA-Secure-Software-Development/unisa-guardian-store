@@ -254,3 +254,4 @@ export class SearchResultComponent implements OnDestroy, AfterViewInit {
     return this.deluxeGuard.isDeluxe()
   }
 }
+
