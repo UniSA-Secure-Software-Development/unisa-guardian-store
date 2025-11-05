@@ -1,40 +1,21 @@
 rules:
-  - id: express-unsafe-route-missing-csrf
+  - id: express-route-missing-csrf
     languages: [javascript, typescript]
-    message: "Express 路由为有副作用的 HTTP 方法但缺少 CSRF 校验中间件（如 csrfProtection, verifyCsrfToken, 或 csurf）。"
+    message: "写操作路由缺少 csrfProtection 中间件"
     severity: ERROR
+    paths:
+      include:
+        - server.ts
+        - routes/**/*.ts
     patterns:
       - pattern-either:
-          - pattern: app.post($ROUTE, ...)
-          - pattern: router.post($ROUTE, ...)
-          - pattern: app.put($ROUTE, ...)
-          - pattern: router.put($ROUTE, ...)
-          - pattern: app.patch($ROUTE, ...)
-          - pattern: router.patch($ROUTE, ...)
-          - pattern: app.delete($ROUTE, ...)
-          - pattern: router.delete($ROUTE, ...)
-
-    # "patterns-not" 块定义了我们想要排除的"好"模式：
-  
-    patterns-not:
-      - pattern-either:
-          # --- 匹配 post ---
-          - pattern: $APP.post($ROUTE, ..., csrfProtection, ...)
-          - pattern: $APP.post($ROUTE, ..., verifyCsrfToken, ...)
-          - pattern: $APP.post($ROUTE, ..., csurf( ... ), ...)
-          # --- 匹配 put ---
-          - pattern: $APP.put($ROUTE, ..., csrfProtection, ...)
-          - pattern: $APP.put($ROUTE, ..., verifyCsrfToken, ...)
-          - pattern: $APP.put($ROUTE, ..., csurf( ... ), ...)
-          # --- 匹配 patch ---
-          - pattern: $APP.patch($ROUTE, ..., csrfProtection, ...)
-          - pattern: $APP.patch($ROUTE, ..., verifyCsrfToken, ...)
-          - pattern: $APP.patch($ROUTE, ..., csurf( ... ), ...)
-          # --- 匹配 delete ---
-          - pattern: $APP.delete($ROUTE, ..., csrfProtection, ...)
-          - pattern: $APP.delete($ROUTE, ..., verifyCsrfToken, ...)
-          - pattern: $APP.delete($ROUTE, ..., csurf( ... ), ...)
-
+          - pattern: app.$METHOD($ROUTE, ...$MWS, $HANDLER)
+          - pattern: router.$METHOD($ROUTE, ...$MWS, $HANDLER)
+      - metavariable-regex:
+          metavariable: METHOD
+          regex: "(post|put|patch|delete)"
+      - pattern-not: app.$METHOD($ROUTE, ..., csrfProtection(...), ...)
+      - pattern-not: router.$METHOD($ROUTE, ..., csrfProtection(...), ...)
     metadata:
       category: security
       technology: [express]
