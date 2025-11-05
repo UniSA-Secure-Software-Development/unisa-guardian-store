@@ -92,7 +92,7 @@ module.exports = function login () {
     }
 
     models.sequelize.query(
-      `SELECT id, totpSecret 
+      `SELECT id, totpSecret, email, role
       FROM Users 
       WHERE email = $1 AND password = $2 AND deletedAt IS NULL
       LIMIT 1`,
