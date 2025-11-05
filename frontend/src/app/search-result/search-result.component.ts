@@ -121,11 +121,11 @@ export class SearchResultComponent implements OnDestroy, AfterViewInit {
     }, (err) => console.log(err))
   }
 
-  trustProductDescription (tableData: any[]) { // vuln-code-snippet neutral-line restfulXssChallenge
-    for (let i = 0; i < tableData.length; i++) { // vuln-code-snippet neutral-line restfulXssChallenge
-      tableData[i].description = this.sanitizer.bypassSecurityTrustHtml(tableData[i].description) // vuln-code-snippet vuln-line restfulXssChallenge
-    } // vuln-code-snippet neutral-line restfulXssChallenge
-  } // vuln-code-snippet neutral-line restfulXssChallenge
+  // trustProductDescription (tableData: any[]) { // vuln-code-snippet neutral-line restfulXssChallenge
+  //   for (let i = 0; i < tableData.length; i++) { // vuln-code-snippet neutral-line restfulXssChallenge
+  //     tableData[i].description = this.sanitizer.bypassSecurityTrustHtml(tableData[i].description) // vuln-code-snippet vuln-line restfulXssChallenge
+  //   } // vuln-code-snippet neutral-line restfulXssChallenge
+  // } // vuln-code-snippet neutral-line restfulXssChallenge
   // vuln-code-snippet end restfulXssChallenge
 
   ngOnDestroy () {
