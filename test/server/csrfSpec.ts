@@ -24,25 +24,24 @@ describe('csrf middleware', () => {
 
   it('should set csrfToken cookie if missing (GET)', () => {
     const { req, res, next } = build('GET')
-    // 直接调用中间件，而不是 csrfProtection
-    csrfProtection(req, res, next)
+    csrfProtection()(req, res, next)
     expect(res.cookie).to.have.been.calledWithMatch('csrfToken', sinon.match.string)
-    expect(next).to.have.been.called()
+    sinon.assert.called(next)
   })
 
   it('should reject unsafe method without matching token', () => {
     const { req, res, next } = build('POST', { host: 'localhost:3000' }, {}, { csrfToken: 'cookie-token' })
-    csrfProtection(req, res, next)
+    csrfProtection()(req, res, next)
     expect(res.status).to.have.been.calledWith(403)
     expect(res.json).to.have.been.calledWithMatch({ error: sinon.match.string })
-    expect(next).to.not.have.been.called()
+    sinon.assert.notCalled(next)
   })
 
   it('should allow unsafe method with matching header token', () => {
     const token = 'abc123'
     const { req, res, next } = build('POST', { host: 'localhost:3000', origin: 'http://localhost:3000' }, {}, { csrfToken: token })
     req.headers['x-csrf-token'] = token // 模拟 Angular 发送的 X-CSRF-Token 头
-    csrfProtection(req, res, next)
-    expect(next).to.have.been.called()
+    csrfProtection()(req, res, next)
+    sinon.assert.called(next)
   })
 })

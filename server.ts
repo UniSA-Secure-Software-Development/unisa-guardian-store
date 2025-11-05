@@ -256,9 +256,8 @@ restoreOverwrittenFilesWithOriginals().then(() => {
 
   app.use(express.static(path.resolve('frontend/dist/frontend')))
   app.use(cookieParser('kekse'))
-  /* CSRF protection: set token cookie and verify unsafe methods */
+  /* CSRF protection: provide token endpoint; apply middleware selectively on state-changing routes */
   const { csrfProtection, issueCsrfToken } = require('./middleware/csrf')
-  app.use(csrfProtection())
   app.get('/rest/csrf-token', issueCsrfToken())
   // vuln-code-snippet end directoryListingChallenge accessLogDisclosureChallenge
 
@@ -593,7 +592,7 @@ restoreOverwrittenFilesWithOriginals().then(() => {
 
   /* Routes for profile page */
   app.get('/profile', security.updateAuthenticatedUsers(), userProfile())
-  app.post('/profile', updateUserProfile())
+  app.post('/profile', csrfProtection(), updateUserProfile())
 
   /* Route for vulnerable code snippets */
   app.get('/snippets', vulnCodeSnippet.serveChallengesWithCodeSnippet())
