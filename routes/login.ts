@@ -46,6 +46,15 @@ function isValidEmail (email: string): boolean {
   return true
 }
 
+function isValidPassword (password: string): boolean {
+  if (!password || typeof password !== 'string') return false
+
+  // Allow alphanumeric, and special characters, barring some SQL related characters e.g. [',",;]
+  if (!/^[A-Za-z0-9!@#$%^&*()_\-+=[{\]}:,.?]+$/.test(password)) return false
+
+  return true
+}
+
 // vuln-code-snippet start loginAdminChallenge loginBenderChallenge loginJimChallenge
 module.exports = function login () {
   function afterLogin (user: { data: User, bid: number }, res: Response, next: NextFunction) {
@@ -78,7 +87,7 @@ module.exports = function login () {
       res.status(401).send(res.__('Invalid email or password.'))
     }
     // Check for SQL injection characters
-    if (/[-';]/.test(password)) {
+    if (!isValidPassword(password)) {
       res.status(401).send(res.__('Invalid email or password.')) // TODO check if need to check during register
     }
 
