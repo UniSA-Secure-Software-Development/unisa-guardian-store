@@ -26,7 +26,7 @@ jobs:
       - name: "Check out Git repository"
         uses: actions/checkout@5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f #v2: v2.3.4 available
       - name: "Use Node.js 16"
-        uses: actions/setup-node@f1f314fca9dfce2769ece7d933488f076716723e #v1: v2.x available
+        uses: actions/setup-node@v4
         with:
           node-version: 16
       - name: "Install CLI tools"
@@ -58,7 +58,7 @@ jobs:
       - name: "Check out Git repository"
         uses: actions/checkout@5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f #v2: v2.3.4 available
       - name: "Use Node.js 16"
-        uses: actions/setup-node@f1f314fca9dfce2769ece7d933488f076716723e #v1: v2.x available
+        uses: actions/setup-node@v4
         with:
           node-version: 16
       - name: "Install CLI tools"
@@ -72,12 +72,12 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
-        node-version: [14, 16, 18]
+        node-version: [16, 18]
     steps:
       - name: "Check out Git repository"
         uses: actions/checkout@5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f #v2: v2.3.4 available
       - name: "Use Node.js ${{ matrix.node-version }}"
-        uses: actions/setup-node@f1f314fca9dfce2769ece7d933488f076716723e #v1: v2.x available
+        uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
       - name: "Install CLI tools"
@@ -107,12 +107,12 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
-        node-version: [14, 16, 18]
+        node-version: [16, 18]
     steps:
       - name: "Check out Git repository"
         uses: actions/checkout@5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f #v2: v2.3.4 available
       - name: "Use Node.js ${{ matrix.node-version }}"
-        uses: actions/setup-node@f1f314fca9dfce2769ece7d933488f076716723e #v1: v2.x available
+        uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
       - name: "Install CLI tools"
@@ -175,7 +175,7 @@ jobs:
       - name: "Check out Git repository"
         uses: actions/checkout@5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f #v2: v2.3.4 available
       - name: "Use Node.js 16"
-        uses: actions/setup-node@f1f314fca9dfce2769ece7d933488f076716723e #v1: v2.x available
+        uses: actions/setup-node@v4
         with:
           node-version: 16
       - name: "Install CLI tools"
@@ -205,7 +205,7 @@ jobs:
       - name: "Check out Git repository"
         uses: actions/checkout@5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f #v2: v2.3.4 available
       - name: "Use Node.js 16"
-        uses: actions/setup-node@f1f314fca9dfce2769ece7d933488f076716723e #v1: v2.x available
+        uses: actions/setup-node@v4
         with:
           node-version: 16
       - name: "Install CLI tools"
@@ -269,12 +269,12 @@ jobs:
           CYPRESS_CACHE_FOLDER: /Users/runner/Library/Caches/Cypress
           CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v4
         if: failure()
         with:
           name: cypress-screenshots
           path: cypress/screenshots
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: cypress-videos
@@ -286,7 +286,7 @@ jobs:
       - name: "Check out Git repository"
         uses: actions/checkout@5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f #v2: v2.3.4 available
       - name: "Use Node.js 16"
-        uses: actions/setup-node@f1f314fca9dfce2769ece7d933488f076716723e #v1: v2.x available
+        uses: actions/setup-node@v4
         with:
           node-version: 16
       - name: "Install CLI tools"
@@ -342,7 +342,7 @@ jobs:
       - name: "Check out Git repository"
         uses: actions/checkout@5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f #v2: v2.3.4 available
       - name: "Execute smoke test on Docker"
-        run: docker-compose -f docker-compose.test.yml up --exit-code-from sut
+        run: docker compose -f docker-compose.test.yml up --exit-code-from sut
   docker:
     needs: [test, api-test, e2e, e2e-with-cypress, e2e-in-subfolder, custom-config-test, docker-test]
     runs-on: ubuntu-latest
