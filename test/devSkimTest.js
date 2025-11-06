@@ -12,3 +12,4 @@ http.get('http://example.com', (res) => {
 })
 
 console.log('devskim-test ready', ADMIN_PASSWORD, weakHash('hello'))
+// trigger run
