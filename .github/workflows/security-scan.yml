@@ -1,0 +1,40 @@
+name: Security Scan
+
+on:
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  devskim:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: microsoft/DevSkim-Action@v1
+        with:
+          directory: '.'
+          output_filename: 'devskim-results.sarif'
+          severity: 'critical,important,moderate'
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: devskim-report
+          path: devskim-results.sarif
+
+  dependency-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dependency-check/Dependency-Check_Action@main
+        with:
+          project: 'Guardian Store'
+          path: '.'
+          format: 'HTML'
+          out: 'reports'
+          args: '--failOnCVSS 7'
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dependency-check-report
+          path: reports/dependency-check-report.html
