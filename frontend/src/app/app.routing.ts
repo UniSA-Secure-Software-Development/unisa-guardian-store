@@ -41,14 +41,24 @@ import { DeliveryMethodComponent } from './delivery-method/delivery-method.compo
 import { PhotoWallComponent } from './photo-wall/photo-wall.component'
 import { DeluxeUserComponent } from './deluxe-user/deluxe-user.component'
 import { AccountingGuard, AdminGuard, LoginGuard } from './app.guard'
+import { environment } from '../environments/environment'
+
+const adminRoutes: Routes = environment.enableAdmin
+  ? [{
+      path: 'administration',
+      component: AdministrationComponent,
+      canActivate: [AdminGuard]
+    }]
+  : []
 
 // vuln-code-snippet start adminSectionChallenge scoreBoardChallenge
 const routes: Routes = [
-  { // vuln-code-snippet neutral-line adminSectionChallenge
-    path: 'administration', // vuln-code-snippet vuln-line adminSectionChallenge
-    component: AdministrationComponent, // vuln-code-snippet neutral-line adminSectionChallenge
-    canActivate: [AdminGuard] // vuln-code-snippet neutral-line adminSectionChallenge
-  }, // vuln-code-snippet neutral-line adminSectionChallenge
+  // { // vuln-code-snippet neutral-line adminSectionChallenge
+  //   path: 'administration', // vuln-code-snippet vuln-line adminSectionChallenge
+  //   component: AdministrationComponent, // vuln-code-snippet neutral-line adminSectionChallenge
+  //   canActivate: [AdminGuard] // vuln-code-snippet neutral-line adminSectionChallenge
+  // }, // vuln-code-snippet neutral-line adminSectionChallenge
+  ...adminRoutes,
   {
     path: 'accounting',
     component: AccountingComponent,

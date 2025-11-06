@@ -9,7 +9,8 @@
 
 export const environment = {
   production: false,
-  hostServer: 'http://localhost:3000'
+  hostServer: 'http://localhost:3000',
+  enableAdmin: false // ← public/dev build: NO admin route
 }
 
 /*
