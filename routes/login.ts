@@ -41,7 +41,6 @@ module.exports = function login () {
         WHERE email = :email 
         AND password = :password 
         AND deletedAt IS NULL`
-    console.log(email, password)
     models.sequelize.query(sql, { replacements: { email, password }, model: UserModel, plain: true }) // vuln-code-snippet vuln-line loginAdminChallenge loginBenderChallenge loginJimChallenge
       .then((authenticatedUser: { data: User }) => { // vuln-code-snippet neutral-line loginAdminChallenge loginBenderChallenge loginJimChallenge
         const user = utils.queryResultToJson(authenticatedUser)

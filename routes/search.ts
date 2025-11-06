@@ -15,7 +15,7 @@ class ErrorWithParent extends Error {
   parent: Error | undefined
 }
 
-// appends an escape char (\) before any potentially harmful characters (\, %, _)
+// escapes backslash, %, and _
 function escapeLike (str: string) {
   return str.replace(/([\\%_])/g, '\\$1')
 }
@@ -23,11 +23,11 @@ function escapeLike (str: string) {
 // vuln-code-snippet start unionSqlInjectionChallenge dbSchemaChallenge
 module.exports = function searchProducts () {
   return (req: Request, res: Response, next: NextFunction) => {
-    let criteria: any = req.query.q === 'undefined' ? '' : req.query.q ?? ''
-    criteria = (criteria.length <= 200) ? criteria : criteria.substring(0, 200)
-
+    const raw = req.query.q ?? ''
+    const criteria = String(raw) === 'undefined' ? '' : raw.toString().slice(0, 200)
     // sends search query as bound var instead of concatenation
-    const safeCriteria = `%${escapeLike(String(criteria))}`
+    const safeCriteria = `%${escapeLike(criteria)}%`
+
     const sql = `SELECT *
       FROM Products
       WHERE (
