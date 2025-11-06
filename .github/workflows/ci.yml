@@ -1,6 +1,6 @@
 name: "CI/CD Pipeline"
 on:
-  push:
+/bin   push:
     branches-ignore:
       - l10n_develop
       - gh-pages
@@ -20,6 +20,27 @@ on:
 env:
   ANGULAR_CLI_VERSION: 13
 jobs:
+  snyk-security-scan:
+  runs-on: ubuntu-latest
+  name: Snyk Security Scan
+  steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Set up Node
+      uses: actions/setup-node@v4
+      with:
+        node-version: 16
+
+    - name: Install dependencies
+      run: npm install
+
+    - name: Run Snyk to check for vulnerabilities
+      uses: snyk/actions/node@master
+      env:
+        SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+      with:
+        command: test
   lint:
     runs-on: ubuntu-latest
     steps:
