@@ -446,3 +446,61 @@ jobs:
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
+# Build the app
+  build:
+    # Configure the job 
+    name: Build
+    runs-on: ubuntu-latest
+    # Steps to run
+    steps:
+    - run: echo "Build the app..."
+    - run: echo "Not implemented to save time when running the workflow"
+
+  scan:
+    # Configure the job 
+    name: Run security scans
+    needs: build
+    runs-on: ubuntu-latest
+
+    # Steps to run
+    steps:
+    # DevSkim
+    # - Some CI support inbuilt tasks and scans, for  ease of use
+    # - We could install and run DevSkim directly, but we can do it more easily using the DevSkim action
+    # - See docs at: https://github.com/microsoft/DevSkim-Action 
+      - name: Run DevSkim
+        uses: microsoft/devskim-action@v1
+        with:
+          directory-to-scan: .
+          should-scan-archives: false
+          output-filename: devskim-results.sarif
+          output-directory: ./devskim-output
+
+# Upload SARIF results so they appear in GitHub Security tab
+      - name: Upload DevSkim results to GitHub Security
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: ./devskim-output/devskim-results.sarif
+
+
+          # OWASP Dependency Check
+      - name: Run Dependency-Check
+        run: |
+          ./tools/dependency-check/bin/dependency-check.sh \
+          -s . \
+          -o .comp4035/output \
+          --disableAssembly \
+          --nvdApiKey ${{ secrets.NVD_API_KEY }} \
+          --ossIndexUsername ${{ secrets.OSSINDEX_USER }} \
+          --ossIndexPassword ${{ secrets.OSSINDEX_TOKEN }}
+
+    
+    # Add commands below to run SAST tests
+    # OWASP Dependency Check
+    # - Same command we ran manually during the practical
+    # - '-s .' scans the current directory for a supported package list
+    # - '-o .comp4035/output' sets the location of the scan output file
+      - run: ./tools/dependency-check/bin/dependency-check.sh -s . -o ./dependencycheck-output --disableAssembly
+
+    
+  

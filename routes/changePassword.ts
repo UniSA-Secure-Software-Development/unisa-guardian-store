@@ -6,10 +6,12 @@
 import { Request, Response, NextFunction } from 'express'
 import { UserModel } from '../models/user'
 import challengeUtils = require('../lib/challengeUtils')
+import jwt from 'jsonwebtoken'
 
 const security = require('../lib/insecurity')
 const cache = require('../data/datacache')
 const challenges = cache.challenges
+const secret = process.env.TOKEN_SECRET ?? 'default_secret'
 
 module.exports = function changePassword () {
   return ({ query, headers, connection }: Request, res: Response, next: NextFunction) => {
@@ -22,25 +24,36 @@ module.exports = function changePassword () {
     } else if (newPassword !== repeatPassword) {
       res.status(401).send(res.__('New and repeated password do not match.'))
     } else {
-      const token = headers.authorization ? headers.authorization.substr('Bearer='.length) : null
+      const token = headers.authorization?.replace('Bearer ', '')
+      if (!token) {
+        return res.status(401).send('Missing authentication token.')
+      }
+      const decoded = jwt.verify(token, secret)
+      if (typeof decoded !== 'object' || !('data' in decoded)) {
+        return res.status(401).send('Invalid token payload.')
+      }
+      const userId = decoded.data.id
       const loggedInUser = security.authenticatedUsers.get(token)
       if (loggedInUser) {
-        if (currentPassword && security.hash(currentPassword) !== loggedInUser.data.password) {
-          res.status(401).send(res.__('Current password is not correct.'))
-        } else {
-          UserModel.findByPk(loggedInUser.data.id).then((user: UserModel | null) => {
-            if (user) {
-              user.update({ password: newPasswordInString }).then((user: UserModel) => {
-                challengeUtils.solveIf(challenges.changePasswordBenderChallenge, () => { return user.id === 3 && !currentPassword && user.password === security.hash('slurmCl4ssic') })
-                res.json({ user })
-              }).catch((error: Error) => {
-                next(error)
-              })
-            }
+        UserModel.findByPk(userId).then((user: UserModel | null) => {
+          if (!user) {
+            return res.status(404).send('User not found.')
+          }
+          if (currentPassword && security.hash(currentPassword) !== user.password) {
+            return res.status(401).send(res.__('Current password is not correct.'))
+          }
+          user.update({ password: newPasswordInString }).then((updatedUser: UserModel) => {
+            challengeUtils.solveIf(
+              challenges.changePasswordBenderChallenge,
+              () => updatedUser.id === 3 && !currentPassword && updatedUser.password === security.hash('slurmCl4ssic')
+            )
+            res.json({ user: updatedUser })
           }).catch((error: Error) => {
             next(error)
           })
-        }
+        }).catch((error: Error) => {
+          next(error)
+        })
       } else {
         next(new Error('Blocked illegal activity by ' + connection.remoteAddress))
       }

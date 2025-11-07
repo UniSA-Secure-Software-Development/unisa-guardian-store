@@ -10,6 +10,15 @@ const security = require('../lib/insecurity')
 
 module.exports = function retrieveUserList () {
   return (_req: Request, res: Response, next: NextFunction) => {
+    // add authorisation check to grab user lists to ensure that no unauthorised users can fetch lists
+    if (!_req.user) {
+      return res.status(401).json({ error: 'Authentication required' })
+    }
+    const user = _req.user as { role?: string }
+
+    if (!user || user.role !== 'admin') {
+      return res.status(403).json({ error: 'Forbidden: Admins only' })
+    }
     UserModel.findAll().then((users: UserModel[]) => {
       const usersWithLoginStatus = utils.queryResultToJson(users)
       usersWithLoginStatus.data.forEach((user: { token: string, password: string, totpSecret: string }) => {
