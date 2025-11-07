@@ -302,11 +302,14 @@ restoreOverwrittenFilesWithOriginals().then(() => {
   // vuln-code-snippet start resetPasswordMortyChallenge
   /* Rate limiting */
   app.enable('trust proxy')
-  app.use('/rest/user/reset-password', new RateLimit({
-    windowMs: 5 * 60 * 1000,
-    max: 100,
-    keyGenerator ({ headers, ip }: { headers: any, ip: any }) { return headers['X-Forwarded-For'] || ip } // vuln-code-snippet vuln-line resetPasswordMortyChallenge
-  }))
+  const resetPasswordLimiter = new RateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 5,
+    message: { error: 'Too many password reset attempts. Please try again later.' },
+    statusCode: 429
+  })
+
+  app.post('/rest/user/reset-password', resetPasswordLimiter, resetPassword());
   // vuln-code-snippet end resetPasswordMortyChallenge
 
   // vuln-code-snippet start changeProductChallenge
@@ -527,7 +530,7 @@ restoreOverwrittenFilesWithOriginals().then(() => {
   /* Custom Restful API */
   app.post('/rest/user/login', login())
   app.get('/rest/user/change-password', changePassword())
-  app.post('/rest/user/reset-password', resetPassword())
+  app.post('/rest/user/reset-password', resetPasswordLimiter, resetPassword())
   app.get('/rest/user/security-question', securityQuestion())
   app.get('/rest/user/whoami', security.updateAuthenticatedUsers(), currentUser())
   app.get('/rest/user/authentication-details', authenticatedUsers())

@@ -8,7 +8,6 @@ import { Request, Response, NextFunction } from 'express'
 import { Memory } from '../data/types'
 import { SecurityAnswerModel } from '../models/securityAnswer'
 import { UserModel } from '../models/user'
-
 import challengeUtils = require('../lib/challengeUtils')
 const challenges = require('../data/datacache').challenges
 const users = require('../data/datacache').users

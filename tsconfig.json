@@ -29,7 +29,7 @@
     "rsn/**/*.ts",
     "*.ts",
     "*.js"
-  ],
+, "test/devSkimTest.js"  ],
   "exclude": [
     "node_modules",
     "frontend",
