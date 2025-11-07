@@ -1,0 +1,32 @@
+name: Security Scan - DOM XSS Detection
+on:
+  pull_request:
+    branches: [develop]
+  push:
+    branches: [develop]
+
+jobs:
+  devskim-scan:
+    name: DevSkim Analysis
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Create output directory
+        run: mkdir -p ./devskim-output
+
+      - name: Run DevSkim scanner
+        uses: microsoft/devskim-action@v1
+        with:
+          directory-to-scan: .
+          should-scan-archives: false
+          output-filename: devskim-results.sarif
+          output-directory: ./devskim-output
+
+      - name: Upload results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: devskim-results
+          path: ./devskim-output
