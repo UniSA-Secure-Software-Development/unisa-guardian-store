@@ -66,7 +66,8 @@ module.exports = function getUserProfile () {
           next(error)
         })
       } else {
-        next(new Error('Blocked illegal activity by ' + req.connection.remoteAddress))
+        console.log('Unauthenticated access to user profile from', req.ip)
+        res.status(401).send({ error: 'Unauthorized - please log in first' })
       }
     })
   }

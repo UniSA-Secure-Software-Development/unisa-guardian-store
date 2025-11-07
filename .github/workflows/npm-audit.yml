@@ -1,0 +1,53 @@
+# .github/workflows/npm-audit.yml
+# Automated security scan for vulnerable dependencies
+
+name: NPM Audit Security Scan
+
+on:
+  push:
+    branches: [ develop, main ]
+  pull_request:
+    branches: [ develop, main ]
+
+jobs:
+  npm-audit:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checkout repository
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Step 2: Set up Node environment
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: 'npm'
+
+      # Step 3: Clean install dependencies
+      - name: Install dependencies
+        run: npm ci --legacy-peer-deps
+
+      # Step 4: Run NPM audit and save report
+      - name: Run npm audit
+        continue-on-error: true
+        run: |
+          mkdir -p reports
+          npm audit --audit-level=moderate --json > reports/npm-audit.json
+
+      # Step 5: Print concise audit summary
+      - name: Print audit summary
+        run: |
+          if [ -f scripts/print-audit-summary.js ]; then
+            node scripts/print-audit-summary.js
+          else
+            echo "No summary script found — audit JSON saved under /reports"
+          fi
+
+      # Step 6: Upload audit report as artifact
+      - name: Upload audit report
+        uses: actions/upload-artifact@v4
+        with:
+          name: npm-audit-report
+          path: reports/npm-audit.json

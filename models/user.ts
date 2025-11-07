@@ -5,6 +5,8 @@
 
 /* jslint node: true */
 import config = require('config')
+import bcrypt = require('bcrypt') // Added import for bcrypt at the top
+
 import {
   InferAttributes,
   InferCreationAttributes,
@@ -45,7 +47,7 @@ const UserModelInit = (sequelize: Sequelize) => {
       username: {
         type: DataTypes.STRING,
         defaultValue: '',
-        set (username: string) {
+        set(username: string) {
           if (!utils.disableOnContainerEnv()) {
             username = security.sanitizeLegacy(username)
           } else {
@@ -57,7 +59,7 @@ const UserModelInit = (sequelize: Sequelize) => {
       email: {
         type: DataTypes.STRING,
         unique: true,
-        set (email: string) {
+        set(email: string) {
           if (!utils.disableOnContainerEnv()) {
             challengeUtils.solveIf(challenges.persistedXssUserChallenge, () => {
               return utils.contains(
@@ -73,8 +75,19 @@ const UserModelInit = (sequelize: Sequelize) => {
       },
       password: {
         type: DataTypes.STRING,
-        set (clearTextPassword) {
-          this.setDataValue('password', security.hash(clearTextPassword))
+        set(clearTextPassword: string) {
+          // Updated logic: handle SHA-256 and bcrypt correctly
+          // If password is already hashed (either bcrypt or SHA256), store as is
+          if (
+            clearTextPassword.startsWith('$2b$') || // bcrypt hash
+            clearTextPassword.length === 64 // SHA-256 hex hash
+          ) {
+            this.setDataValue('password', clearTextPassword)
+          } else {
+            // Otherwise, hash plain text password with bcrypt
+            const hashed = bcrypt.hashSync(clearTextPassword, 10)
+            this.setDataValue('password', hashed)
+          }
         }
       },
       role: {
@@ -83,12 +96,12 @@ const UserModelInit = (sequelize: Sequelize) => {
         validate: {
           isIn: [['customer', 'deluxe', 'accounting', 'admin']]
         },
-        set (role: string) {
+        set(role: string) {
           const profileImage = this.getDataValue('profileImage')
           if (
             role === security.roles.admin &&
-          (!profileImage ||
-            profileImage === '/assets/public/images/uploads/default.svg')
+            (!profileImage ||
+              profileImage === '/assets/public/images/uploads/default.svg')
           ) {
             this.setDataValue(
               'profileImage',
@@ -126,11 +139,12 @@ const UserModelInit = (sequelize: Sequelize) => {
     }
   )
 
+  // No change here, keeps original challenge logic
   User.addHook('afterValidate', (user: User) => {
     if (
       user.email &&
-    user.email.toLowerCase() ===
-      `acc0unt4nt@${config.get('application.domain')}`.toLowerCase()
+      user.email.toLowerCase() ===
+        `acc0unt4nt@${config.get('application.domain')}`.toLowerCase()
     ) {
       return Promise.reject(
         new Error(
