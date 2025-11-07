@@ -1,7 +1,7 @@
 rules:
   - id: express-route-missing-csrf
     languages: [javascript, typescript]
-    message: "写操作路由缺少 csrfProtection 中间件"
+    message: "The write operation route is missing the csrfProtection middleware."
     severity: ERROR
     paths:
       include:
