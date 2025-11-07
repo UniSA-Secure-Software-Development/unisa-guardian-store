@@ -2,10 +2,11 @@
  * Copyright (c) 2014-2022 Bjoern Kimminich & the OWASP Juice Shop contributors.
  * SPDX-License-Identifier: MIT
  */
-
+// testing
 import models = require('../models/index')
 import { Request, Response, NextFunction } from 'express'
 import { UserModel } from '../models/user'
+import { QueryTypes } from 'sequelize'
 
 const utils = require('../lib/utils')
 const challengeUtils = require('../lib/challengeUtils')
@@ -20,7 +21,21 @@ module.exports = function searchProducts () {
   return (req: Request, res: Response, next: NextFunction) => {
     let criteria: any = req.query.q === 'undefined' ? '' : req.query.q ?? ''
     criteria = (criteria.length <= 200) ? criteria : criteria.substring(0, 200)
-    models.sequelize.query(`SELECT * FROM Products WHERE ((name LIKE '%${criteria}%' OR description LIKE '%${criteria}%') AND deletedAt IS NULL) ORDER BY name`) // vuln-code-snippet vuln-line unionSqlInjectionChallenge dbSchemaChallenge
+
+    // paramterized queries prevent sql injection
+    const likePattern = `%${criteria}`
+
+    const sql = `SELECT * FROM Products
+    WHERE ((name LIKE :pattern OR description LIKE :pattern))
+    AND deletedAt IS NULL
+    ORDER BY name`
+
+    models.sequelize.query(sql, {
+      replacements: { pattern: likePattern },
+      type: QueryTypes.SELECT
+    })
+
+    // models.sequelize.query(`SELECT * FROM Products WHERE ((name LIKE '%${criteria}%' OR description LIKE '%${criteria}%') AND deletedAt IS NULL) ORDER BY name`) // vuln-code-snippet vuln-line unionSqlInjectionChallenge dbSchemaChallenge
       .then(([products]: any) => {
         const dataString = JSON.stringify(products)
         if (challengeUtils.notSolved(challenges.unionSqlInjectionChallenge)) { // vuln-code-snippet hide-start
