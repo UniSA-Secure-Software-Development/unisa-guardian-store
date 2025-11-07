@@ -5,9 +5,9 @@
 
 import { Component, OnInit } from '@angular/core'
 import { UntypedFormControl, Validators } from '@angular/forms'
-import { ImageCaptchaService } from '../Services/image-captcha.service'
-import { DataSubjectService } from '../Services/data-subject.service'
 import { DomSanitizer } from '@angular/platform-browser'
+import { DataSubjectService } from '../Services/data-subject.service'
+import { ImageCaptchaService } from '../Services/image-captcha.service'
 
 @Component({
   selector: 'app-data-export',
@@ -42,7 +42,12 @@ export class DataExportComponent implements OnInit {
 
   getNewCaptcha () {
     this.imageCaptchaService.getCaptcha().subscribe((data: any) => {
-      this.captcha = this.sanitizer.bypassSecurityTrustHtml(data.image)
+    this.captcha = this.sanitizer.bypassSecurityTrustHtml(data.image)
+    })
+
+    // Below is the fix to ensure input is plain-text.
+    this.imageCaptchaService.getCaptcha().subscribe((data: any) => {
+      this.captcha = String(data.image || '')
     })
   }
 

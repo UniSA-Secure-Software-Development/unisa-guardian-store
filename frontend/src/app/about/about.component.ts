@@ -5,13 +5,13 @@
 
 import { Component, OnInit } from '@angular/core'
 import { DomSanitizer } from '@angular/platform-browser'
-import { ConfigurationService } from '../Services/configuration.service'
-import { FeedbackService } from '../Services/feedback.service'
-import { IImage } from 'ng-simple-slideshow'
 import { dom, library } from '@fortawesome/fontawesome-svg-core'
 import { faFacebook, faReddit, faSlack, faTwitter } from '@fortawesome/free-brands-svg-icons'
 import { faNewspaper, faStar } from '@fortawesome/free-regular-svg-icons'
 import { faStar as fasStar } from '@fortawesome/free-solid-svg-icons'
+import { IImage } from 'ng-simple-slideshow'
+import { ConfigurationService } from '../Services/configuration.service'
+import { FeedbackService } from '../Services/feedback.service'
 
 library.add(faFacebook, faTwitter, faSlack, faReddit, faNewspaper, faStar, fasStar)
 dom.watch()
@@ -77,9 +77,12 @@ export class AboutComponent implements OnInit {
     this.feedbackService.find().subscribe((feedbacks) => {
       for (let i = 0; i < feedbacks.length; i++) {
         // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-        feedbacks[i].comment = `<span style="width: 90%; display:block;">${feedbacks[i].comment}<br/> (${this.stars[feedbacks[i].rating]})</span>`
-        feedbacks[i].comment = this.sanitizer.bypassSecurityTrustHtml(feedbacks[i].comment)
-        this.slideshowDataSource.push({ url: this.images[i % this.images.length], caption: feedbacks[i].comment })
+        // feedbacks[i].comment = `<span style="width: 90%; display:block;">${feedbacks[i].comment}<br/> (${this.stars[feedbacks[i].rating]})</span>`
+        // feedbacks[i].comment = this.sanitizer.bypassSecurityTrustHtml(feedbacks[i].comment)
+        // Below are the fixes
+        const secureFb = String(feedbacks[i].comment || '').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+        const caption = `<span style="width: 90%; display:block;">${secureFb}<br/> (${this.stars[feedbacks[i].rating]})</span>`
+        this.slideshowDataSource.push({ url: this.images[i % this.images.length], caption: caption })
       }
     }, (err) => {
       console.log(err)
