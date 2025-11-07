@@ -1,0 +1,21 @@
+rules:
+  - id: express-route-missing-csrf
+    languages: [javascript, typescript]
+    message: "The write operation route is missing the csrfProtection middleware."
+    severity: ERROR
+    paths:
+      include:
+        - server.ts
+        - routes/**/*.ts
+    patterns:
+      - pattern-either:
+          - pattern: app.$METHOD($ROUTE, ...$MWS, $HANDLER)
+          - pattern: router.$METHOD($ROUTE, ...$MWS, $HANDLER)
+      - metavariable-regex:
+          metavariable: METHOD
+          regex: "(post|put|patch|delete)"
+      - pattern-not: app.$METHOD($ROUTE, ..., csrfProtection(...), ...)
+      - pattern-not: router.$METHOD($ROUTE, ..., csrfProtection(...), ...)
+    metadata:
+      category: security
+      technology: [express]
