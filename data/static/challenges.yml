@@ -40,7 +40,7 @@
   difficulty: 2
   hint: 'It is just slightly harder to find than the score board link.'
   hintUrl: 'https://pwning.owasp-juice.shop/part2/broken-access-control.html#access-the-administration-section-of-the-store'
-  mitigationUrl: 'https://cheatsheetseries.owasp.org/cheatsheets/Access_Control_Cheat_Sheet.html'
+  mitigationUrl: ' '
   key: adminSectionChallenge
 -
   name: 'Arbitrary File Write'
