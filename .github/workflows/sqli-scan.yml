@@ -23,11 +23,11 @@ jobs:
 
       - name: Start the app in background
         run: |
-          npm run serve &
+          npm start &
 
       - name: Wait for app to be ready
         run: |
-          for i in {1..30}; do
+          for i in {1..10}; do
             if curl -f http://localhost:3000; then
               echo "App is up!"
               break
