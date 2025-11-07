@@ -1,0 +1,65 @@
+name: SQL Injection Scan
+
+on:
+  push:
+    branches: [ main, develop ]
+  workflow_dispatch:
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 16
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Start the app in background
+        run: |
+          npm start &
+
+      - name: Wait for app to be ready
+        run: |
+          for i in {1..10}; do
+            if curl -f http://localhost:3000; then
+              echo "App is up!"
+              break
+            fi
+            echo "Waiting for app... ($i/30)"
+            sleep 2
+          done
+          if [ $i -eq 30 ]; then
+            echo "App failed to start" && exit 1
+          fi
+
+      - name: Run sqlmap scan
+        run: |
+          docker run --network host \
+            remnux/sqlmap \
+            -u "http://localhost:3000/rest/products/search?q=test" \
+            --batch --level=5 --risk=3 --dbms=sqlite \
+            --flush-session > sqlmap_output.txt
+
+      - name: Check for vulnerabilities and fail if found
+        run: |
+          if grep -iq "vulnerable" sqlmap_output.txt || grep -iq "injectable" sqlmap_output.txt; then
+            echo "SQL injection detected - review sqlmap_output.txt!"
+            cat sqlmap_output.txt
+            exit 1
+          else
+            echo "No SQL injection vulnerabilities detected."
+          fi
+
+      - name: Upload scan results
+        if: always()  # Upload even if failed
+        uses: actions/upload-artifact@v4
+        with:
+          name: sqlmap-results
+          path: sqlmap_output.txt
