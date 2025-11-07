@@ -29,6 +29,7 @@ LABEL maintainer="Bjoern Kimminich <bjoern.kimminich@owasp.org>" \
     org.opencontainers.image.created=$BUILD_DATE
 WORKDIR /juice-shop
 COPY --from=installer --chown=nonroot /juice-shop .
+RUN dotnet tool install Microsoft.CST.DevSkim --version 0.4.254 --tool-path /bin
 USER 65532
 EXPOSE 3000
 CMD ["/juice-shop/build/app.js"]
