@@ -12,9 +12,6 @@ chai.use(sinonChai)
 describe('csrf middleware', () => {
   const { csrfProtection } = require('../../middleware/csrf')
 
-  /**
-   * 辅助函数：构建模拟的 req, res, next 对象
-   */
   const build = (method: string, headers: any = {}, body: any = {}, cookies: any = {}) => {
     const req: any = { method, headers, body, cookies, secure: false }
     const res: any = { status: sinon.stub().returnsThis(), json: sinon.spy(), cookie: sinon.spy() }
@@ -40,7 +37,7 @@ describe('csrf middleware', () => {
   it('should allow unsafe method with matching header token', () => {
     const token = 'abc123'
     const { req, res, next } = build('POST', { host: 'localhost:3000', origin: 'http://localhost:3000' }, {}, { csrfToken: token })
-    req.headers['x-csrf-token'] = token // 模拟 Angular 发送的 X-CSRF-Token 头
+    req.headers['x-csrf-token'] = token
     csrfProtection()(req, res, next)
     sinon.assert.called(next)
   })
