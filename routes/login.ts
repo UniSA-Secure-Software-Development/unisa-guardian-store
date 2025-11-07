@@ -9,6 +9,7 @@ import { User } from '../data/types'
 import { BasketModel } from '../models/basket'
 import { UserModel } from '../models/user'
 import challengeUtils = require('../lib/challengeUtils')
+import { QueryTypes } from 'sequelize'
 
 const utils = require('../lib/utils')
 const security = require('../lib/insecurity')
@@ -33,7 +34,15 @@ module.exports = function login () {
 
   return (req: Request, res: Response, next: NextFunction) => {
     verifyPreLoginChallenges(req) // vuln-code-snippet hide-line
-    models.sequelize.query(`SELECT * FROM Users WHERE email = '${req.body.email || ''}' AND password = '${security.hash(req.body.password || '')}' AND deletedAt IS NULL`, { model: UserModel, plain: true }) // vuln-code-snippet vuln-line loginAdminChallenge loginBenderChallenge loginJimChallenge
+    const loginQuery = 'SELECT * FROM Users WHERE email = :userEmail AND password = :userPassword AND deletedAt IS NULL'
+    const loginEmail = req.body.email || ''
+    const loginPassword = security.hash(req.body.password || '')
+    models.sequelize.query(loginQuery, {
+      replacements: { userEmail: loginEmail, userPassword: loginPassword },
+      type: QueryTypes.SELECT,
+      model: UserModel,
+      plain: true
+    })
       .then((authenticatedUser: { data: User }) => { // vuln-code-snippet neutral-line loginAdminChallenge loginBenderChallenge loginJimChallenge
         const user = utils.queryResultToJson(authenticatedUser)
         if (user.data?.id && user.data.totpSecret !== '') {
