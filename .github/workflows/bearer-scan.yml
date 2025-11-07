@@ -1,0 +1,21 @@
+name: Bearer Security Scan
+
+on:
+  push:
+  pull_request:
+    branches:
+      - main
+      - develop
+
+jobs:
+  bearer_scan:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Bearer Scan
+        uses: bearer/bearer-action@v2
+        with:
+          path: 'routes'
+          only-rule: 'javascript_lang_sql_injection'
