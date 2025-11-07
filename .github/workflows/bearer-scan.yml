@@ -13,10 +13,8 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Bearer
-        uses: bearer/actions/setup@v1
+      - name: Bearer Scan
+        uses: bearer/bearer-action@v2
         with:
-          version: latest
-
-      - name: Run Bearer scan on routes directory
-        run: bearer scan routes --only-rule javascript_lang_sql_injection
+          path: 'routes'
+          only-rule: 'javascript_lang_sql_injection'
