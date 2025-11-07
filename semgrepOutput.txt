@@ -1,0 +1,2423 @@
+                                  
+                                  
+┌────────────────────────────────┐
+│ 110 Non-blocking Code Findings │
+└────────────────────────────────┘
+                
+    Gruntfile.js
+    ❯❱ javascript.node-stdlib.cryptography.crypto-weak-algorithm.crypto-weak-algorithm
+          The use of a weak cryptographic algorithm (e.g., SHA-1 or MD5) has been identified. These algorithms
+          are considered insecure due to vulnerabilities that make them susceptible to collision attacks,     
+          allowing attackers to compromise data integrity or security. Replace SHA-1 or MD5 with secure       
+          hashing algorithms, such as: SHA-256 or higher (e.g., SHA-3).                                       
+          Details: https://sg.run/nJgp1                                                                       
+                                                                                                              
+           73┆ const md5 = crypto.createHash('md5')
+    
+    
+          Taint comes from:
+    
+           73┆ const md5 = crypto.createHash('md5')
+    
+    
+                This is how taint reaches the sink:
+    
+           73┆ const md5 = crypto.createHash('md5')
+    
+                                           
+    cypress/integration/e2e/contact.spec.ts
+    ❯❱ javascript.browser.security.eval-detected.eval-detected
+          Detected the use of eval(). eval() can be dangerous if used to evaluate dynamic content. If this 
+          content can be input from outside the program, this may be a code injection vulnerability. Ensure
+          evaluated content is not definable by external sources.                                          
+          Details: https://sg.run/7ope                                                                     
+                                                                                                           
+          257┆ const answer = eval(val).toString();
+                                             
+    cypress/integration/e2e/forgedJwt.spec.ts
+   ❯❯❱ generic.secrets.security.detected-jwt-token.detected-jwt-token
+          JWT token detected          
+          Details: https://sg.run/05N5
+                                      
+            7┆ "eyJhbGciOiJub25lIiwidHlwIjoiSldUIn0.eyJkYXRhIjp7ImVtYWlsIjoiand0bjNkQGp1aWNlLXNoLm9wIn0sIm
+               lhdCI6MTUwODYzOTYxMiwiZXhwIjo5OTk5OTk5OTk5fQ."                                             
+            ⋮┆----------------------------------------
+           22┆ "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJkYXRhIjp7ImVtYWlsIjoicnNhX2xvcmRAanVpY2Utc2gub3Aif
+               SwiaWF0IjoxNTgzMDM3NzExfQ.gShXDT5TrE5736mpIbfVDEcQbLfteJaQUG7Z0PH8Xc8"                     
+                                             
+    cypress/integration/e2e/totpSetup.spec.ts
+   ❯❯❱ generic.secrets.security.detected-generic-secret.detected-generic-secret
+          Generic Secret detected     
+          Details: https://sg.run/l2o5
+                                      
+            7┆ totpSecret: "IFTXE3SPOEYVURT2MRYGI52TKJ4HC3KH",
+                       
+    data/datacreator.ts
+    ❯❱ javascript.lang.security.audit.path-traversal.path-join-resolve-traversal.path-join-resolve-traversal
+          Detected possible user input going into a `path.join` or `path.resolve` function. This could   
+          possibly lead to a path traversal vulnerability,  where the attacker can access arbitrary files
+          stored in the file system. Instead, be sure to sanitize or validate user input first.          
+          Details: https://sg.run/OPqk                                                                   
+                                                                                                         
+           41┆ const filePath = path.resolve('./data/static/' + file + '.yml')
+    
+    
+          Taint comes from:
+    
+           40┆ function loadStaticData (file: string) {
+    
+    
+          Taint flows through these intermediate variables:
+    
+           40┆ function loadStaticData (file: string) {
+    
+    
+                This is how taint reaches the sink:
+    
+           41┆ const filePath = path.resolve('./data/static/' + file + '.yml')
+    
+                                                
+    data/static/codefixes/dbSchemaChallenge_1.ts
+   ❯❯❯❱ javascript.express.db.sequelize-express.sequelize-express
+          Untrusted input might be used to build a database query, which can lead to a SQL injection         
+          vulnerability. An attacker can execute malicious SQL statements and gain unauthorized access to    
+          sensitive data, modify, delete data, or execute arbitrary system commands. To prevent this         
+          vulnerability, use prepared statements that do not concatenate user-controllable strings and use   
+          parameterized queries where SQL commands and user data are strictly separated. Also, consider using
+          an object-relational (ORM) framework to operate with safer abstractions.                           
+          Details: https://sg.run/6JKdw                                                                      
+                                                                                                             
+            5┆ models.sequelize.query("SELECT * FROM Products WHERE ((name LIKE '%"+criteria+"%' OR
+               description LIKE '%"+criteria+"%') AND deletedAt IS NULL) ORDER BY name")           
+    
+    
+          Taint comes from:
+    
+            3┆ let criteria: any = req.query.q === 'undefined' ? '' : req.query.q ?? ''
+    
+    
+          Taint flows through these intermediate variables:
+    
+            3┆ let criteria: any = req.query.q === 'undefined' ? '' : req.query.q ?? ''
+    
+    
+                This is how taint reaches the sink:
+    
+            5┆ models.sequelize.query("SELECT * FROM Products WHERE ((name LIKE '%"+criteria+"%' OR
+               description LIKE '%"+criteria+"%') AND deletedAt IS NULL) ORDER BY name")           
+    
+    
+            ⋮┆----------------------------------------
+   
+   ❯❯❱ javascript.sequelize.security.audit.sequelize-injection-express.express-sequelize-injection
+          Detected a sequelize statement that is tainted by user-input. This could lead to SQL injection if   
+          the variable is user-controlled and is not properly sanitized. In order to prevent SQL injection, it
+          is recommended to use parameterized queries or prepared statements.                                 
+          Details: https://sg.run/gjoe                                                                        
+                                                                                                              
+            5┆ models.sequelize.query("SELECT * FROM Products WHERE ((name LIKE '%"+criteria+"%' OR
+               description LIKE '%"+criteria+"%') AND deletedAt IS NULL) ORDER BY name")           
+    
+    
+          Taint comes from:
+    
+            3┆ let criteria: any = req.query.q === 'undefined' ? '' : req.query.q ?? ''
+    
+    
+          Taint flows through these intermediate variables:
+    
+            3┆ let criteria: any = req.query.q === 'undefined' ? '' : req.query.q ?? ''
+    
+    
+                This is how taint reaches the sink:
+    
+            5┆ models.sequelize.query("SELECT * FROM Products WHERE ((name LIKE '%"+criteria+"%' OR
+               description LIKE '%"+criteria+"%') AND deletedAt IS NULL) ORDER BY name")           
+    
+                                                
+    data/static/codefixes/dbSchemaChallenge_3.ts
+   ❯❯❯❱ javascript.express.db.sequelize-express.sequelize-express
+          Untrusted input might be used to build a database query, which can lead to a SQL injection         
+          vulnerability. An attacker can execute malicious SQL statements and gain unauthorized access to    
+          sensitive data, modify, delete data, or execute arbitrary system commands. To prevent this         
+          vulnerability, use prepared statements that do not concatenate user-controllable strings and use   
+          parameterized queries where SQL commands and user data are strictly separated. Also, consider using
+          an object-relational (ORM) framework to operate with safer abstractions.                           
+          Details: https://sg.run/6JKdw                                                                      
+                                                                                                             
+           11┆ models.sequelize.query(`SELECT * FROM Products WHERE ((name LIKE '%${criteria}%' OR
+               description LIKE '%${criteria}%') AND deletedAt IS NULL) ORDER BY name`)           
+    
+    
+          Taint comes from:
+    
+            5┆ let criteria: any = req.query.q === 'undefined' ? '' : req.query.q ?? ''
+    
+    
+          Taint flows through these intermediate variables:
+    
+            5┆ let criteria: any = req.query.q === 'undefined' ? '' : req.query.q ?? ''
+    
+    
+                This is how taint reaches the sink:
+    
+           11┆ models.sequelize.query(`SELECT * FROM Products WHERE ((name LIKE '%${criteria}%' OR
+               description LIKE '%${criteria}%') AND deletedAt IS NULL) ORDER BY name`)           
+    
+    
+            ⋮┆----------------------------------------
+   
+   ❯❯❱ javascript.sequelize.security.audit.sequelize-injection-express.express-sequelize-injection
+          Detected a sequelize statement that is tainted by user-input. This could lead to SQL injection if   
+          the variable is user-controlled and is not properly sanitized. In order to prevent SQL injection, it
+          is recommended to use parameterized queries or prepared statements.                                 
+          Details: https://sg.run/gjoe                                                                        
+                                                                                                              
+           11┆ models.sequelize.query(`SELECT * FROM Products WHERE ((name LIKE '%${criteria}%' OR
+               description LIKE '%${criteria}%') AND deletedAt IS NULL) ORDER BY name`)           
+    
+    
+          Taint comes from:
+    
+            5┆ let criteria: any = req.query.q === 'undefined' ? '' : req.query.q ?? ''
+    
+    
+          Taint flows through these intermediate variables:
+    
+            5┆ let criteria: any = req.query.q === 'undefined' ? '' : req.query.q ?? ''
+    
+    
+                This is how taint reaches the sink:
+    
+           11┆ models.sequelize.query(`SELECT * FROM Products WHERE ((name LIKE '%${criteria}%' OR
+               description LIKE '%${criteria}%') AND deletedAt IS NULL) ORDER BY name`)           
+    
+                                                  
+    data/static/codefixes/restfulXssChallenge_2.ts
+     ❱ javascript.audit.detect-replaceall-sanitization.detect-replaceall-sanitization
+          Detected a call to `replaceAll()` in an attempt to HTML escape the string                        
+          `tableData[i].description`. Manually sanitizing input through a manually built list can be       
+          circumvented in many situations, and it's better to use a well known sanitization library such as
+          `sanitize-html` or `DOMPurify`.                                                                  
+          Details: https://sg.run/AzoB                                                                     
+                                                                                                           
+           59┆ tableData[i].description = tableData[i].description.replaceAll('<', '&lt;').replaceAll('>',
+               '&gt;')                                                                                    
+            ⋮┆----------------------------------------
+     ❱ javascript.audit.detect-replaceall-sanitization.detect-replaceall-sanitization
+          Detected a call to `replaceAll()` in an attempt to HTML escape the string                          
+          `tableData[i].description.replaceAll('<', '&lt;')`. Manually sanitizing input through a manually   
+          built list can be circumvented in many situations, and it's better to use a well known sanitization
+          library such as `sanitize-html` or `DOMPurify`.                                                    
+          Details: https://sg.run/AzoB                                                                       
+                                                                                                             
+           59┆ tableData[i].description = tableData[i].description.replaceAll('<', '&lt;').replaceAll('>',
+               '&gt;')                                                                                    
+                                                         
+    data/static/codefixes/unionSqlInjectionChallenge_1.ts
+   ❯❯❯❱ javascript.express.db.sequelize-express.sequelize-express
+          Untrusted input might be used to build a database query, which can lead to a SQL injection         
+          vulnerability. An attacker can execute malicious SQL statements and gain unauthorized access to    
+          sensitive data, modify, delete data, or execute arbitrary system commands. To prevent this         
+          vulnerability, use prepared statements that do not concatenate user-controllable strings and use   
+          parameterized queries where SQL commands and user data are strictly separated. Also, consider using
+          an object-relational (ORM) framework to operate with safer abstractions.                           
+          Details: https://sg.run/6JKdw                                                                      
+                                                                                                             
+            6┆ models.sequelize.query(`SELECT * FROM Products WHERE ((name LIKE '%${criteria}%' OR
+               description LIKE '%${criteria}%') AND deletedAt IS NULL) ORDER BY name`)           
+    
+    
+          Taint comes from:
+    
+            3┆ let criteria: any = req.query.q === 'undefined' ? '' : req.query.q ?? ''
+    
+    
+          Taint flows through these intermediate variables:
+    
+            3┆ let criteria: any = req.query.q === 'undefined' ? '' : req.query.q ?? ''
+    
+    
+                This is how taint reaches the sink:
+    
+            6┆ models.sequelize.query(`SELECT * FROM Products WHERE ((name LIKE '%${criteria}%' OR
+               description LIKE '%${criteria}%') AND deletedAt IS NULL) ORDER BY name`)           
+    
+    
+            ⋮┆----------------------------------------
+   
+   ❯❯❱ javascript.sequelize.security.audit.sequelize-injection-express.express-sequelize-injection
+          Detected a sequelize statement that is tainted by user-input. This could lead to SQL injection if   
+          the variable is user-controlled and is not properly sanitized. In order to prevent SQL injection, it
+          is recommended to use parameterized queries or prepared statements.                                 
+          Details: https://sg.run/gjoe                                                                        
+                                                                                                              
+            6┆ models.sequelize.query(`SELECT * FROM Products WHERE ((name LIKE '%${criteria}%' OR
+               description LIKE '%${criteria}%') AND deletedAt IS NULL) ORDER BY name`)           
+    
+    
+          Taint comes from:
+    
+            3┆ let criteria: any = req.query.q === 'undefined' ? '' : req.query.q ?? ''
+    
+    
+          Taint flows through these intermediate variables:
+    
+            3┆ let criteria: any = req.query.q === 'undefined' ? '' : req.query.q ?? ''
+    
+    
+                This is how taint reaches the sink:
+    
+            6┆ models.sequelize.query(`SELECT * FROM Products WHERE ((name LIKE '%${criteria}%' OR
+               description LIKE '%${criteria}%') AND deletedAt IS NULL) ORDER BY name`)           
+    
+                                                         
+    data/static/codefixes/unionSqlInjectionChallenge_3.ts
+   ❯❯❯❱ javascript.express.db.sequelize-express.sequelize-express
+          Untrusted input might be used to build a database query, which can lead to a SQL injection         
+          vulnerability. An attacker can execute malicious SQL statements and gain unauthorized access to    
+          sensitive data, modify, delete data, or execute arbitrary system commands. To prevent this         
+          vulnerability, use prepared statements that do not concatenate user-controllable strings and use   
+          parameterized queries where SQL commands and user data are strictly separated. Also, consider using
+          an object-relational (ORM) framework to operate with safer abstractions.                           
+          Details: https://sg.run/6JKdw                                                                      
+                                                                                                             
+           10┆ models.sequelize.query(`SELECT * FROM Products WHERE ((name LIKE '%${criteria}%' OR
+               description LIKE '%${criteria}%') AND deletedAt IS NULL) ORDER BY name`)           
+    
+    
+          Taint comes from:
+    
+            3┆ let criteria: any = req.query.q === 'undefined' ? '' : req.query.q ?? ''
+    
+    
+          Taint flows through these intermediate variables:
+    
+            3┆ let criteria: any = req.query.q === 'undefined' ? '' : req.query.q ?? ''
+    
+    
+                This is how taint reaches the sink:
+    
+           10┆ models.sequelize.query(`SELECT * FROM Products WHERE ((name LIKE '%${criteria}%' OR
+               description LIKE '%${criteria}%') AND deletedAt IS NULL) ORDER BY name`)           
+    
+    
+            ⋮┆----------------------------------------
+   
+   ❯❯❱ javascript.sequelize.security.audit.sequelize-injection-express.express-sequelize-injection
+          Detected a sequelize statement that is tainted by user-input. This could lead to SQL injection if   
+          the variable is user-controlled and is not properly sanitized. In order to prevent SQL injection, it
+          is recommended to use parameterized queries or prepared statements.                                 
+          Details: https://sg.run/gjoe                                                                        
+                                                                                                              
+           10┆ models.sequelize.query(`SELECT * FROM Products WHERE ((name LIKE '%${criteria}%' OR
+               description LIKE '%${criteria}%') AND deletedAt IS NULL) ORDER BY name`)           
+    
+    
+          Taint comes from:
+    
+            3┆ let criteria: any = req.query.q === 'undefined' ? '' : req.query.q ?? ''
+    
+    
+          Taint flows through these intermediate variables:
+    
+            3┆ let criteria: any = req.query.q === 'undefined' ? '' : req.query.q ?? ''
+    
+    
+                This is how taint reaches the sink:
+    
+           10┆ models.sequelize.query(`SELECT * FROM Products WHERE ((name LIKE '%${criteria}%' OR
+               description LIKE '%${criteria}%') AND deletedAt IS NULL) ORDER BY name`)           
+    
+                         
+    data/static/users.yml
+   ❯❯❱ generic.secrets.security.detected-generic-secret.detected-generic-secret
+          Generic Secret detected     
+          Details: https://sg.run/l2o5
+                                      
+          150┆ totpSecret: IFTXE3SPOEYVURT2MRYGI52TKJ4HC3KH
+                           
+    docker-compose.test.yml
+    ❯❱ yaml.docker-compose.security.no-new-privileges.no-new-privileges
+          Service 'app' allows for privilege escalation via setuid or setgid binaries. Add 'no-new-
+          privileges:true' in 'security_opt' to prevent this.                                      
+          Details: https://sg.run/0n8q                                                             
+                                                                                                   
+            7┆ app:
+   
+    ❯❱ yaml.docker-compose.security.writable-filesystem-service.writable-filesystem-service
+          Service 'app' is running with a writable root filesystem. This may allow malicious applications to
+          download and run additional payloads, or modify container files. If an application inside a       
+          container has to save something temporarily consider using a tmpfs. Add 'read_only: true' to this 
+          service to prevent this.                                                                          
+          Details: https://sg.run/e4JE                                                                      
+                                                                                                            
+            7┆ app:
+                                      
+    frontend/src/app/app.guard.spec.ts
+   ❯❯❱ generic.secrets.security.detected-jwt-token.detected-jwt-token
+          JWT token detected          
+          Details: https://sg.run/05N5
+                                      
+           40┆ localStorage.setItem('token', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODk
+               wIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQs
+               sw5c')                                                                                     
+                                                                  
+    frontend/src/app/last-login-ip/last-login-ip.component.spec.ts
+   ❯❯❱ generic.secrets.security.detected-jwt-token.detected-jwt-token
+          JWT token detected          
+          Details: https://sg.run/05N5
+                                      
+           50┆ localStorage.setItem('token', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjp7Imxhc3RMb2d
+               pbklwIjoiMS4yLjMuNCJ9fQ.RAkmdqwNypuOxv3SDjPO4xMKvd1CddKvDFYDBfUt3bg')                      
+            ⋮┆----------------------------------------
+           56┆ localStorage.setItem('token', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjp7fX0.bVBhvll
+               6IaeR3aUdoOeyR8YZe2S2DfhGAxTGfd9enLw')                                                     
+                                                             
+    frontend/src/app/search-result/search-result.component.ts
+    ❯❱ typescript.angular.angular-route-bypass-security-trust.angular-route-bypass-security-trust
+          Untrusted input could be used to tamper with a web page rendering, which can lead to a Cross-site   
+          scripting (XSS) vulnerability. XSS vulnerabilities occur when untrusted input executes malicious    
+          JavaScript code, leading to issues such as account compromise and sensitive information leakage.    
+          Validate the user input, perform contextual output encoding, or sanitize the input. A popular       
+          library used to prevent XSS is DOMPurify. You can also use libraries and frameworks such as Angular,
+          Vue, and React, which offer secure defaults when rendering input.                                   
+          Details: https://sg.run/JpBW                                                                        
+                                                                                                              
+          152┆ this.searchValue = this.sanitizer.bypassSecurityTrustHtml(queryParam) // vuln-code-snippet
+               vuln-line localXssChallenge xssBonusChallenge                                             
+    
+    
+          Taint comes from:
+    
+          145┆ let queryParam: string = this.route.snapshot.queryParams.q
+    
+    
+          Taint flows through these intermediate variables:
+    
+          145┆ let queryParam: string = this.route.snapshot.queryParams.q
+    
+    
+                This is how taint reaches the sink:
+    
+          152┆ this.searchValue = this.sanitizer.bypassSecurityTrustHtml(queryParam) // vuln-code-snippet
+               vuln-line localXssChallenge xssBonusChallenge                                             
+    
+                                        
+    frontend/src/assets/private/three.js
+   ❯❯❱ javascript.browser.security.insecure-document-method.insecure-document-method
+          User controlled data in methods like `innerHTML`, `outerHTML` or `document.write` is an anti-pattern
+          that can lead to XSS vulnerabilities                                                                
+          Details: https://sg.run/LwA9                                                                        
+                                                                                                              
+          11375┆ this.statusDomElement.innerHTML = message;
+                                                      
+    frontend/src/hacking-instructor/helpers/helpers.ts
+    ❯❱ javascript.lang.security.audit.prototype-pollution.prototype-pollution-loop.prototype-pollution-loop
+          Possibility of prototype polluting function detected. By adding or modifying attributes of an object
+          prototype, it is possible to create attributes that exist on every object, or replace critical      
+          attributes with malicious ones. This can be problematic if the software depends on existence or non-
+          existence of certain attributes, or uses pre-defined attributes of object prototype (such as        
+          hasOwnProperty, toString or valueOf). Possible mitigations might be: freezing the object prototype, 
+          using an object without prototypes (via Object.create(null) ), blocking modifications of attributes 
+          that resolve to object prototype, using Map instead of object.                                      
+          Details: https://sg.run/w1DB                                                                        
+                                                                                                              
+           36┆ replacementValue = replacementValue[property]
+                                            
+    frontend/src/hacking-instructor/index.ts
+   ❯❯❱ javascript.browser.security.insecure-document-method.insecure-document-method
+          User controlled data in methods like `innerHTML`, `outerHTML` or `document.write` is an anti-pattern
+          that can lead to XSS vulnerabilities                                                                
+          Details: https://sg.run/LwA9                                                                        
+                                                                                                              
+          107┆ textBox.innerHTML = snarkdown(hint.text)
+                           
+    frontend/src/index.html
+    ❯❱ html.security.audit.missing-integrity.missing-integrity
+          This tag is missing an 'integrity' subresource integrity attribute. The 'integrity' attribute allows
+          for the browser to verify that externally hosted files (for example from a CDN) are delivered       
+          without unexpected manipulation. Without this attribute, if an attacker can modify the externally   
+          hosted resource, this could lead to XSS and other types of attacks. To prevent this, include the    
+          base64-encoded cryptographic hash of the resource (file) you’re telling the browser to fetch in the 
+          'integrity' attribute for all externally hosted files.                                              
+          Details: https://sg.run/krXA                                                                        
+                                                                                                              
+           14┆ <link rel="stylesheet" type="text/css"                                               
+               href="//cdnjs.cloudflare.com/ajax/libs/cookieconsent2/3.1.0/cookieconsent.min.css" />
+            ⋮┆----------------------------------------
+           15┆ <script                                                                                   
+               src="//cdnjs.cloudflare.com/ajax/libs/cookieconsent2/3.1.0/cookieconsent.min.js"></script>
+            ⋮┆----------------------------------------
+           16┆ <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+                     
+    lib/insecurity.ts
+    ❯❱ javascript.lang.hardcoded.strings.detected-private-key.detected-private-key
+          A secret is hard-coded in the application. Secrets stored in source code, such as credentials,  
+          identifiers, and other types of sensitive data, can be leaked and used by internal or external  
+          malicious actors. Use environment variables to securely provide credentials and other secrets or
+          retrieve them from a secure vault or Hardware Security Module (HSM).                            
+          Details: https://sg.run/2dRY                                                                    
+                                                                                                          
+           22┆ const privateKey = '-----BEGIN RSA PRIVATE KEY-----                                        
+               \r\nMIICXAIBAAKBgQDNwqLEe9wgTXCbC7+RPdDbBbeqjdbs4kOPOIGzqLpXvJXlxxW8iMz0EaM4BKUqYsIa+ndv3NA
+               n2RxCd5ubVdJJcX43zO6Ko0TFEZx/65gY3BE0O6syCEmUP4qbSd6exou/F+WTISzbQ5FBVPVmhnYhG/kpwt/cIxK5iU
+               n5hm+4tQIDAQABAoGBAI+8xiPoOrA+KMnG/T4jJsG6TsHQcDHvJi7o1IKC/hnIXha0atTX5AUkRRce95qSfvKFweXdJ
+               XSQ0JMGJyfuXgU6dI0TcseFRfewXAa/ssxAC+iUVR6KUMh1PE2wXLitfeI6JLvVtrBYswm2I7CtY0q8n5AGimHWVXJP
+               LfGV7m0BAkEA+fqFt2LXbLtyg6wZyxMA/cnmt5Nt3U2dAu77MzFJvibANUNHE4HPLZxjGNXN+a6m0K6TD4kDdh5HfUY
+               LWWRBYQJBANK3carmulBwqzcDBjsJ0YrIONBpCAsXxk8idXb8jL9aNIg15Wumm2enqqObahDHB5jnGOLmbasizvSVqy
+               pfM9UCQCQl8xIqy+YgURXzXCN+kwUgHinrutZms87Jyi+D8Br8NY0+Nlf+zHvXAomD2W5CsEK7C+8SLBr3k/TsnRWHJ
+               uECQHFE9RA2OP8WoaLPuGCyFXaxzICThSRZYluVnWkZtxsBhW2W8z1b8PvWUE7kMy7TnkzeJS2LSnaNHoyxi7IaPQUC
+               QCwWU4U+v4lD7uYBw00Ga/xt+7+UqFPlPVdz1yyr4q24Zxaw0LgmuEvgU5dycq8N7JxjTubX0MIRR+G9fmDBBl8=\r\
+               n-----END RSA PRIVATE KEY-----'                                                            
+   
+    ❯❱ javascript.node-stdlib.cryptography.crypto-weak-algorithm.crypto-weak-algorithm
+          The use of a weak cryptographic algorithm (e.g., SHA-1 or MD5) has been identified. These algorithms
+          are considered insecure due to vulnerabilities that make them susceptible to collision attacks,     
+          allowing attackers to compromise data integrity or security. Replace SHA-1 or MD5 with secure       
+          hashing algorithms, such as: SHA-256 or higher (e.g., SHA-3).                                       
+          Details: https://sg.run/nJgp1                                                                       
+                                                                                                              
+           42┆ exports.hash = (data: string) => crypto.createHash('md5').update(data).digest('hex')
+    
+    
+          Taint comes from:
+    
+           42┆ exports.hash = (data: string) => crypto.createHash('md5').update(data).digest('hex')
+    
+    
+                This is how taint reaches the sink:
+    
+           42┆ exports.hash = (data: string) => crypto.createHash('md5').update(data).digest('hex')
+    
+    
+            ⋮┆----------------------------------------
+   
+    ❯❱ javascript.lang.security.audit.hardcoded-hmac-key.hardcoded-hmac-key
+          Detected a hardcoded hmac key. Avoid hardcoding secrets and consider using an alternate option such
+          as reading the secret from a config file or using an environment variable.                         
+          Details: https://sg.run/K9bn                                                                       
+                                                                                                             
+           43┆ exports.hmac = (data: string) => crypto.createHmac('sha256',
+               'pa4qacea4VK9t9nGv7yZtwmj').update(data).digest('hex')      
+   
+    ❯❱ javascript.express.security.audit.express-jwt-not-revoked.express-jwt-not-revoked
+          No token revoking configured for `express-jwt`. A leaked token could still be used and unable to be
+          revoked. Consider using function as the `isRevoked` option.                                        
+          Details: https://sg.run/kXNo                                                                       
+                                                                                                             
+           53┆ exports.isAuthorized = () => expressJwt({ secret: publicKey })
+            ⋮┆----------------------------------------
+           54┆ exports.denyAll = () => expressJwt({ secret: '' + Math.random() })
+   
+    ❯❱ javascript.jsonwebtoken.security.audit.jwt-exposed-data.jwt-exposed-data
+          The object is passed strictly to jsonwebtoken.sign(...) Make sure that sensitive information is not
+          exposed through JWT token payload.                                                                 
+          Details: https://sg.run/5Qkj                                                                       
+                                                                                                             
+           55┆ exports.authorize = (user = {}) => jwt.sign(user, privateKey, { expiresInMinutes: 60 * 5,
+               algorithm: 'RS256' })                                                                    
+   
+    ❯❱ javascript.jsonwebtoken.security.jwt-hardcode.hardcoded-jwt-secret
+          A hard-coded credential was detected. It is not recommended to store credentials in source-code, as
+          this risks secrets being leaked and used by either an internal or external malicious adversary. It 
+          is recommended to use environment variables to securely provide credentials or retrieve credentials
+          from a secure vault or HSM (Hardware Security Module).                                             
+          Details: https://sg.run/4xN9                                                                       
+                                                                                                             
+           55┆ exports.authorize = (user = {}) => jwt.sign(user, privateKey, { expiresInMinutes: 60 * 5,
+               algorithm: 'RS256' })                                                                    
+    
+    
+          Taint comes from:
+    
+           22┆ const privateKey = '-----BEGIN RSA PRIVATE KEY-----                                        
+               \r\nMIICXAIBAAKBgQDNwqLEe9wgTXCbC7+RPdDbBbeqjdbs4kOPOIGzqLpXvJXlxxW8iMz0EaM4BKUqYsIa+ndv3NA
+               n2RxCd5ubVdJJcX43zO6Ko0TFEZx/65gY3BE0O6syCEmUP4qbSd6exou/F+WTISzbQ5FBVPVmhnYhG/kpwt/cIxK5iU
+               n5hm+4tQIDAQABAoGBAI+8xiPoOrA+KMnG/T4jJsG6TsHQcDHvJi7o1IKC/hnIXha0atTX5AUkRRce95qSfvKFweXdJ
+               XSQ0JMGJyfuXgU6dI0TcseFRfewXAa/ssxAC+iUVR6KUMh1PE2wXLitfeI6JLvVtrBYswm2I7CtY0q8n5AGimHWVXJP
+               LfGV7m0BAkEA+fqFt2LXbLtyg6wZyxMA/cnmt5Nt3U2dAu77MzFJvibANUNHE4HPLZxjGNXN+a6m0K6TD4kDdh5HfUY
+               LWWRBYQJBANK3carmulBwqzcDBjsJ0YrIONBpCAsXxk8idXb8jL9aNIg15Wumm2enqqObahDHB5jnGOLmbasizvSVqy
+               pfM9UCQCQl8xIqy+YgURXzXCN+kwUgHinrutZms87Jyi+D8Br8NY0+Nlf+zHvXAomD2W5CsEK7C+8SLBr3k/TsnRWHJ
+               uECQHFE9RA2OP8WoaLPuGCyFXaxzICThSRZYluVnWkZtxsBhW2W8z1b8PvWUE7kMy7TnkzeJS2LSnaNHoyxi7IaPQUC
+               QCwWU4U+v4lD7uYBw00Ga/xt+7+UqFPlPVdz1yyr4q24Zxaw0LgmuEvgU5dycq8N7JxjTubX0MIRR+G9fmDBBl8=\r\
+               n-----END RSA PRIVATE KEY-----'                                                            
+    
+    
+          Taint flows through these intermediate variables:
+    
+           22┆ const privateKey = '-----BEGIN RSA PRIVATE KEY-----                                        
+               \r\nMIICXAIBAAKBgQDNwqLEe9wgTXCbC7+RPdDbBbeqjdbs4kOPOIGzqLpXvJXlxxW8iMz0EaM4BKUqYsIa+ndv3NA
+               n2RxCd5ubVdJJcX43zO6Ko0TFEZx/65gY3BE0O6syCEmUP4qbSd6exou/F+WTISzbQ5FBVPVmhnYhG/kpwt/cIxK5iU
+               n5hm+4tQIDAQABAoGBAI+8xiPoOrA+KMnG/T4jJsG6TsHQcDHvJi7o1IKC/hnIXha0atTX5AUkRRce95qSfvKFweXdJ
+               XSQ0JMGJyfuXgU6dI0TcseFRfewXAa/ssxAC+iUVR6KUMh1PE2wXLitfeI6JLvVtrBYswm2I7CtY0q8n5AGimHWVXJP
+               LfGV7m0BAkEA+fqFt2LXbLtyg6wZyxMA/cnmt5Nt3U2dAu77MzFJvibANUNHE4HPLZxjGNXN+a6m0K6TD4kDdh5HfUY
+               LWWRBYQJBANK3carmulBwqzcDBjsJ0YrIONBpCAsXxk8idXb8jL9aNIg15Wumm2enqqObahDHB5jnGOLmbasizvSVqy
+               pfM9UCQCQl8xIqy+YgURXzXCN+kwUgHinrutZms87Jyi+D8Br8NY0+Nlf+zHvXAomD2W5CsEK7C+8SLBr3k/TsnRWHJ
+               uECQHFE9RA2OP8WoaLPuGCyFXaxzICThSRZYluVnWkZtxsBhW2W8z1b8PvWUE7kMy7TnkzeJS2LSnaNHoyxi7IaPQUC
+               QCwWU4U+v4lD7uYBw00Ga/xt+7+UqFPlPVdz1yyr4q24Zxaw0LgmuEvgU5dycq8N7JxjTubX0MIRR+G9fmDBBl8=\r\
+               n-----END RSA PRIVATE KEY-----'                                                            
+    
+    
+                This is how taint reaches the sink:
+    
+           55┆ exports.authorize = (user = {}) => jwt.sign(user, privateKey, { expiresInMinutes: 60 * 5,
+               algorithm: 'RS256' })                                                                    
+    
+    
+            ⋮┆----------------------------------------
+   
+    ❯❱ javascript.lang.security.audit.hardcoded-hmac-key.hardcoded-hmac-key
+          Detected a hardcoded hmac key. Avoid hardcoding secrets and consider using an alternate option such
+          as reading the secret from a config file or using an environment variable.                         
+          Details: https://sg.run/K9bn                                                                       
+                                                                                                             
+          166┆ const hmac = crypto.createHmac('sha256', privateKey)
+   
+    ❯❱ javascript.express.web.cookies-default-express.cookies-default-express
+          Having default cookie settings is insecure because they often lack critical security attributes,
+          leaving cookies vulnerable to various attacks like CSRF or XSS. Always configure cookies with   
+          security attributes: `HttpOnly`, `Secure`, `SameSite`.                                          
+          Details: https://sg.run/JDG5Z                                                                   
+                                                                                                          
+          211┆ res.cookie('token', token)
+   
+    ❯❱ javascript.express.session-fixation.session-fixation
+          Detected `req` argument which enters `res.cookie`, this can lead to session fixation vulnerabilities
+          if an attacker can control the cookie value. This vulnerability can lead to unauthorized access to  
+          accounts, and in some esoteric cases, Cross-Site-Scripting (XSS). Users should not be able to       
+          influence cookies directly, for session cookies, they should be generated securely using an approved
+          session management library. If the cookie does need to be set by a user, consider using an allow-   
+          list based approach to restrict the cookies which can be set.                                       
+          Details: https://sg.run/0qDv                                                                        
+                                                                                                              
+          211┆ res.cookie('token', token)
+    
+    
+          Taint comes from:
+    
+          205┆ const token = req.cookies.token || utils.jwtFrom(req)
+    
+    
+          Taint flows through these intermediate variables:
+    
+          205┆ const token = req.cookies.token || utils.jwtFrom(req)
+    
+    
+                This is how taint reaches the sink:
+    
+          211┆ res.cookie('token', token)
+    
+                                                       
+    lib/startup/restoreOverwrittenFilesWithOriginals.ts
+    ❯❱ javascript.lang.security.audit.path-traversal.path-join-resolve-traversal.path-join-resolve-traversal
+          Detected possible user input going into a `path.join` or `path.resolve` function. This could   
+          possibly lead to a path traversal vulnerability,  where the attacker can access arbitrary files
+          stored in the file system. Instead, be sure to sanitize or validate user input first.          
+          Details: https://sg.run/OPqk                                                                   
+                                                                                                         
+           30┆ files.map((filename: string) => copyFile(filename, path.resolve('i18n/',
+               filename.substring(filename.lastIndexOf('/') + 1))))                    
+    
+    
+          Taint comes from:
+    
+           30┆ files.map((filename: string) => copyFile(filename, path.resolve('i18n/',
+               filename.substring(filename.lastIndexOf('/') + 1))))                    
+    
+    
+          Taint flows through these intermediate variables:
+    
+           30┆ files.map((filename: string) => copyFile(filename, path.resolve('i18n/',
+               filename.substring(filename.lastIndexOf('/') + 1))))                    
+    
+    
+                This is how taint reaches the sink:
+    
+           30┆ files.map((filename: string) => copyFile(filename, path.resolve('i18n/',
+               filename.substring(filename.lastIndexOf('/') + 1))))                    
+    
+                                        
+    lib/startup/validatePreconditions.ts
+    ❯❱ javascript.lang.security.audit.path-traversal.path-join-resolve-traversal.path-join-resolve-traversal
+          Detected possible user input going into a `path.join` or `path.resolve` function. This could   
+          possibly lead to a path traversal vulnerability,  where the attacker can access arbitrary files
+          stored in the file system. Instead, be sure to sanitize or validate user input first.          
+          Details: https://sg.run/OPqk                                                                   
+                                                                                                         
+           95┆ return access(path.resolve(pathRelativeToProjectRoot)).then(() => {
+    
+    
+          Taint comes from:
+    
+           92┆ const checkIfRequiredFileExists = async (pathRelativeToProjectRoot: string) => {
+    
+    
+          Taint flows through these intermediate variables:
+    
+           92┆ const checkIfRequiredFileExists = async (pathRelativeToProjectRoot: string) => {
+    
+    
+                This is how taint reaches the sink:
+    
+           95┆ return access(path.resolve(pathRelativeToProjectRoot)).then(() => {
+    
+                
+    lib/utils.ts
+    ❯❱ javascript.jssha.jssha-sha1.jssha-sha1
+          The SHA1 hashing algorithm is considered to be weak. If this is used in any sensitive operation such
+          as password hashing, or is used to ensure data integrity (collision sensitive) then you should use a
+          stronger hashing algorithm. For passwords, consider using `Argon2id`, `scrypt`, or `bcrypt`. For    
+          data integrity, consider using `SHA-256`.                                                           
+          Details: https://sg.run/ERyN                                                                        
+                                                                                                              
+           96┆ const shaObj = new jsSHA('SHA-1', 'TEXT') // eslint-disable-line new-cap
+                   
+    models/index.ts
+    ❯❱ javascript.sequelize.node-sequelize-hardcoded-secret-argument.node-sequelize-hardcoded-secret-argument
+          A secret is hard-coded in the application. Secrets stored in source code, such as credentials,  
+          identifiers, and other types of sensitive data, can be leaked and used by internal or external  
+          malicious actors. Use environment variables to securely provide credentials and other secrets or
+          retrieve them from a secure vault or Hardware Security Module (HSM).                            
+          Details: https://sg.run/E7ZB                                                                    
+                                                                                                          
+           31┆ const sequelize = new Sequelize('database', 'username', 'password', {
+                      
+    routes/b2bOrder.ts
+   ❯❯❯❱ javascript.express.code.vm-express.vm-express
+          The application might dynamically evaluate untrusted input, which can lead to a code injection    
+          vulnerability. An attacker can execute arbitrary code, potentially gaining complete control of the
+          system. To prevent this vulnerability, avoid executing code containing user input. If this is     
+          unavoidable, validate and sanitize the input, and use safe alternatives for evaluating user input.
+          Details: https://sg.run/KxPNP                                                                     
+                                                                                                            
+           22┆ vm.runInContext('safeEval(orderLinesData)', sandbox, { timeout: 2000 })
+    
+    
+          Taint comes from:
+    
+           16┆ return ({ body }: Request, res: Response, next: NextFunction) => {
+    
+    
+          Taint flows through these intermediate variables:
+    
+           16┆ return ({ body }: Request, res: Response, next: NextFunction) => {
+    
+           18┆ const orderLinesData = body.orderLinesData || ''
+    
+           20┆ const sandbox = { safeEval, orderLinesData }
+    
+    
+                This is how taint reaches the sink:
+    
+           22┆ vm.runInContext('safeEval(orderLinesData)', sandbox, { timeout: 2000 })
+    
+    
+            ⋮┆----------------------------------------
+   
+    ❯❱ javascript.express.security.audit.express-detect-notevil-usage.express-detect-notevil-usage
+          Detected usage of the `notevil` package, which is unmaintained and has vulnerabilities. Using any 
+          sort of `eval()` functionality can be very dangerous, but if you must, the `eval` package is an up
+          to date alternative. Be sure that only trusted input reaches an `eval()` function.                
+          Details: https://sg.run/W70E                                                                      
+                                                                                                            
+           22┆ vm.runInContext('safeEval(orderLinesData)', sandbox, { timeout: 2000 })
+                     
+    routes/captcha.ts
+    ❯❱ javascript.browser.security.eval-detected.eval-detected
+          Detected the use of eval(). eval() can be dangerous if used to evaluate dynamic content. If this 
+          content can be input from outside the program, this may be a code injection vulnerability. Ensure
+          evaluated content is not definable by external sources.                                          
+          Details: https://sg.run/7ope                                                                     
+                                                                                                           
+           23┆ const answer = eval(expression).toString() // eslint-disable-line no-eval
+                         
+    routes/dataErasure.ts
+    ❯❱ javascript.express.security.audit.express-path-join-resolve-traversal.express-path-join-resolve-traversal
+          Possible writing outside of the destination, make sure that the target path is nested in the
+          intended destination                                                                        
+          Details: https://sg.run/weRn                                                                
+                                                                                                      
+           69┆ const filePath: string = path.resolve(req.body.layout).toLowerCase()
+    
+    
+          Taint comes from:
+    
+           69┆ const filePath: string = path.resolve(req.body.layout).toLowerCase()
+    
+    
+                This is how taint reaches the sink:
+    
+           69┆ const filePath: string = path.resolve(req.body.layout).toLowerCase()
+    
+    
+            ⋮┆----------------------------------------
+   
+    ❯❱ javascript.lang.security.audit.path-traversal.path-join-resolve-traversal.path-join-resolve-traversal
+          Detected possible user input going into a `path.join` or `path.resolve` function. This could   
+          possibly lead to a path traversal vulnerability,  where the attacker can access arbitrary files
+          stored in the file system. Instead, be sure to sanitize or validate user input first.          
+          Details: https://sg.run/OPqk                                                                   
+                                                                                                         
+           69┆ const filePath: string = path.resolve(req.body.layout).toLowerCase()
+    
+    
+          Taint comes from:
+    
+           54┆ router.post('/', async (req: Request<{}, {}, DataErasureRequestParams>, res: Response,
+               next: NextFunction): Promise<void> => {                                               
+    
+    
+          Taint flows through these intermediate variables:
+    
+           54┆ router.post('/', async (req: Request<{}, {}, DataErasureRequestParams>, res: Response,
+               next: NextFunction): Promise<void> => {                                               
+    
+    
+                This is how taint reaches the sink:
+    
+           69┆ const filePath: string = path.resolve(req.body.layout).toLowerCase()
+    
+                        
+    routes/dataExport.ts
+   ❯❯❯❱ javascript.express.mongodb.express-mongo-nosqli.express-mongo-nosqli
+          Detected a `../data/mongodb` statement that comes from a `req` argument. This could lead to NoSQL
+          injection if the variable is user-controlled and is not properly sanitized. Be sure to properly  
+          sanitize the data if you absolutely must pass request data into a mongo query.                   
+          Details: https://sg.run/Qqxq                                                                     
+                                                                                                           
+           61┆ db.orders.find({ email: updatedEmail }).then((orders: Array<{
+    
+    
+          Taint comes from:
+    
+           17┆ const loggedInUser =                                                               
+               security.authenticatedUsers.get(req.headers?.authorization?.replace('Bearer ', ''))
+    
+    
+          Taint flows through these intermediate variables:
+    
+           17┆ const loggedInUser =                                                               
+               security.authenticatedUsers.get(req.headers?.authorization?.replace('Bearer ', ''))
+    
+           17┆ const loggedInUser =                                                               
+               security.authenticatedUsers.get(req.headers?.authorization?.replace('Bearer ', ''))
+    
+           17┆ const loggedInUser =                                                               
+               security.authenticatedUsers.get(req.headers?.authorization?.replace('Bearer ', ''))
+    
+           20┆ const email = loggedInUser.data.email
+    
+           21┆ const updatedEmail = email.replace(/[aeiou]/gi, '*')
+    
+    
+                This is how taint reaches the sink:
+    
+           61┆ db.orders.find({ email: updatedEmail }).then((orders: Array<{
+    
+                        
+    routes/fileServer.ts
+    ❯❱ javascript.express.security.audit.express-res-sendfile.express-res-sendfile
+          The application processes user-input, this is passed to res.sendFile which can allow an attacker to
+          arbitrarily read files on the system through path traversal. It is recommended to perform input    
+          validation in addition to canonicalizing the path. This allows you to validate the path against the
+          intended directory it should be accessing.                                                         
+          Details: https://sg.run/7DJk                                                                       
+                                                                                                             
+           33┆ res.sendFile(path.resolve('ftp/', file))
+    
+    
+          Taint comes from:
+    
+           26┆ function verify (file: string, res: Response, next: NextFunction) {
+    
+           27┆   if (file && (endsWithAllowlistedFileType(file) || (file === 'incident-support.kdbx'))) {
+    
+           28┆     file = security.cutOffPoisonNullByte(file)
+    
+           29┆
+    
+           30┆     challengeUtils.solveIf(challenges.directoryListingChallenge, () => { return
+               file.toLowerCase() === 'acquisitions.md' })                                    
+    
+           31┆     verifySuccessfulPoisonNullByteExploit(file)
+    
+           32┆
+    
+           33┆     res.sendFile(path.resolve('ftp/', file))
+    
+           34┆   } else {
+    
+           35┆     res.status(403)
+    
+             [hid 3 additional lines, adjust with --max-lines-per-finding] 
+    
+    
+                This is how taint reaches the sink:
+    
+           33┆ res.sendFile(path.resolve('ftp/', file))
+    
+    
+            ⋮┆----------------------------------------
+   
+    ❯❱ javascript.lang.security.audit.path-traversal.path-join-resolve-traversal.path-join-resolve-traversal
+          Detected possible user input going into a `path.join` or `path.resolve` function. This could   
+          possibly lead to a path traversal vulnerability,  where the attacker can access arbitrary files
+          stored in the file system. Instead, be sure to sanitize or validate user input first.          
+          Details: https://sg.run/OPqk                                                                   
+                                                                                                         
+           33┆ res.sendFile(path.resolve('ftp/', file))
+    
+    
+          Taint comes from:
+    
+           26┆ function verify (file: string, res: Response, next: NextFunction) {
+    
+    
+          Taint flows through these intermediate variables:
+    
+           26┆ function verify (file: string, res: Response, next: NextFunction) {
+    
+    
+                This is how taint reaches the sink:
+    
+           33┆ res.sendFile(path.resolve('ftp/', file))
+    
+                        
+    routes/fileUpload.ts
+    ❯❱ javascript.lang.security.audit.path-traversal.path-join-resolve-traversal.path-join-resolve-traversal
+          Detected possible user input going into a `path.join` or `path.resolve` function. This could   
+          possibly lead to a path traversal vulnerability,  where the attacker can access arbitrary files
+          stored in the file system. Instead, be sure to sanitize or validate user input first.          
+          Details: https://sg.run/OPqk                                                                   
+                                                                                                         
+           29┆ const tempFile = path.join(os.tmpdir(), filename)
+    
+    
+          Taint comes from:
+    
+           24┆ function handleZipFileUpload ({ file }: Request, res: Response, next: NextFunction) {
+    
+    
+          Taint flows through these intermediate variables:
+    
+           24┆ function handleZipFileUpload ({ file }: Request, res: Response, next: NextFunction) {
+    
+           28┆ const filename = file.originalname.toLowerCase()
+    
+    
+                This is how taint reaches the sink:
+    
+           29┆ const tempFile = path.join(os.tmpdir(), filename)
+    
+    
+            ⋮┆----------------------------------------
+   
+   ❯❯❱ javascript.express.file.fs-express.fs-express
+          The application builds a file path from potentially untrusted data, which can lead to a path        
+          traversal vulnerability. An attacker can manipulate the path which the application uses to access   
+          files. If the application does not validate user input and sanitize file paths, sensitive files such
+          as configuration or user data can be accessed, potentially creating or overwriting files. To prevent
+          this vulnerability, validate and sanitize any input that is used to create references to file paths.
+          Also, enforce strict file access controls. For example, choose privileges allowing public-facing    
+          applications to access only the required files.                                                     
+          Details: https://sg.run/GdqX1                                                                       
+                                                                                                              
+           30┆ fs.open(tempFile, 'w', function (err, fd) {
+    
+    
+          Taint comes from:
+    
+           28┆ const filename = file.originalname.toLowerCase()
+    
+    
+          Taint flows through these intermediate variables:
+    
+           28┆ const filename = file.originalname.toLowerCase()
+    
+           29┆ const tempFile = path.join(os.tmpdir(), filename)
+    
+    
+                This is how taint reaches the sink:
+    
+           30┆ fs.open(tempFile, 'w', function (err, fd) {
+    
+    
+            ⋮┆----------------------------------------
+           35┆ fs.createReadStream(tempFile)
+    
+    
+          Taint comes from:
+    
+           28┆ const filename = file.originalname.toLowerCase()
+    
+    
+          Taint flows through these intermediate variables:
+    
+           28┆ const filename = file.originalname.toLowerCase()
+    
+           29┆ const tempFile = path.join(os.tmpdir(), filename)
+    
+    
+                This is how taint reaches the sink:
+    
+           35┆ fs.createReadStream(tempFile)
+    
+    
+            ⋮┆----------------------------------------
+   
+    ❯❱ javascript.lang.security.audit.path-traversal.path-join-resolve-traversal.path-join-resolve-traversal
+          Detected possible user input going into a `path.join` or `path.resolve` function. This could   
+          possibly lead to a path traversal vulnerability,  where the attacker can access arbitrary files
+          stored in the file system. Instead, be sure to sanitize or validate user input first.          
+          Details: https://sg.run/OPqk                                                                   
+                                                                                                         
+           39┆ const absolutePath = path.resolve('uploads/complaints/' + fileName)
+    
+    
+          Taint comes from:
+    
+           37┆ .on('entry', function (entry: any) {
+    
+    
+          Taint flows through these intermediate variables:
+    
+           37┆ .on('entry', function (entry: any) {
+    
+           38┆ const fileName = entry.path
+    
+    
+                This is how taint reaches the sink:
+    
+           39┆ const absolutePath = path.resolve('uploads/complaints/' + fileName)
+    
+    
+            ⋮┆----------------------------------------
+   
+   ❯❯❯❱ javascript.express.code.vm-express.vm-express
+          The application might dynamically evaluate untrusted input, which can lead to a code injection    
+          vulnerability. An attacker can execute arbitrary code, potentially gaining complete control of the
+          system. To prevent this vulnerability, avoid executing code containing user input. If this is     
+          unavoidable, validate and sanitize the input, and use safe alternatives for evaluating user input.
+          Details: https://sg.run/KxPNP                                                                     
+                                                                                                            
+           80┆ const xmlDoc = vm.runInContext('libxml.parseXml(data, { noblanks: true, noent: true,
+               nocdata: true })', sandbox, { timeout: 2000 })                                      
+    
+    
+          Taint comes from:
+    
+           76┆ const data = file.buffer.toString()
+    
+    
+          Taint flows through these intermediate variables:
+    
+           76┆ const data = file.buffer.toString()
+    
+           78┆ const sandbox = { libxml, data }
+    
+    
+                This is how taint reaches the sink:
+    
+           80┆ const xmlDoc = vm.runInContext('libxml.parseXml(data, { noblanks: true, noent: true,
+               nocdata: true })', sandbox, { timeout: 2000 })                                      
+    
+    
+            ⋮┆----------------------------------------
+   
+    ❯❱ javascript.express.security.audit.express-libxml-vm-noent.express-libxml-vm-noent
+          Detected use of parseXml() function with the `noent` field set to `true`. This can lead to an XML
+          External Entities (XXE) attack if untrusted data is passed into it.                              
+          Details: https://sg.run/n8Ag                                                                     
+                                                                                                           
+           80┆ const xmlDoc = vm.runInContext('libxml.parseXml(data, { noblanks: true, noent: true,
+               nocdata: true })', sandbox, { timeout: 2000 })                                      
+                       
+    routes/keyServer.ts
+    ❯❱ javascript.express.security.audit.express-res-sendfile.express-res-sendfile
+          The application processes user-input, this is passed to res.sendFile which can allow an attacker to
+          arbitrarily read files on the system through path traversal. It is recommended to perform input    
+          validation in addition to canonicalizing the path. This allows you to validate the path against the
+          intended directory it should be accessing.                                                         
+          Details: https://sg.run/7DJk                                                                       
+                                                                                                             
+           14┆ res.sendFile(path.resolve('encryptionkeys/', file))
+    
+    
+          Taint comes from:
+    
+           10┆ return ({ params }: Request, res: Response, next: NextFunction) => {
+    
+    
+          Taint flows through these intermediate variables:
+    
+           10┆ return ({ params }: Request, res: Response, next: NextFunction) => {
+    
+           11┆ const file = params.file
+    
+    
+                This is how taint reaches the sink:
+    
+           14┆ res.sendFile(path.resolve('encryptionkeys/', file))
+    
+    
+            ⋮┆----------------------------------------
+   
+    ❯❱ javascript.express.security.audit.express-path-join-resolve-traversal.express-path-join-resolve-traversal
+          Possible writing outside of the destination, make sure that the target path is nested in the
+          intended destination                                                                        
+          Details: https://sg.run/weRn                                                                
+                                                                                                      
+           14┆ res.sendFile(path.resolve('encryptionkeys/', file))
+    
+    
+          Taint comes from:
+    
+           10┆ return ({ params }: Request, res: Response, next: NextFunction) => {
+    
+    
+          Taint flows through these intermediate variables:
+    
+           10┆ return ({ params }: Request, res: Response, next: NextFunction) => {
+    
+           11┆ const file = params.file
+    
+    
+                This is how taint reaches the sink:
+    
+           14┆ res.sendFile(path.resolve('encryptionkeys/', file))
+    
+    
+            ⋮┆----------------------------------------
+   
+    ❯❱ javascript.lang.security.audit.path-traversal.path-join-resolve-traversal.path-join-resolve-traversal
+          Detected possible user input going into a `path.join` or `path.resolve` function. This could   
+          possibly lead to a path traversal vulnerability,  where the attacker can access arbitrary files
+          stored in the file system. Instead, be sure to sanitize or validate user input first.          
+          Details: https://sg.run/OPqk                                                                   
+                                                                                                         
+           14┆ res.sendFile(path.resolve('encryptionkeys/', file))
+    
+    
+          Taint comes from:
+    
+           10┆ return ({ params }: Request, res: Response, next: NextFunction) => {
+    
+    
+          Taint flows through these intermediate variables:
+    
+           10┆ return ({ params }: Request, res: Response, next: NextFunction) => {
+    
+           11┆ const file = params.file
+    
+    
+                This is how taint reaches the sink:
+    
+           14┆ res.sendFile(path.resolve('encryptionkeys/', file))
+    
+                                
+    routes/likeProductReviews.ts
+   ❯❯❯❱ javascript.express.mongodb.express-mongo-nosqli.express-mongo-nosqli
+          Detected a `../data/mongodb` statement that comes from a `req` argument. This could lead to NoSQL
+          injection if the variable is user-controlled and is not properly sanitized. Be sure to properly  
+          sanitize the data if you absolutely must pass request data into a mongo query.                   
+          Details: https://sg.run/Qqxq                                                                     
+                                                                                                           
+           18┆ db.reviews.findOne({ _id: id }).then((review: Review) => {
+    
+    
+          Taint comes from:
+    
+           16┆ const id = req.body.id
+    
+    
+          Taint flows through these intermediate variables:
+    
+           16┆ const id = req.body.id
+    
+    
+                This is how taint reaches the sink:
+    
+           18┆ db.reviews.findOne({ _id: id }).then((review: Review) => {
+    
+    
+            ⋮┆----------------------------------------
+           25┆ { _id: id },
+    
+    
+          Taint comes from:
+    
+           16┆ const id = req.body.id
+    
+    
+          Taint flows through these intermediate variables:
+    
+           16┆ const id = req.body.id
+    
+    
+                This is how taint reaches the sink:
+    
+           25┆ { _id: id },
+    
+    
+            ⋮┆----------------------------------------
+           31┆ db.reviews.findOne({ _id: id }).then((review: Review) => {
+    
+    
+          Taint comes from:
+    
+           16┆ const id = req.body.id
+    
+    
+          Taint flows through these intermediate variables:
+    
+           16┆ const id = req.body.id
+    
+    
+                This is how taint reaches the sink:
+    
+           31┆ db.reviews.findOne({ _id: id }).then((review: Review) => {
+    
+    
+            ⋮┆----------------------------------------
+           42┆ { _id: id },
+    
+    
+          Taint comes from:
+    
+           16┆ const id = req.body.id
+    
+    
+          Taint flows through these intermediate variables:
+    
+           16┆ const id = req.body.id
+    
+    
+                This is how taint reaches the sink:
+    
+           42┆ { _id: id },
+    
+                           
+    routes/logfileServer.ts
+    ❯❱ javascript.express.security.audit.express-res-sendfile.express-res-sendfile
+          The application processes user-input, this is passed to res.sendFile which can allow an attacker to
+          arbitrarily read files on the system through path traversal. It is recommended to perform input    
+          validation in addition to canonicalizing the path. This allows you to validate the path against the
+          intended directory it should be accessing.                                                         
+          Details: https://sg.run/7DJk                                                                       
+                                                                                                             
+           14┆ res.sendFile(path.resolve('logs/', file))
+    
+    
+          Taint comes from:
+    
+           10┆ return ({ params }: Request, res: Response, next: NextFunction) => {
+    
+    
+          Taint flows through these intermediate variables:
+    
+           10┆ return ({ params }: Request, res: Response, next: NextFunction) => {
+    
+           11┆ const file = params.file
+    
+    
+                This is how taint reaches the sink:
+    
+           14┆ res.sendFile(path.resolve('logs/', file))
+    
+    
+            ⋮┆----------------------------------------
+   
+    ❯❱ javascript.express.security.audit.express-path-join-resolve-traversal.express-path-join-resolve-traversal
+          Possible writing outside of the destination, make sure that the target path is nested in the
+          intended destination                                                                        
+          Details: https://sg.run/weRn                                                                
+                                                                                                      
+           14┆ res.sendFile(path.resolve('logs/', file))
+    
+    
+          Taint comes from:
+    
+           10┆ return ({ params }: Request, res: Response, next: NextFunction) => {
+    
+    
+          Taint flows through these intermediate variables:
+    
+           10┆ return ({ params }: Request, res: Response, next: NextFunction) => {
+    
+           11┆ const file = params.file
+    
+    
+                This is how taint reaches the sink:
+    
+           14┆ res.sendFile(path.resolve('logs/', file))
+    
+    
+            ⋮┆----------------------------------------
+   
+    ❯❱ javascript.lang.security.audit.path-traversal.path-join-resolve-traversal.path-join-resolve-traversal
+          Detected possible user input going into a `path.join` or `path.resolve` function. This could   
+          possibly lead to a path traversal vulnerability,  where the attacker can access arbitrary files
+          stored in the file system. Instead, be sure to sanitize or validate user input first.          
+          Details: https://sg.run/OPqk                                                                   
+                                                                                                         
+           14┆ res.sendFile(path.resolve('logs/', file))
+    
+    
+          Taint comes from:
+    
+           10┆ return ({ params }: Request, res: Response, next: NextFunction) => {
+    
+    
+          Taint flows through these intermediate variables:
+    
+           10┆ return ({ params }: Request, res: Response, next: NextFunction) => {
+    
+           11┆ const file = params.file
+    
+    
+                This is how taint reaches the sink:
+    
+           14┆ res.sendFile(path.resolve('logs/', file))
+    
+                   
+    routes/order.ts
+    ❯❱ javascript.lang.security.audit.path-traversal.path-join-resolve-traversal.path-join-resolve-traversal
+          Detected possible user input going into a `path.join` or `path.resolve` function. This could   
+          possibly lead to a path traversal vulnerability,  where the attacker can access arbitrary files
+          stored in the file system. Instead, be sure to sanitize or validate user input first.          
+          Details: https://sg.run/OPqk                                                                   
+                                                                                                         
+           46┆ const fileWriter = doc.pipe(fs.createWriteStream(path.join('ftp/', pdfFile)))
+    
+    
+          Taint comes from:
+    
+           35┆ return (req: Request, res: Response, next: NextFunction) => {
+    
+    
+          Taint flows through these intermediate variables:
+    
+           35┆ return (req: Request, res: Response, next: NextFunction) => {
+    
+           40┆ const customer = security.authenticatedUsers.from(req)
+    
+           41┆ const email = customer ? customer.data ? customer.data.email : '' : ''
+    
+           42┆ const orderId = security.hash(email).slice(0, 4) + '-' + utils.randomHexString(16)
+    
+           43┆ const pdfFile = `order_${orderId}.pdf`
+    
+           43┆ const pdfFile = `order_${orderId}.pdf`
+    
+    
+                This is how taint reaches the sink:
+    
+           46┆ const fileWriter = doc.pipe(fs.createWriteStream(path.join('ftp/', pdfFile)))
+    
+                                    
+    routes/profileImageFileUpload.ts
+    ❯❱ javascript.express.express-fs-filename.express-fs-filename
+          The application builds a file path from potentially untrusted data, which can lead to a path        
+          traversal vulnerability. An attacker can manipulate the file path which the application uses to     
+          access files. If the application does not validate user input and sanitize file paths, sensitive    
+          files such as configuration or user data can be accessed, potentially creating or overwriting files.
+          To prevent this vulnerability, validate and sanitize any input that is used to create references to 
+          file paths. Also, enforce strict file access controls. For example, choose privileges allowing      
+          public-facing applications to access only the required files.                                       
+          Details: https://sg.run/0B9W                                                                        
+                                                                                                              
+           28┆ fs.open(`frontend/dist/frontend/assets/public/images/uploads/${loggedInUser.data.id}.${uplo
+               adedFileType.ext}`, 'w', function (err, fd) {                                              
+    
+    
+          Taint comes from:
+    
+           26┆ const loggedInUser = security.authenticatedUsers.get(req.cookies.token)
+    
+    
+          Taint flows through these intermediate variables:
+    
+           26┆ const loggedInUser = security.authenticatedUsers.get(req.cookies.token)
+    
+    
+                This is how taint reaches the sink:
+    
+           28┆ fs.open(`frontend/dist/frontend/assets/public/images/uploads/${loggedInUser.data.id}.${uplo
+               adedFileType.ext}`, 'w', function (err, fd) {                                              
+    
+    
+            ⋮┆----------------------------------------
+   
+   ❯❯❱ javascript.express.file.fs-express.fs-express
+          The application builds a file path from potentially untrusted data, which can lead to a path        
+          traversal vulnerability. An attacker can manipulate the path which the application uses to access   
+          files. If the application does not validate user input and sanitize file paths, sensitive files such
+          as configuration or user data can be accessed, potentially creating or overwriting files. To prevent
+          this vulnerability, validate and sanitize any input that is used to create references to file paths.
+          Also, enforce strict file access controls. For example, choose privileges allowing public-facing    
+          applications to access only the required files.                                                     
+          Details: https://sg.run/GdqX1                                                                       
+                                                                                                              
+           28┆ fs.open(`frontend/dist/frontend/assets/public/images/uploads/${loggedInUser.data.id}.${uplo
+               adedFileType.ext}`, 'w', function (err, fd) {                                              
+    
+    
+          Taint comes from:
+    
+           26┆ const loggedInUser = security.authenticatedUsers.get(req.cookies.token)
+    
+    
+          Taint flows through these intermediate variables:
+    
+           26┆ const loggedInUser = security.authenticatedUsers.get(req.cookies.token)
+    
+    
+                This is how taint reaches the sink:
+    
+           28┆ fs.open(`frontend/dist/frontend/assets/public/images/uploads/${loggedInUser.data.id}.${uplo
+               adedFileType.ext}`, 'w', function (err, fd) {                                              
+    
+                                   
+    routes/profileImageUrlUpload.ts
+    ❯❱ javascript.express.request.ssrf-deepsemgrep.ssrf-deepsemgrep
+          Untrusted input might be used to build an HTTP request, which can lead to a Server-side request    
+          forgery (SSRF) vulnerability. SSRF allows an attacker to send crafted requests from the server side
+          to other internal or external systems. SSRF can lead to unauthorized access to sensitive data and, 
+          in some cases, allow the attacker to control applications or systems that trust the vulnerable     
+          service. To prevent this vulnerability, avoid allowing user input to craft the base request.       
+          Instead, treat it as part of the path or query parameter and encode it appropriately. When user    
+          input is necessary to prepare the HTTP request, perform strict input validation. Additionally,     
+          whenever possible, use allowlists to only interact with expected, trusted domains.                 
+          Details: https://sg.run/Wxn4                                                                       
+                                                                                                             
+           23┆ .get(url)
+    
+    
+          Taint comes from:
+    
+           18┆ const url = req.body.imageUrl
+    
+    
+          Taint flows through these intermediate variables:
+    
+           18┆ const url = req.body.imageUrl
+    
+    
+                This is how taint reaches the sink:
+    
+           23┆ .get(url)
+    
+    
+            ⋮┆----------------------------------------
+   
+    ❯❱ javascript.express.security.audit.express-ssrf.express-ssrf
+          The following request request.get() was found to be crafted from user-input `req` which can lead to 
+          Server-Side Request Forgery (SSRF) vulnerabilities. It is recommended where possible to not allow   
+          user-input to craft the base request, but to be treated as part of the path or query parameter. When
+          user-input is necessary to craft the request, it is recommeneded to follow OWASP best practices to  
+          prevent abuse.                                                                                      
+          Details: https://sg.run/0PNw                                                                        
+                                                                                                              
+           23┆ .get(url)
+    
+    
+          Taint comes from:
+    
+           18┆ const url = req.body.imageUrl
+    
+    
+          Taint flows through these intermediate variables:
+    
+           18┆ const url = req.body.imageUrl
+    
+    
+                This is how taint reaches the sink:
+    
+           23┆ .get(url)
+    
+    
+            ⋮┆----------------------------------------
+   
+    ❯❱ javascript.express.express-fs-filename.express-fs-filename
+          The application builds a file path from potentially untrusted data, which can lead to a path        
+          traversal vulnerability. An attacker can manipulate the file path which the application uses to     
+          access files. If the application does not validate user input and sanitize file paths, sensitive    
+          files such as configuration or user data can be accessed, potentially creating or overwriting files.
+          To prevent this vulnerability, validate and sanitize any input that is used to create references to 
+          file paths. Also, enforce strict file access controls. For example, choose privileges allowing      
+          public-facing applications to access only the required files.                                       
+          Details: https://sg.run/0B9W                                                                        
+                                                                                                              
+           31┆ imageRequest.pipe(fs.createWriteStream(`frontend/dist/frontend/assets/public/images/uploads
+               /${loggedInUser.data.id}.${ext}`))                                                         
+    
+    
+          Taint comes from:
+    
+           18┆ const url = req.body.imageUrl
+    
+    
+          Taint flows through these intermediate variables:
+    
+           18┆ const url = req.body.imageUrl
+    
+           30┆ const ext = ['jpg', 'jpeg', 'png', 'svg',                   
+               'gif'].includes(url.split('.').slice(-1)[0].toLowerCase()) ?
+               url.split('.').slice(-1)[0].toLowerCase() : 'jpg'           
+    
+    
+                This is how taint reaches the sink:
+    
+           31┆ imageRequest.pipe(fs.createWriteStream(`frontend/dist/frontend/assets/public/images/uploads
+               /${loggedInUser.data.id}.${ext}`))                                                         
+    
+    
+            ⋮┆----------------------------------------
+   
+   ❯❯❱ javascript.express.file.fs-express.fs-express
+          The application builds a file path from potentially untrusted data, which can lead to a path        
+          traversal vulnerability. An attacker can manipulate the path which the application uses to access   
+          files. If the application does not validate user input and sanitize file paths, sensitive files such
+          as configuration or user data can be accessed, potentially creating or overwriting files. To prevent
+          this vulnerability, validate and sanitize any input that is used to create references to file paths.
+          Also, enforce strict file access controls. For example, choose privileges allowing public-facing    
+          applications to access only the required files.                                                     
+          Details: https://sg.run/GdqX1                                                                       
+                                                                                                              
+           31┆ imageRequest.pipe(fs.createWriteStream(`frontend/dist/frontend/assets/public/images/uploads
+               /${loggedInUser.data.id}.${ext}`))                                                         
+    
+    
+          Taint comes from:
+    
+           18┆ const url = req.body.imageUrl
+    
+    
+          Taint flows through these intermediate variables:
+    
+           18┆ const url = req.body.imageUrl
+    
+           30┆ const ext = ['jpg', 'jpeg', 'png', 'svg',                   
+               'gif'].includes(url.split('.').slice(-1)[0].toLowerCase()) ?
+               url.split('.').slice(-1)[0].toLowerCase() : 'jpg'           
+    
+    
+                This is how taint reaches the sink:
+    
+           31┆ imageRequest.pipe(fs.createWriteStream(`frontend/dist/frontend/assets/public/images/uploads
+               /${loggedInUser.data.id}.${ext}`))                                                         
+    
+                              
+    routes/quarantineServer.ts
+    ❯❱ javascript.express.security.audit.express-res-sendfile.express-res-sendfile
+          The application processes user-input, this is passed to res.sendFile which can allow an attacker to
+          arbitrarily read files on the system through path traversal. It is recommended to perform input    
+          validation in addition to canonicalizing the path. This allows you to validate the path against the
+          intended directory it should be accessing.                                                         
+          Details: https://sg.run/7DJk                                                                       
+                                                                                                             
+           14┆ res.sendFile(path.resolve('ftp/quarantine/', file))
+    
+    
+          Taint comes from:
+    
+           10┆ return ({ params, query }: Request, res: Response, next: NextFunction) => {
+    
+    
+          Taint flows through these intermediate variables:
+    
+           10┆ return ({ params, query }: Request, res: Response, next: NextFunction) => {
+    
+           11┆ const file = params.file
+    
+    
+                This is how taint reaches the sink:
+    
+           14┆ res.sendFile(path.resolve('ftp/quarantine/', file))
+    
+    
+            ⋮┆----------------------------------------
+   
+    ❯❱ javascript.express.security.audit.express-path-join-resolve-traversal.express-path-join-resolve-traversal
+          Possible writing outside of the destination, make sure that the target path is nested in the
+          intended destination                                                                        
+          Details: https://sg.run/weRn                                                                
+                                                                                                      
+           14┆ res.sendFile(path.resolve('ftp/quarantine/', file))
+    
+    
+          Taint comes from:
+    
+           10┆ return ({ params, query }: Request, res: Response, next: NextFunction) => {
+    
+    
+          Taint flows through these intermediate variables:
+    
+           10┆ return ({ params, query }: Request, res: Response, next: NextFunction) => {
+    
+           11┆ const file = params.file
+    
+    
+                This is how taint reaches the sink:
+    
+           14┆ res.sendFile(path.resolve('ftp/quarantine/', file))
+    
+    
+            ⋮┆----------------------------------------
+   
+    ❯❱ javascript.lang.security.audit.path-traversal.path-join-resolve-traversal.path-join-resolve-traversal
+          Detected possible user input going into a `path.join` or `path.resolve` function. This could   
+          possibly lead to a path traversal vulnerability,  where the attacker can access arbitrary files
+          stored in the file system. Instead, be sure to sanitize or validate user input first.          
+          Details: https://sg.run/OPqk                                                                   
+                                                                                                         
+           14┆ res.sendFile(path.resolve('ftp/quarantine/', file))
+    
+    
+          Taint comes from:
+    
+           10┆ return ({ params, query }: Request, res: Response, next: NextFunction) => {
+    
+    
+          Taint flows through these intermediate variables:
+    
+           10┆ return ({ params, query }: Request, res: Response, next: NextFunction) => {
+    
+           11┆ const file = params.file
+    
+    
+                This is how taint reaches the sink:
+    
+           14┆ res.sendFile(path.resolve('ftp/quarantine/', file))
+    
+                      
+    routes/redirect.ts
+    ❯❱ javascript.express.security.audit.express-open-redirect.express-open-redirect
+          The application redirects to a URL specified by user-supplied input `query` that is not validated. 
+          This could redirect users to malicious locations. Consider using an allow-list approach to validate
+          URLs, or warn users they are being redirected to a third-party website.                            
+          Details: https://sg.run/EpoP                                                                       
+                                                                                                             
+           19┆ res.redirect(toUrl as string)
+    
+    
+          Taint comes from:
+    
+           14┆ return ({ query }: Request, res: Response, next: NextFunction) => {
+    
+    
+          Taint flows through these intermediate variables:
+    
+           14┆ return ({ query }: Request, res: Response, next: NextFunction) => {
+    
+           15┆ const toUrl = query.to
+    
+    
+                This is how taint reaches the sink:
+    
+           19┆ res.redirect(toUrl as string)
+    
+    
+            ⋮┆----------------------------------------
+   
+    ❯❱ javascript.express.open-redirect-deepsemgrep.open-redirect-deepsemgrep
+          The application builds a URL using user-controlled input which can lead to an open redirect         
+          vulnerability. An attacker can manipulate the URL and redirect users to an arbitrary domain. Open   
+          redirect vulnerabilities can lead to issues such as Cross-site scripting (XSS) or redirecting to a  
+          malicious domain for activities such as phishing to capture users' credentials. To prevent this     
+          vulnerability perform strict input validation of the domain against an allowlist of approved        
+          domains. Notify a user in your application that they are leaving the website. Display a domain where
+          they are redirected to the user. A user can then either accept or deny the redirect to an untrusted 
+          site.                                                                                               
+          Details: https://sg.run/BDbW                                                                        
+                                                                                                              
+           19┆ res.redirect(toUrl as string)
+    
+    
+          Taint comes from:
+    
+           14┆ return ({ query }: Request, res: Response, next: NextFunction) => {
+    
+    
+          Taint flows through these intermediate variables:
+    
+           14┆ return ({ query }: Request, res: Response, next: NextFunction) => {
+    
+           15┆ const toUrl = query.to
+    
+    
+                This is how taint reaches the sink:
+    
+           19┆ res.redirect(toUrl as string)
+    
+    
+            ⋮┆----------------------------------------
+   
+    ❯❱ javascript.express.web.tainted-redirect-express.tainted-redirect-express
+          The application builds a URL using user-controlled input which can lead to an open redirect         
+          vulnerability. An attacker can manipulate the URL and redirect users to an arbitrary domain. Open   
+          redirect vulnerabilities can lead to issues such as Cross-site scripting (XSS) or redirecting to a  
+          malicious domain for activities such as phishing to capture users' credentials. To prevent this     
+          vulnerability perform strict input validation of the domain against an allowlist of approved        
+          domains. Notify a user in your application that they are leaving the website. Display a domain where
+          they are redirected to the user. A user can then either accept or deny the redirect to an untrusted 
+          site.                                                                                               
+          Details: https://sg.run/7KEAw                                                                       
+                                                                                                              
+           19┆ res.redirect(toUrl as string)
+    
+    
+          Taint comes from:
+    
+           14┆ return ({ query }: Request, res: Response, next: NextFunction) => {
+    
+    
+          Taint flows through these intermediate variables:
+    
+           14┆ return ({ query }: Request, res: Response, next: NextFunction) => {
+    
+           15┆ const toUrl = query.to
+    
+    
+                This is how taint reaches the sink:
+    
+           19┆ res.redirect(toUrl as string)
+    
+                                
+    routes/showProductReviews.ts
+   ❯❯❯❱ javascript.express.mongodb.express-mongo-nosqli.express-mongo-nosqli
+          Detected a `../data/mongodb` statement that comes from a `req` argument. This could lead to NoSQL
+          injection if the variable is user-controlled and is not properly sanitized. Be sure to properly  
+          sanitize the data if you absolutely must pass request data into a mongo query.                   
+          Details: https://sg.run/Qqxq                                                                     
+                                                                                                           
+           34┆ db.reviews.find({ $where: 'this.product == ' + id }).then((reviews: Review[]) => {
+    
+    
+          Taint comes from:
+    
+           30┆ const id = utils.disableOnContainerEnv() ? Number(req.params.id) : req.params.id
+    
+    
+          Taint flows through these intermediate variables:
+    
+           30┆ const id = utils.disableOnContainerEnv() ? Number(req.params.id) : req.params.id
+    
+    
+                This is how taint reaches the sink:
+    
+           34┆ db.reviews.find({ $where: 'this.product == ' + id }).then((reviews: Review[]) => {
+    
+                        
+    routes/trackOrder.ts
+   ❯❯❯❱ javascript.express.mongodb.express-mongo-nosqli.express-mongo-nosqli
+          Detected a `../data/mongodb` statement that comes from a `req` argument. This could lead to NoSQL
+          injection if the variable is user-controlled and is not properly sanitized. Be sure to properly  
+          sanitize the data if you absolutely must pass request data into a mongo query.                   
+          Details: https://sg.run/Qqxq                                                                     
+                                                                                                           
+           18┆ db.orders.find({ $where: `this.orderId === '${id}'` }).then((order: any) => {
+    
+    
+          Taint comes from:
+    
+           15┆ const id = utils.disableOnContainerEnv() ? String(req.params.id).replace(/[^\w-]+/g, '') :
+               req.params.id                                                                             
+    
+    
+          Taint flows through these intermediate variables:
+    
+           15┆ const id = utils.disableOnContainerEnv() ? String(req.params.id).replace(/[^\w-]+/g, '') :
+               req.params.id                                                                             
+    
+           18┆ db.orders.find({ $where: `this.orderId === '${id}'` }).then((order: any) => {
+    
+    
+                This is how taint reaches the sink:
+    
+           18┆ db.orders.find({ $where: `this.orderId === '${id}'` }).then((order: any) => {
+    
+                                  
+    routes/updateProductReviews.ts
+   ❯❯❯❱ javascript.express.mongodb.express-mongo-nosqli.express-mongo-nosqli
+          Detected a `../data/mongodb` statement that comes from a `req` argument. This could lead to NoSQL
+          injection if the variable is user-controlled and is not properly sanitized. Be sure to properly  
+          sanitize the data if you absolutely must pass request data into a mongo query.                   
+          Details: https://sg.run/Qqxq                                                                     
+                                                                                                           
+           18┆ { _id: req.body.id }, // vuln-code-snippet vuln-line noSqlReviewsChallenge
+               forgedReviewChallenge                                                     
+    
+    
+          Taint comes from:
+    
+           18┆ { _id: req.body.id }, // vuln-code-snippet vuln-line noSqlReviewsChallenge
+               forgedReviewChallenge                                                     
+    
+    
+                This is how taint reaches the sink:
+    
+           18┆ { _id: req.body.id }, // vuln-code-snippet vuln-line noSqlReviewsChallenge
+               forgedReviewChallenge                                                     
+    
+                               
+    routes/updateUserProfile.ts
+    ❯❱ javascript.express.web.cookies-default-express.cookies-default-express
+          Having default cookie settings is insecure because they often lack critical security attributes,
+          leaving cookies vulnerable to various attacks like CSRF or XSS. Always configure cookies with   
+          security attributes: `HttpOnly`, `Secure`, `SameSite`.                                          
+          Details: https://sg.run/JDG5Z                                                                   
+                                                                                                          
+           31┆ res.cookie('token', updatedToken)
+                         
+    routes/userProfile.ts
+    ❯❱ javascript.browser.security.eval-detected.eval-detected
+          Detected the use of eval(). eval() can be dangerous if used to evaluate dynamic content. If this 
+          content can be input from outside the program, this may be a code injection vulnerability. Ensure
+          evaluated content is not definable by external sources.                                          
+          Details: https://sg.run/7ope                                                                     
+                                                                                                           
+           36┆ username = eval(code) // eslint-disable-line no-eval
+   
+    ❯❱ javascript.express.security.express-insecure-template-usage.express-insecure-template-usage
+          User data from `req` is being compiled into the template, which can lead to a Server Side Template
+          Injection (SSTI) vulnerability.                                                                   
+          Details: https://sg.run/b49v                                                                      
+                                                                                                            
+           56┆ const fn = pug.compile(template)
+    
+    
+          Taint comes from:
+    
+           24┆ const loggedInUser = security.authenticatedUsers.get(req.cookies.token)
+    
+    
+          Taint flows through these intermediate variables:
+    
+           24┆ const loggedInUser = security.authenticatedUsers.get(req.cookies.token)
+    
+           26┆ UserModel.findByPk(loggedInUser.data.id).then((user: UserModel | null) => {
+    
+           47┆ template = template.replace(/_emailHash_/g, security.hash(user?.email))
+    
+           47┆ template = template.replace(/_emailHash_/g, security.hash(user?.email))
+    
+    
+                This is how taint reaches the sink:
+    
+           56┆ const fn = pug.compile(template)
+    
+                          
+    routes/videoHandler.ts
+    ❯❱ javascript.lang.security.audit.unknown-value-with-script-tag.unknown-value-with-script-tag
+          Cannot determine what 'subs' is and it is used with a '<script>' tag. This could be susceptible to
+          cross-site scripting (XSS). Ensure 'subs' is not externally controlled, or sanitize this data.    
+          Details: https://sg.run/1Zy1                                                                      
+                                                                                                            
+           57┆ challengeUtils.solveIf(challenges.videoXssChallenge, () => { return utils.contains(subs,
+               '</script><script>alert(`xss`)</script>') })                                            
+            ⋮┆----------------------------------------
+           69┆ compiledTemplate = compiledTemplate.replace('<script id="subtitle"></script>', '<script  
+               id="subtitle" type="text/vtt" data-label="English" data-lang="en">' + subs + '</script>')
+                           
+    routes/vulnCodeFixes.ts
+    ❯❱ javascript.express.express-fs-filename.express-fs-filename
+          The application builds a file path from potentially untrusted data, which can lead to a path        
+          traversal vulnerability. An attacker can manipulate the file path which the application uses to     
+          access files. If the application does not validate user input and sanitize file paths, sensitive    
+          files such as configuration or user data can be accessed, potentially creating or overwriting files.
+          To prevent this vulnerability, validate and sanitize any input that is used to create references to 
+          file paths. Also, enforce strict file access controls. For example, choose privileges allowing      
+          public-facing applications to access only the required files.                                       
+          Details: https://sg.run/0B9W                                                                        
+                                                                                                              
+           81┆ if (fs.existsSync('./data/static/codefixes/' + key + '.info.yml')) {
+    
+    
+          Taint comes from:
+    
+           72┆ const key = req.body.key
+    
+    
+          Taint flows through these intermediate variables:
+    
+           72┆ const key = req.body.key
+    
+    
+                This is how taint reaches the sink:
+    
+           81┆ if (fs.existsSync('./data/static/codefixes/' + key + '.info.yml')) {
+    
+    
+            ⋮┆----------------------------------------
+           82┆ const codingChallengeInfos = yaml.load(fs.readFileSync('./data/static/codefixes/' + key +
+               '.info.yml', 'utf8'))                                                                    
+    
+    
+          Taint comes from:
+    
+           72┆ const key = req.body.key
+    
+    
+          Taint flows through these intermediate variables:
+    
+           72┆ const key = req.body.key
+    
+    
+                This is how taint reaches the sink:
+    
+           82┆ const codingChallengeInfos = yaml.load(fs.readFileSync('./data/static/codefixes/' + key +
+               '.info.yml', 'utf8'))                                                                    
+    
+    
+            ⋮┆----------------------------------------
+   
+   ❯❯❱ javascript.express.file.fs-express.fs-express
+          The application builds a file path from potentially untrusted data, which can lead to a path        
+          traversal vulnerability. An attacker can manipulate the path which the application uses to access   
+          files. If the application does not validate user input and sanitize file paths, sensitive files such
+          as configuration or user data can be accessed, potentially creating or overwriting files. To prevent
+          this vulnerability, validate and sanitize any input that is used to create references to file paths.
+          Also, enforce strict file access controls. For example, choose privileges allowing public-facing    
+          applications to access only the required files.                                                     
+          Details: https://sg.run/GdqX1                                                                       
+                                                                                                              
+           82┆ const codingChallengeInfos = yaml.load(fs.readFileSync('./data/static/codefixes/' + key +
+               '.info.yml', 'utf8'))                                                                    
+    
+    
+          Taint comes from:
+    
+           72┆ const key = req.body.key
+    
+    
+          Taint flows through these intermediate variables:
+    
+           72┆ const key = req.body.key
+    
+    
+                This is how taint reaches the sink:
+    
+           82┆ const codingChallengeInfos = yaml.load(fs.readFileSync('./data/static/codefixes/' + key +
+               '.info.yml', 'utf8'))                                                                    
+    
+                             
+    routes/vulnCodeSnippet.ts
+    ❯❱ javascript.lang.security.audit.path-traversal.path-join-resolve-traversal.path-join-resolve-traversal
+          Detected possible user input going into a `path.join` or `path.resolve` function. This could   
+          possibly lead to a path traversal vulnerability,  where the attacker can access arbitrary files
+          stored in the file system. Instead, be sure to sanitize or validate user input first.          
+          Details: https://sg.run/OPqk                                                                   
+                                                                                                         
+           33┆ const moreMatches = await fileSniff(files.map(file => path.resolve(currPath, file)), match)
+    
+    
+          Taint comes from:
+    
+           28┆ export const fileSniff = async (paths: readonly string[], match: RegExp): Promise<Match[]>
+               => {                                                                                      
+    
+    
+          Taint flows through these intermediate variables:
+    
+           28┆ export const fileSniff = async (paths: readonly string[], match: RegExp): Promise<Match[]>
+               => {                                                                                      
+    
+           30┆ for (const currPath of paths) {
+    
+           30┆ for (const currPath of paths) {
+    
+    
+                This is how taint reaches the sink:
+    
+           33┆ const moreMatches = await fileSniff(files.map(file => path.resolve(currPath, file)), match)
+    
+    
+            ⋮┆----------------------------------------
+           33┆ const moreMatches = await fileSniff(files.map(file => path.resolve(currPath, file)), match)
+    
+    
+          Taint comes from:
+    
+           28┆ export const fileSniff = async (paths: readonly string[], match: RegExp): Promise<Match[]>
+               => {                                                                                      
+    
+    
+          Taint flows through these intermediate variables:
+    
+           28┆ export const fileSniff = async (paths: readonly string[], match: RegExp): Promise<Match[]>
+               => {                                                                                      
+    
+           30┆ for (const currPath of paths) {
+    
+           30┆ for (const currPath of paths) {
+    
+           32┆ const files = fs.readdirSync(currPath)
+    
+           33┆ const moreMatches = await fileSniff(files.map(file => path.resolve(currPath, file)), match)
+    
+    
+                This is how taint reaches the sink:
+    
+           33┆ const moreMatches = await fileSniff(files.map(file => path.resolve(currPath, file)), match)
+    
+    
+            ⋮┆----------------------------------------
+   
+    ❯❱ javascript.lang.security.audit.detect-non-literal-regexp.detect-non-literal-regexp
+          RegExp() called with a `key` function argument, this might allow an attacker to cause a Regular     
+          Expression Denial-of-Service (ReDoS) within your application as RegExP blocks the main thread. For  
+          this reason, it is recommended to use hardcoded regexes instead. If your regex is run on user-      
+          controlled input, consider performing input validation or use a regex checking/sanitization library 
+          such as https://www.npmjs.com/package/recheck to verify that the regex does not appear vulnerable to
+          ReDoS.                                                                                              
+          Details: https://sg.run/gr65                                                                        
+                                                                                                              
+          104┆ const match = new RegExp(`vuln-code-snippet start.*${challenge.key}`)
+    
+    
+          Taint comes from:
+    
+           99┆ export const retrieveCodeSnippet = async (key: string, pass: boolean = false) => {
+    
+    
+          Taint flows through these intermediate variables:
+    
+           99┆ export const retrieveCodeSnippet = async (key: string, pass: boolean = false) => {
+    
+          101┆ if (pass) challenge = { key }
+    
+          104┆ const match = new RegExp(`vuln-code-snippet start.*${challenge.key}`)
+    
+    
+                This is how taint reaches the sink:
+    
+          104┆ const match = new RegExp(`vuln-code-snippet start.*${challenge.key}`)
+    
+    
+            ⋮┆----------------------------------------
+    ❯❱ javascript.lang.security.audit.detect-non-literal-regexp.detect-non-literal-regexp
+          RegExp() called with a `req` function argument, this might allow an attacker to cause a Regular     
+          Expression Denial-of-Service (ReDoS) within your application as RegExP blocks the main thread. For  
+          this reason, it is recommended to use hardcoded regexes instead. If your regex is run on user-      
+          controlled input, consider performing input validation or use a regex checking/sanitization library 
+          such as https://www.npmjs.com/package/recheck to verify that the regex does not appear vulnerable to
+          ReDoS.                                                                                              
+          Details: https://sg.run/gr65                                                                        
+                                                                                                              
+          104┆ const match = new RegExp(`vuln-code-snippet start.*${challenge.key}`)
+    
+    
+          Taint comes from:
+    
+          145┆ exports.serveCodeSnippet = () => async (req: Request<SnippetRequestBody, {}, {}>, res:
+               Response, next: NextFunction) => {                                                    
+    
+    
+          Taint flows through these intermediate variables:
+    
+          145┆ exports.serveCodeSnippet = () => async (req: Request<SnippetRequestBody, {}, {}>, res:
+               Response, next: NextFunction) => {                                                    
+    
+    
+                This is how taint reaches the sink:
+    
+          148┆ snippetData = await retrieveCodeSnippet(req.params.challenge)
+    
+          Taint flows through these intermediate variables:
+    
+           99┆ export const retrieveCodeSnippet = async (key: string, pass: boolean = false) => {
+    
+          101┆ if (pass) challenge = { key }
+    
+          104┆ const match = new RegExp(`vuln-code-snippet start.*${challenge.key}`)
+    
+          then reaches:
+    
+          104┆ const match = new RegExp(`vuln-code-snippet start.*${challenge.key}`)
+    
+    
+            ⋮┆----------------------------------------
+   
+   ❯❯❱ javascript.express.file.fs-express.fs-express
+          The application builds a file path from potentially untrusted data, which can lead to a path        
+          traversal vulnerability. An attacker can manipulate the path which the application uses to access   
+          files. If the application does not validate user input and sanitize file paths, sensitive files such
+          as configuration or user data can be accessed, potentially creating or overwriting files. To prevent
+          this vulnerability, validate and sanitize any input that is used to create references to file paths.
+          Also, enforce strict file access controls. For example, choose privileges allowing public-facing    
+          applications to access only the required files.                                                     
+          Details: https://sg.run/GdqX1                                                                       
+                                                                                                              
+          107┆ const source = fs.readFileSync(path.resolve(matches[0].path), 'utf8')
+    
+    
+          Taint comes from:
+    
+          180┆ const key = req.body.key
+    
+    
+          Taint flows through these intermediate variables:
+    
+          180┆ const key = req.body.key
+    
+    
+                This is how taint reaches the sink:
+    
+          183┆ snippetData = await retrieveCodeSnippet(key)
+    
+          Taint flows through these intermediate variables:
+    
+           99┆ export const retrieveCodeSnippet = async (key: string, pass: boolean = false) => {
+    
+          101┆ if (pass) challenge = { key }
+    
+          104┆ const match = new RegExp(`vuln-code-snippet start.*${challenge.key}`)
+    
+          104┆ const match = new RegExp(`vuln-code-snippet start.*${challenge.key}`)
+    
+          105┆ const matches = await fileSniff(SNIPPET_PATHS, match)
+    
+           28┆ export const fileSniff = async (paths: readonly string[], match: RegExp): Promise<Match[]>
+               => {                                                                                      
+    
+           33┆ const moreMatches = await fileSniff(files.map(file => path.resolve(currPath, file)), match)
+    
+           33┆ const moreMatches = await fileSniff(files.map(file => path.resolve(currPath, file)), match)
+    
+           34┆ matches.push(...moreMatches)
+    
+          105┆ const matches = await fileSniff(SNIPPET_PATHS, match)
+    
+          105┆ const matches = await fileSniff(SNIPPET_PATHS, match)
+    
+          then reaches:
+    
+          107┆ const source = fs.readFileSync(path.resolve(matches[0].path), 'utf8')
+    
+    
+            ⋮┆----------------------------------------
+   
+    ❯❱ javascript.express.security.audit.express-path-join-resolve-traversal.express-path-join-resolve-traversal
+          Possible writing outside of the destination, make sure that the target path is nested in the
+          intended destination                                                                        
+          Details: https://sg.run/weRn                                                                
+                                                                                                      
+          107┆ const source = fs.readFileSync(path.resolve(matches[0].path), 'utf8')
+    
+    
+          Taint comes from:
+    
+          148┆ snippetData = await retrieveCodeSnippet(req.params.challenge)
+    
+    
+                This is how taint reaches the sink:
+    
+          148┆ snippetData = await retrieveCodeSnippet(req.params.challenge)
+    
+          Taint flows through these intermediate variables:
+    
+           99┆ export const retrieveCodeSnippet = async (key: string, pass: boolean = false) => {
+    
+          101┆ if (pass) challenge = { key }
+    
+          104┆ const match = new RegExp(`vuln-code-snippet start.*${challenge.key}`)
+    
+          104┆ const match = new RegExp(`vuln-code-snippet start.*${challenge.key}`)
+    
+          105┆ const matches = await fileSniff(SNIPPET_PATHS, match)
+    
+           28┆ export const fileSniff = async (paths: readonly string[], match: RegExp): Promise<Match[]>
+               => {                                                                                      
+    
+           33┆ const moreMatches = await fileSniff(files.map(file => path.resolve(currPath, file)), match)
+    
+           33┆ const moreMatches = await fileSniff(files.map(file => path.resolve(currPath, file)), match)
+    
+           34┆ matches.push(...moreMatches)
+    
+          105┆ const matches = await fileSniff(SNIPPET_PATHS, match)
+    
+          105┆ const matches = await fileSniff(SNIPPET_PATHS, match)
+    
+          then reaches:
+    
+          107┆ const source = fs.readFileSync(path.resolve(matches[0].path), 'utf8')
+    
+    
+            ⋮┆----------------------------------------
+   
+    ❯❱ javascript.lang.security.audit.path-traversal.path-join-resolve-traversal.path-join-resolve-traversal
+          Detected possible user input going into a `path.join` or `path.resolve` function. This could   
+          possibly lead to a path traversal vulnerability,  where the attacker can access arbitrary files
+          stored in the file system. Instead, be sure to sanitize or validate user input first.          
+          Details: https://sg.run/OPqk                                                                   
+                                                                                                         
+          107┆ const source = fs.readFileSync(path.resolve(matches[0].path), 'utf8')
+    
+    
+          Taint comes from:
+    
+          105┆ const matches = await fileSniff(SNIPPET_PATHS, match)
+    
+          Taint flows through these intermediate variables:
+    
+           28┆ export const fileSniff = async (paths: readonly string[], match: RegExp): Promise<Match[]>
+               => {                                                                                      
+    
+           30┆ for (const currPath of paths) {
+    
+           30┆ for (const currPath of paths) {
+    
+           41┆ matches.push({
+    
+          then reaches:
+    
+           28┆ export const fileSniff = async (paths: readonly string[], match: RegExp): Promise<Match[]>
+               => {                                                                                      
+    
+    
+          Taint flows through these intermediate variables:
+    
+          105┆ const matches = await fileSniff(SNIPPET_PATHS, match)
+    
+          105┆ const matches = await fileSniff(SNIPPET_PATHS, match)
+    
+    
+                This is how taint reaches the sink:
+    
+          107┆ const source = fs.readFileSync(path.resolve(matches[0].path), 'utf8')
+    
+    
+            ⋮┆----------------------------------------
+   
+    ❯❱ javascript.lang.security.audit.detect-non-literal-regexp.detect-non-literal-regexp
+          RegExp() called with a `key` function argument, this might allow an attacker to cause a Regular     
+          Expression Denial-of-Service (ReDoS) within your application as RegExP blocks the main thread. For  
+          this reason, it is recommended to use hardcoded regexes instead. If your regex is run on user-      
+          controlled input, consider performing input validation or use a regex checking/sanitization library 
+          such as https://www.npmjs.com/package/recheck to verify that the regex does not appear vulnerable to
+          ReDoS.                                                                                              
+          Details: https://sg.run/gr65                                                                        
+                                                                                                              
+          123┆ if (new RegExp(`vuln-code-snippet vuln-line.*${challenge.key}`).exec(lines[i]) != null) {
+    
+    
+          Taint comes from:
+    
+           99┆ export const retrieveCodeSnippet = async (key: string, pass: boolean = false) => {
+    
+    
+          Taint flows through these intermediate variables:
+    
+           99┆ export const retrieveCodeSnippet = async (key: string, pass: boolean = false) => {
+    
+          101┆ if (pass) challenge = { key }
+    
+          123┆ if (new RegExp(`vuln-code-snippet vuln-line.*${challenge.key}`).exec(lines[i]) != null) {
+    
+    
+                This is how taint reaches the sink:
+    
+          123┆ if (new RegExp(`vuln-code-snippet vuln-line.*${challenge.key}`).exec(lines[i]) != null) {
+    
+    
+            ⋮┆----------------------------------------
+    ❯❱ javascript.lang.security.audit.detect-non-literal-regexp.detect-non-literal-regexp
+          RegExp() called with a `req` function argument, this might allow an attacker to cause a Regular     
+          Expression Denial-of-Service (ReDoS) within your application as RegExP blocks the main thread. For  
+          this reason, it is recommended to use hardcoded regexes instead. If your regex is run on user-      
+          controlled input, consider performing input validation or use a regex checking/sanitization library 
+          such as https://www.npmjs.com/package/recheck to verify that the regex does not appear vulnerable to
+          ReDoS.                                                                                              
+          Details: https://sg.run/gr65                                                                        
+                                                                                                              
+          123┆ if (new RegExp(`vuln-code-snippet vuln-line.*${challenge.key}`).exec(lines[i]) != null) {
+    
+    
+          Taint comes from:
+    
+          145┆ exports.serveCodeSnippet = () => async (req: Request<SnippetRequestBody, {}, {}>, res:
+               Response, next: NextFunction) => {                                                    
+    
+    
+          Taint flows through these intermediate variables:
+    
+          145┆ exports.serveCodeSnippet = () => async (req: Request<SnippetRequestBody, {}, {}>, res:
+               Response, next: NextFunction) => {                                                    
+    
+    
+                This is how taint reaches the sink:
+    
+          148┆ snippetData = await retrieveCodeSnippet(req.params.challenge)
+    
+          Taint flows through these intermediate variables:
+    
+           99┆ export const retrieveCodeSnippet = async (key: string, pass: boolean = false) => {
+    
+          101┆ if (pass) challenge = { key }
+    
+          123┆ if (new RegExp(`vuln-code-snippet vuln-line.*${challenge.key}`).exec(lines[i]) != null) {
+    
+          then reaches:
+    
+          123┆ if (new RegExp(`vuln-code-snippet vuln-line.*${challenge.key}`).exec(lines[i]) != null) {
+    
+    
+            ⋮┆----------------------------------------
+    ❯❱ javascript.lang.security.audit.detect-non-literal-regexp.detect-non-literal-regexp
+          RegExp() called with a `key` function argument, this might allow an attacker to cause a Regular     
+          Expression Denial-of-Service (ReDoS) within your application as RegExP blocks the main thread. For  
+          this reason, it is recommended to use hardcoded regexes instead. If your regex is run on user-      
+          controlled input, consider performing input validation or use a regex checking/sanitization library 
+          such as https://www.npmjs.com/package/recheck to verify that the regex does not appear vulnerable to
+          ReDoS.                                                                                              
+          Details: https://sg.run/gr65                                                                        
+                                                                                                              
+          125┆ } else if (new RegExp(`vuln-code-snippet neutral-line.*${challenge.key}`).exec(lines[i]) !=
+               null) {                                                                                    
+    
+    
+          Taint comes from:
+    
+           99┆ export const retrieveCodeSnippet = async (key: string, pass: boolean = false) => {
+    
+    
+          Taint flows through these intermediate variables:
+    
+           99┆ export const retrieveCodeSnippet = async (key: string, pass: boolean = false) => {
+    
+          101┆ if (pass) challenge = { key }
+    
+          125┆ } else if (new RegExp(`vuln-code-snippet neutral-line.*${challenge.key}`).exec(lines[i]) !=
+               null) {                                                                                    
+    
+    
+                This is how taint reaches the sink:
+    
+          125┆ } else if (new RegExp(`vuln-code-snippet neutral-line.*${challenge.key}`).exec(lines[i]) !=
+               null) {                                                                                    
+    
+    
+            ⋮┆----------------------------------------
+    ❯❱ javascript.lang.security.audit.detect-non-literal-regexp.detect-non-literal-regexp
+          RegExp() called with a `req` function argument, this might allow an attacker to cause a Regular     
+          Expression Denial-of-Service (ReDoS) within your application as RegExP blocks the main thread. For  
+          this reason, it is recommended to use hardcoded regexes instead. If your regex is run on user-      
+          controlled input, consider performing input validation or use a regex checking/sanitization library 
+          such as https://www.npmjs.com/package/recheck to verify that the regex does not appear vulnerable to
+          ReDoS.                                                                                              
+          Details: https://sg.run/gr65                                                                        
+                                                                                                              
+          125┆ } else if (new RegExp(`vuln-code-snippet neutral-line.*${challenge.key}`).exec(lines[i]) !=
+               null) {                                                                                    
+    
+    
+          Taint comes from:
+    
+          145┆ exports.serveCodeSnippet = () => async (req: Request<SnippetRequestBody, {}, {}>, res:
+               Response, next: NextFunction) => {                                                    
+    
+    
+          Taint flows through these intermediate variables:
+    
+          145┆ exports.serveCodeSnippet = () => async (req: Request<SnippetRequestBody, {}, {}>, res:
+               Response, next: NextFunction) => {                                                    
+    
+    
+                This is how taint reaches the sink:
+    
+          148┆ snippetData = await retrieveCodeSnippet(req.params.challenge)
+    
+          Taint flows through these intermediate variables:
+    
+           99┆ export const retrieveCodeSnippet = async (key: string, pass: boolean = false) => {
+    
+          101┆ if (pass) challenge = { key }
+    
+          125┆ } else if (new RegExp(`vuln-code-snippet neutral-line.*${challenge.key}`).exec(lines[i]) !=
+               null) {                                                                                    
+    
+          then reaches:
+    
+          125┆ } else if (new RegExp(`vuln-code-snippet neutral-line.*${challenge.key}`).exec(lines[i]) !=
+               null) {                                                                                    
+    
+    
+            ⋮┆----------------------------------------
+   
+   ❯❯❱ javascript.express.file.fs-express.fs-express
+          The application builds a file path from potentially untrusted data, which can lead to a path        
+          traversal vulnerability. An attacker can manipulate the path which the application uses to access   
+          files. If the application does not validate user input and sanitize file paths, sensitive files such
+          as configuration or user data can be accessed, potentially creating or overwriting files. To prevent
+          this vulnerability, validate and sanitize any input that is used to create references to file paths.
+          Also, enforce strict file access controls. For example, choose privileges allowing public-facing    
+          applications to access only the required files.                                                     
+          Details: https://sg.run/GdqX1                                                                       
+                                                                                                              
+          195┆ const codingChallengeInfos = yaml.load(fs.readFileSync('./data/static/codefixes/' + key +
+               '.info.yml', 'utf8'))                                                                    
+    
+    
+          Taint comes from:
+    
+          180┆ const key = req.body.key
+    
+    
+          Taint flows through these intermediate variables:
+    
+          180┆ const key = req.body.key
+    
+    
+                This is how taint reaches the sink:
+    
+          195┆ const codingChallengeInfos = yaml.load(fs.readFileSync('./data/static/codefixes/' + key +
+               '.info.yml', 'utf8'))                                                                    
+    
+             
+    server.ts
+     ❱ javascript.express.security.audit.express-check-csurf-middleware-usage.express-check-csurf-middleware-usage
+          A CSRF middleware was not detected in your express application. Ensure you are either using one such
+          as `csurf` or `csrf` (see rule references) and/or you are properly doing CSRF validation in your    
+          routes with a token or cookies.                                                                     
+          Details: https://sg.run/BxzR                                                                        
+                                                                                                              
+           91┆ const app = express()
+   
+    ❯❱ javascript.express.web.cors-default-config-express.cors-default-config-express
+          Having default CORS settings is insecure because they often allow overly permissive cross-origin   
+          access, exposing your application to unauthorized data sharing, potentially exposing sensitive data
+          to malicious websites. Avoid using wildcard (*) origins, especially for endpoints that handle      
+          sensitive data. Use a restrictive CORS policy by explicitly specifying trusted origins in the      
+          Access-Control-Allow-Origin header.                                                                
+          Details: https://sg.run/WAzoz                                                                      
+                                                                                                             
+          159┆ app.options('*', cors())
+            ⋮┆----------------------------------------
+          160┆ app.use(cors())
+   
+    ❯❱ javascript.express.security.audit.express-check-directory-listing.express-check-directory-listing
+          Directory listing/indexing is enabled, which may lead to disclosure of sensitive directories and 
+          files. It is recommended to disable directory listing unless it is a public resource. If you need
+          directory listing, ensure that sensitive files are inaccessible when querying the resource.      
+          Details: https://sg.run/DX2G                                                                     
+                                                                                                           
+          241┆ app.use('/ftp', serveIndexMiddleware, serveIndex('ftp', { icons: true })) // vuln-code-
+               snippet vuln-line directoryListingChallenge                                            
+            ⋮┆----------------------------------------
+          246┆ app.use('/encryptionkeys', serveIndexMiddleware, serveIndex('encryptionkeys', { icons:
+               true, view: 'details' }))                                                             
+            ⋮┆----------------------------------------
+          250┆ app.use('/support/logs', serveIndexMiddleware, serveIndex('logs', { icons: true, view:
+               'details' })) // vuln-code-snippet vuln-line accessLogDisclosureChallenge             
+                            
+    views/promotionVideo.pug
+    ❯❱ javascript.express.security.audit.xss.pug.explicit-unescape.template-explicit-unescape
+          Detected an explicit unescape in a Pug template, using either '!=' or '!{...}'. If external data can
+          reach these locations, your application is exposed to a cross-site scripting (XSS) vulnerability. If
+          you must do this, ensure no external data can reach this location.                                  
+          Details: https://sg.run/3xbe                                                                        
+                                                                                                              
+           79┆ if (splitted.length != 2) {
