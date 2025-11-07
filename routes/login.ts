@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: MIT
  */
 
-import models = require('../models/index')
 import { Request, Response, NextFunction } from 'express'
 import { User } from '../data/types'
 import { BasketModel } from '../models/basket'
@@ -19,11 +18,11 @@ const config = require('config')
 // vuln-code-snippet start loginAdminChallenge loginBenderChallenge loginJimChallenge
 module.exports = function login () {
   function afterLogin (user: { data: User, bid: number }, res: Response, next: NextFunction) {
-    verifyPostLoginChallenges(user) // vuln-code-snippet hide-line
+    verifyPostLoginChallenges(user)
     BasketModel.findOrCreate({ where: { UserId: user.data.id } })
       .then(([basket]: [BasketModel, boolean]) => {
         const token = security.authorize(user)
-        user.bid = basket.id // keep track of original basket
+        user.bid = basket.id
         security.authenticatedUsers.put(token, user)
         res.json({ authentication: { token, bid: basket.id, umail: user.data.email } })
       }).catch((error: Error) => {
@@ -31,13 +30,27 @@ module.exports = function login () {
       })
   }
 
-  return (req: Request, res: Response, next: NextFunction) => {
-    verifyPreLoginChallenges(req) // vuln-code-snippet hide-line
-    models.sequelize.query(`SELECT * FROM Users WHERE email = '${req.body.email || ''}' AND password = '${security.hash(req.body.password || '')}' AND deletedAt IS NULL`, { model: UserModel, plain: true }) // vuln-code-snippet vuln-line loginAdminChallenge loginBenderChallenge loginJimChallenge
-      .then((authenticatedUser: { data: User }) => { // vuln-code-snippet neutral-line loginAdminChallenge loginBenderChallenge loginJimChallenge
+  return async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      verifyPreLoginChallenges(req)
+      const email = (req.body.email || '').trim()
+      const password = req.body.password ? security.hash(req.body.password) : ''
+
+      if (!email || !password) {
+        return res.status(400).json({ error: 'Email and password are required.' })
+      }
+      const authenticatedUser = await UserModel.findOne({
+        where: {
+          email: email,
+          password: password,
+          deletedAt: null
+        } as any
+      })
+
+      if (authenticatedUser) {
         const user = utils.queryResultToJson(authenticatedUser)
         if (user.data?.id && user.data.totpSecret !== '') {
-          res.status(401).json({
+          return res.status(401).json({
             status: 'totp_token_required',
             data: {
               tmpToken: security.authorize({
@@ -46,14 +59,37 @@ module.exports = function login () {
               })
             }
           })
-        } else if (user.data?.id) {
-          afterLogin(user, res, next)
         } else {
-          res.status(401).send(res.__('Invalid email or password.'))
+          return afterLogin(user, res, next)
         }
-      }).catch((error: Error) => {
-        next(error)
-      })
+      } else {
+        return res.status(401).send(res.__('Invalid email or password.'))
+      }
+    } catch (error) {
+      next(error)
+    }
+    // verifyPreLoginChallenges(req) // vuln-code-snippet hide-line
+    // models.sequelize.query(`SELECT * FROM Users WHERE email = '${req.body.email || ''}' AND password = '${security.hash(req.body.password || '')}' AND deletedAt IS NULL`, { model: UserModel, plain: true }) // vuln-code-snippet vuln-line loginAdminChallenge loginBenderChallenge loginJimChallenge
+    //   .then((authenticatedUser: { data: User }) => { // vuln-code-snippet neutral-line loginAdminChallenge loginBenderChallenge loginJimChallenge
+    //     const user = utils.queryResultToJson(authenticatedUser)
+    //     if (user.data?.id && user.data.totpSecret !== '') {
+    //       res.status(401).json({
+    //         status: 'totp_token_required',
+    //         data: {
+    //           tmpToken: security.authorize({
+    //             userId: user.data.id,
+    //             type: 'password_valid_needs_second_factor_token'
+    //           })
+    //         }
+    //       })
+    //     } else if (user.data?.id) {
+    //       afterLogin(user, res, next)
+    //     } else {
+    //       res.status(401).send(res.__('Invalid email or password.'))
+    //     }
+    //   }).catch((error: Error) => {
+    //     next(error)
+    //   })
   }
   // vuln-code-snippet end loginAdminChallenge loginBenderChallenge loginJimChallenge
 
