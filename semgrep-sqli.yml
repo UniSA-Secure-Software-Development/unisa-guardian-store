@@ -1,0 +1,19 @@
+rules:
+  - id: detect-sequelize-raw-query
+    message: "Possible SQL injection: raw sequelize.query used with user input. Use parameterized queries such as bind or replacements."
+    severity: ERROR
+    languages: [javascript, typescript]
+    patterns:
+      - pattern-either:
+          - pattern: "models.sequelize.query($QUERY)"
+          - pattern: "sequelize.query($QUERY)"
+          - pattern: "models.sequelize.query($QUERY, $OPT)"
+          - pattern: "sequelize.query($QUERY, $OPT)"
+      - pattern-not: |
+          models.sequelize.query($QUERY, { replacements: $R })
+      - pattern-not: |
+          sequelize.query($QUERY, { replacements: $R })
+      - pattern-not: |
+          models.sequelize.query($QUERY, { bind: $B })
+      - pattern-not: |
+          sequelize.query($QUERY, { bind: $B })
