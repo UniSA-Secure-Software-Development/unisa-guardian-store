@@ -1,8 +1,9 @@
 name: SQL Injection Scan
 
 on:
-  pull_request:
-    branches: [ main ]
+  push:  
+    branches: [ main, develop ]  
+  workflow_dispatch:  
 
 jobs:
   scan:
@@ -22,7 +23,8 @@ jobs:
 
       - name: Start the app in background
         run: |
-          npm run serve
+          npm run serve &  # Add '&' to run in background, wait for app to start
+          sleep 10  # Give time for app to boot (adjust as needed)
 
       - name: Run sqlmap scan
         run: |
@@ -35,3 +37,9 @@ jobs:
       - name: Fail if vulnerabilities found
         if: ${{ failure() }}
         run: echo "SQL injection detected - fix before merging!" && exit 1
+
+      - name: Upload scan results  # Optional: Artifact upload like practical (page 13)
+        uses: actions/upload-artifact@v4
+        with:
+          name: sqlmap-results
+          path: .  # Or path to sqlmap output files
