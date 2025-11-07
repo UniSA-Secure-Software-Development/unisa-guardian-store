@@ -44,8 +44,6 @@ module.exports = function login () {
     const hashPassword = security.hash(req.body.password || '')
     // sql statement to get passwrod and stuff
     const sql = 'SELECT * FROM Users WHERE email = :email AND password = :password AND deletedAt IS NULL'
-    // models.sequelize.query(`SELECT * FROM Users WHERE email = '${email}' AND password = '${security.hash(hashPassword)}' AND deletedAt IS NULL`, { model: UserModel, plain: true }) // vuln-code-snippet vuln-line loginAdminChallenge loginBenderChallenge loginJimChallenge
-    // parameterised sql query
     models.sequelize.query(sql, {
       replacements: { email: email, password: hashPassword },
       type: QueryTypes.SELECT,
