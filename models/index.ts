@@ -61,4 +61,10 @@ WalletModelInit(sequelize)
 
 relationsInit(sequelize)
 
+sequelize.sync().then(() => {
+  console.log('All models synced successfully')
+}).catch((err: any) => {
+  console.error('Error syncing Sequelize models:', err)
+})
+
 export { sequelize }
