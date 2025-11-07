@@ -1,0 +1,31 @@
+﻿rules:
+  # 禁 [innerHTML]（除非先做消毒）
+  - id: angular-avoid-innerhtml-binding
+    message: "Avoid [innerHTML] with untrusted data. Use interpolation or a sanitizeHtml pipe."
+    severity: ERROR
+    languages: [html]
+    pattern: |
+      <... [innerHTML]=... >
+
+  # 禁 DomSanitizer bypass（所有变体）
+  - id: angular-bypasssecuritytrust
+    message: "Do not use DomSanitizer.bypassSecurityTrust*. It disables Angular XSS protections."
+    severity: ERROR
+    languages: [typescript]
+    patterns:
+      - pattern-either:
+          - pattern: .bypassSecurityTrustHtml(...)
+          - pattern: .bypassSecurityTrustUrl(...)
+          - pattern: .bypassSecurityTrustStyle(...)
+          - pattern: .bypassSecurityTrustScript(...)
+          - pattern: .bypassSecurityTrustResourceUrl(...)
+
+  # 禁直接 innerHTML 赋值（含 Renderer2）
+  - id: ts-direct-innerhtml-assign
+    message: "Do not assign to innerHTML. Use textContent or sanitized HTML."
+    severity: ERROR
+    languages: [typescript]
+    pattern-either:
+      - pattern: .innerHTML = 
+      - pattern: .setProperty(, 'innerHTML', )
+      - pattern: .setProperty(, "innerHTML", )
