@@ -445,7 +445,6 @@ restoreOverwrittenFilesWithOriginals().then(() => {
       endpoints: [`/api/${name}s`, `/api/${name}s/:id`],
       excludeAttributes: exclude
     })
-
     // create a wallet when a new user is registered using API
     if (name === 'User') { // vuln-code-snippet neutral-line registerAdminChallenge
       resource.create.send.before((req: Request, res: Response, context: { instance: { id: any }, continue: any }) => { // vuln-code-snippet vuln-line registerAdminChallenge
@@ -456,7 +455,13 @@ restoreOverwrittenFilesWithOriginals().then(() => {
       }) // vuln-code-snippet neutral-line registerAdminChallenge
     } // vuln-code-snippet neutral-line registerAdminChallenge
     // vuln-code-snippet end registerAdminChallenge
-
+    resource.create.write.before((req: Request, res: Response, context: any) => {
+      const requestedRole = req.body.role
+      if (requestedRole && requestedRole !== 'customer') {
+        return res.status(403).json({ error: 'Unauthorized role assignment' })
+      }
+      return context.continue
+    })
     // translate challenge descriptions and hints on-the-fly
     if (name === 'Challenge') {
       resource.list.fetch.after((req: Request, res: Response, context: { instance: string | any[], continue: any }) => {
@@ -547,7 +552,7 @@ restoreOverwrittenFilesWithOriginals().then(() => {
   app.get('/rest/admin/application-version', appVersion())
   app.get('/rest/captcha', captcha())
   app.get('/rest/image-captcha', imageCaptcha())
-  app.get('/rest/track-order/:id', trackOrder())
+  app.get('/rest/track-order/:id', security.isAuthorized(), trackOrder())
   app.get('/rest/country-mapping', countryMapping())
   app.get('/rest/saveLoginIp', saveLoginIp())
   app.post('/rest/user/data-export', security.appendUserId(), imageCaptcha.verifyCaptcha())
