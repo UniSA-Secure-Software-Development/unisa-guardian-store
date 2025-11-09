@@ -1,3 +1,4 @@
+import { sanitize } from '../../utils/sanitize.js';
 /*
  * Copyright (c) 2014-2022 Bjoern Kimminich & the OWASP Juice Shop contributors.
  * SPDX-License-Identifier: MIT
@@ -18,7 +19,7 @@ module.exports = function productReviews () {
     challengeUtils.solveIf(challenges.forgedReviewChallenge, () => { return user && user.data.email !== req.body.author })
     reviews.insert({
       product: req.params.id,
-      message: req.body.message,
+      message: String(sanitize(req.body.message) ?? '').replace(/<[^>]*>/g,''),
       author: req.body.author,
       likesCount: 0,
       likedBy: []

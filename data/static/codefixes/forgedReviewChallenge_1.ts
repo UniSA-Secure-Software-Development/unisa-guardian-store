@@ -3,7 +3,7 @@ module.exports = function productReviews () {
     const user = security.authenticatedUsers.from(req)
     db.reviews.update(
       { _id: req.body.id },
-      { $set: { message: req.body.message, author: user.data.email } },
+      { $set: { message: String(req.body.message ?? '').replace(/<[^>]*>/g,''), author: user.data.email } },
       { multi: true }
     ).then(
       (result: { modified: number, original: Array<{ author: any }> }) => {

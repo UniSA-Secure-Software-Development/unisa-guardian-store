@@ -23,7 +23,7 @@
 
           <ng-container matColumnDef="email">
             <mat-header-cell *matHeaderCellDef translate></mat-header-cell>
-            <mat-cell *matCellDef="let user" [innerHTML]="user.email" style="vertical-align: middle"></mat-cell>
+            <mat-cell *matCellDef="let user" [innerText]="user.email" style="vertical-align: middle"></mat-cell>
           </ng-container>
 
           <ng-container matColumnDef="user_detail">
@@ -55,7 +55,7 @@
 
         <ng-container matColumnDef="email">
           <mat-header-cell *matHeaderCellDef translate></mat-header-cell>
-          <mat-cell *matCellDef="let user" [innerHTML]="user.email" style="vertical-align: middle"></mat-cell>
+          <mat-cell *matCellDef="let user" [innerText]="user.email" style="vertical-align: middle"></mat-cell>
         </ng-container>
 
         <ng-container matColumnDef="user_detail">
@@ -87,7 +87,7 @@
           <ng-container matColumnDef="comment">
             <mat-header-cell *matHeaderCellDef translate></mat-header-cell>
             <mat-cell *matCellDef="let feedback" (click)="showFeedbackDetails(feedback.comment, feedback.UserId)"><p
-              [innerHTML]="feedback.comment" matTooltip="Click for more information" matTooltipPosition="above"></p>
+              [innerText]="feedback.comment" matTooltip="Click for more information" matTooltipPosition="above"></p>
             </mat-cell>
           </ng-container>
 

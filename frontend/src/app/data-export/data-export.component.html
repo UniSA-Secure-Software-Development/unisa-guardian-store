@@ -22,7 +22,7 @@
       <div *ngIf="presenceOfCaptcha">
         <div>
           <span style="float: left; margin-top: 40px; font-weight: 500; margin-bottom: 20px;" translate>CAPTCHA <span>:</span></span>
-          <div class="captcha-image" [innerHTML]="captcha" style="margin-left: 10px;"></div>
+          <div class="captcha-image" [innerText]="captcha" style="margin-left: 10px;"></div>
         </div>
         <mat-form-field style="margin-top: 10px; width: 100%;" appearance="outline" color="accent">
           <mat-label translate>ENTER_CAPTCHA</mat-label>

@@ -1,3 +1,4 @@
+import { sanitize } from '../../utils/sanitize.js';
 /*
  * Copyright (c) 2014-2022 Bjoern Kimminich & the OWASP Juice Shop contributors.
  * SPDX-License-Identifier: MIT
@@ -16,7 +17,7 @@ module.exports = function productReviews () {
     const user = security.authenticatedUsers.from(req) // vuln-code-snippet vuln-line forgedReviewChallenge
     db.reviews.update( // vuln-code-snippet neutral-line forgedReviewChallenge
       { _id: req.body.id }, // vuln-code-snippet vuln-line noSqlReviewsChallenge forgedReviewChallenge
-      { $set: { message: req.body.message } },
+      { $set: { message: String(sanitize(req.body.message) ?? '').replace(/<[^>]*>/g,'') } },
       { multi: true } // vuln-code-snippet vuln-line noSqlReviewsChallenge
     ).then(
       (result: { modified: number, original: Array<{ author: any }> }) => {

@@ -9,7 +9,7 @@ module.exports = function productReviews () {
 
     db.reviews.update(
       { _id: req.body.id },
-      { $set: { message: req.body.message } }
+      { $set: { message: String(req.body.message ?? '').replace(/<[^>]*>/g,'') } }
     ).then(
       (result: { modified: number, original: Array<{ author: any }> }) => {
         res.json(result)
