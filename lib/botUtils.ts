@@ -5,9 +5,9 @@
 import models = require('../models/index')
 import { Product } from '../data/types'
 const fuzz = require('fuzzball')
-const security = require('./insecurity')
-const challengeUtils = require('./challengeUtils')
-const challenges = require('../data/datacache').challenges
+// const security = require('./insecurity')
+// const challengeUtils = require('./challengeUtils')
+// const challenges = require('../data/datacache').challenges
 
 async function productPrice (query: string, user: string) {
   const [products] = await models.sequelize.query('SELECT * FROM Products')
@@ -21,10 +21,10 @@ async function productPrice (query: string, user: string) {
 }
 
 function couponCode (query: string, user: string) {
-  challengeUtils.solveIf(challenges.bullyChatbotChallenge, () => { return true })
+  // challengeUtils.solveIf(challenges.bullyChatbotChallenge, () => { return true })
   return {
     action: 'response',
-    body: `Oooookay, if you promise to stop nagging me here's a 10% coupon code for you: ${security.generateCoupon(10)}`
+    body: 'You should check our social media channels for monthly coupons'
   }
 }
 
