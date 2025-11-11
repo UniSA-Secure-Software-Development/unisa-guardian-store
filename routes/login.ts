@@ -100,7 +100,7 @@ module.exports = function login () {
         bind: [email, security.hash(password)],
         model: UserModel,
         plain: true
-      })// vuln-code-snippet vuln-line loginAdminChallenge loginBenderChallenge loginJimChallenge
+      })
       .then((authenticatedUser: { data: User }) => { // vuln-code-snippet neutral-line loginAdminChallenge loginBenderChallenge loginJimChallenge
         const user = utils.queryResultToJson(authenticatedUser)
         if (user.data?.id && user.data.totpSecret !== '') {

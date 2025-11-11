@@ -28,7 +28,7 @@ module.exports = function searchProducts () {
       ORDER BY name`,
       {
         bind: [`%${criteria}%`]
-      })// vuln-// vuln-code-snippet vuln-line unionSqlInjectionChallenge dbSchemaChallenge
+      })
 
       .then(([products]: any) => {
         const dataString = JSON.stringify(products)
