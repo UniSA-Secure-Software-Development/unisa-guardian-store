@@ -71,7 +71,7 @@ module.exports = function login () {
   }
 
   return (req: Request, res: Response, next: NextFunction) => {
-    // Cast to string to prevent non string types (allow list technically??)
+    // Cast to string to prevent non string types
     const email = String(req.body.email || '')
     const password = String(req.body.password || '')
 
@@ -80,15 +80,15 @@ module.exports = function login () {
     // Input validation, keeping same error message to reduce information leaked
     // Check for empty fields
     if (!email || !password) {
-      res.status(401).send(res.__('Invalid email or password.')) // TODO need returns??
+      return res.status(401).send(res.__('Invalid email or password.')) 
     }
     // Check email for invalid characters and other
     if (!isValidEmail(email)) {
-      res.status(401).send(res.__('Invalid email or password.'))
+      return res.status(401).send(res.__('Invalid email or password.'))
     }
     // Check for SQL injection characters
     if (!isValidPassword(password)) {
-      res.status(401).send(res.__('Invalid email or password.')) // TODO check if need to check during register
+      return res.status(401).send(res.__('Invalid email or password.'))
     }
 
     models.sequelize.query(
