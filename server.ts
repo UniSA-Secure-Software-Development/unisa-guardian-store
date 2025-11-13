@@ -168,7 +168,8 @@ restoreOverwrittenFilesWithOriginals().then(() => {
   // app.use(cors())
 
   // Setup cross-origin resource sharing between Juice Shop API and Angular Dev Server
-  app.options('*', cors())
+  // TODO: Restrict credentials, currently at risk of CSRF
+  app.options(['https://localhost:4200', 'https://localhost:3000'], cors())
   app.use(cors({
     credentials: true,
     origin: ['https://localhost:4200', 'https://localhost:3000']
@@ -461,16 +462,20 @@ restoreOverwrittenFilesWithOriginals().then(() => {
       excludeAttributes: exclude
     })
 
+    resource.create.write.before((req: { body: any }, res: Response, context: {continue: any}) => {
+      req.body.role = 'customer' // Set role of user to be customer, regardless of the input into the API
+      return context.continue
+    })
+
     // create a wallet when a new user is registered using API
-    if (name === 'User') { // vuln-code-snippet neutral-line registerAdminChallenge
-      resource.create.send.before((req: Request, res: Response, context: { instance: { id: any }, continue: any }) => { // vuln-code-snippet vuln-line registerAdminChallenge
+    if (name === 'User') {
+      resource.create.send.before((req: Request, res: Response, context: { instance: { id: any, role: string }, continue: any }) => {
         WalletModel.create({ UserId: context.instance.id }).catch((err: unknown) => {
           console.log(err)
         })
-        return context.continue // vuln-code-snippet neutral-line registerAdminChallenge
-      }) // vuln-code-snippet neutral-line registerAdminChallenge
-    } // vuln-code-snippet neutral-line registerAdminChallenge
-    // vuln-code-snippet end registerAdminChallenge
+        return context.continue
+      })
+    }
 
     // translate challenge descriptions and hints on-the-fly
     if (name === 'Challenge') {
