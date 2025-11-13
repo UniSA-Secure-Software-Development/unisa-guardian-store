@@ -45,3 +45,8 @@ assets/
 !frontend/src/assets/
 
 .dccache
+
+# Certificates
+*.key
+*.crt
+*.pem
