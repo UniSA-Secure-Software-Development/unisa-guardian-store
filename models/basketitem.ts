@@ -41,7 +41,15 @@ const BasketItemModelInit = (sequelize: Sequelize) => {
     },
     {
       tableName: 'BasketItems',
-      sequelize
+      sequelize,
+      validate: {
+        quantityMustBePositive () {
+          const instance = this as unknown as BasketItem
+          if (instance.quantity < 1) {
+            throw new Error('Quantity must be at least 1')
+          }
+        }
+      }
     }
   )
 }

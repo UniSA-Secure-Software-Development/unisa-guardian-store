@@ -89,6 +89,9 @@ async function quantityCheck (req: Request, res: Response, next: NextFunction, i
 
   // is product limited per user and order, except if user is deluxe?
   if (!product.limitPerUser || (product.limitPerUser && product.limitPerUser >= quantity) || security.isDeluxe(req)) {
+    if (!Number.isInteger(quantity) || quantity < 1) { // this checks if the given quantity is not an integer or is less than 1 and if it is it will error
+      return res.status(400).json({ error: res.__('Quantity must be a positive integer.') })
+    }
     if (product.quantity >= quantity) { // enough in stock?
       next()
     } else {
