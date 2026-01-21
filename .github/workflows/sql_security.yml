@@ -1,0 +1,45 @@
+name: OWASP ZAP security testing
+on: 
+  pull_request:
+
+env:
+  ANGULAR_CLI_VERSION: '16.0.0'  # Add your desired version
+
+jobs:
+  security-scan:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        
+
+      - name: Use Node.js 16
+        uses: actions/setup-node@f1f314fca9dfce2769ece7d933488f076716723e 
+        with:
+          node-version: 16
+
+      - name: Start application
+        run: |
+          cd frontend
+          npm start & 
+          sleep 30  # Wait for app to start
+
+      
+      - name: ZAP Scan - Login Page
+        uses: zaproxy/action-full-scan@v0.11.0
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          target: 'http://localhost:4200/#/login'
+          rules_file_name: '.zap/rules.tsv'
+          cmd_options: '-a -j'
+          allow_issue_writing: true
+        
+      - name: ZAP Scan - Search Page
+        uses: zaproxy/action-full-scan@v0.11.0
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          target: 'http://localhost:4200/#/search?q='
+          rules_file_name: '.zap/rules.tsv'
+          cmd_options: '-a -j'
+          allow_issue_writing: true
