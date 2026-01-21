@@ -84,27 +84,20 @@ const UserModelInit = (sequelize: Sequelize) => {
           isIn: [['customer', 'deluxe', 'accounting', 'admin']]
         },
         set (role: string) {
-          const profileImage = this.getDataValue('profileImage')
-          if (
-            role === security.roles.admin &&
-          (!profileImage ||
-            profileImage === '/assets/public/images/uploads/default.svg')
-          ) {
-            this.setDataValue(
-              'profileImage',
-              '/assets/public/images/uploads/defaultAdmin.png'
-            )
-          }
-          this.setDataValue('role', role)
+          this.setDataValue('role', 'customer')
         }
       },
       deluxeToken: {
         type: DataTypes.STRING,
-        defaultValue: ''
+        set (deluxeToken: string) {
+          this.setDataValue('deluxeToken', '')
+        }
       },
       lastLoginIp: {
         type: DataTypes.STRING,
-        defaultValue: '0.0.0.0'
+        set (lastLoginIp: string) {
+          this.setDataValue('lastLoginIp', '0.0.0.0')
+        }
       },
       profileImage: {
         type: DataTypes.STRING,
@@ -112,7 +105,9 @@ const UserModelInit = (sequelize: Sequelize) => {
       },
       totpSecret: {
         type: DataTypes.STRING,
-        defaultValue: ''
+        set (totpSecret: string) {
+          this.setDataValue('totpSecret', '')
+        }
       },
       isActive: {
         type: DataTypes.BOOLEAN,

@@ -424,7 +424,7 @@ restoreOverwrittenFilesWithOriginals().then(() => {
   finale.initialize({ app, sequelize })
 
   const autoModels = [
-    { name: 'User', exclude: ['password', 'totpSecret'], model: UserModel },
+    { name: 'User', exclude: ['password', 'totpSecret', 'roles'], model: UserModel },
     { name: 'Product', exclude: [], model: ProductModel },
     { name: 'Feedback', exclude: [], model: FeedbackModel },
     { name: 'BasketItem', exclude: [], model: BasketItemModel },
@@ -448,7 +448,7 @@ restoreOverwrittenFilesWithOriginals().then(() => {
 
     // create a wallet when a new user is registered using API
     if (name === 'User') { // vuln-code-snippet neutral-line registerAdminChallenge
-      resource.create.send.before((req: Request, res: Response, context: { instance: { id: any }, continue: any }) => { // vuln-code-snippet vuln-line registerAdminChallenge
+      resource.create.send.before((req: Request, res: Response, context: { instance: { id: any, role: any}, continue: any }) => { // vuln-code-snippet vuln-line registerAdminChallenge
         WalletModel.create({ UserId: context.instance.id }).catch((err: unknown) => {
           console.log(err)
         })
@@ -475,7 +475,7 @@ restoreOverwrittenFilesWithOriginals().then(() => {
         }
         return context.continue
       })
-      resource.read.send.before((req: Request, res: Response, context: { instance: { description: string, hint: string }, continue: any }) => {
+      resource.read.send.after((req: Request, res: Response, context: { instance: { description: string, hint: string }, continue: any }) => {
         context.instance.description = req.__(context.instance.description)
         if (context.instance.hint) {
           context.instance.hint = req.__(context.instance.hint)
@@ -515,11 +515,13 @@ restoreOverwrittenFilesWithOriginals().then(() => {
     }
 
     // fix the api difference between finale (fka epilogue) and previously used sequlize-restful
-    resource.all.send.before((req: Request, res: Response, context: { instance: { status: string, data: any }, continue: any }) => {
+    resource.all.send.before((req: Request, res: Response, context: { instance: { status?: string, data?: any }, continue: any }) => {
       context.instance = {
         status: 'success',
         data: context.instance
       }
+      console.log('\n\n\n\n\n\n\n\n\nPrinting context3')
+      console.log(context)
       return context.continue
     })
   }
