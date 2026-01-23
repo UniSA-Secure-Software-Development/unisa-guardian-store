@@ -4,7 +4,6 @@
   -->
 
 <mat-dialog-content>
-
   <div class="container mat-typography" fxLayout="column">
     <div fxLayout="row" fxLayout.lt-sm="column" fxLayoutGap="20px">
       <div fxFlex="noshrink">
@@ -13,7 +12,9 @@
 
       <div>
         <h1>{{data.productData.name}}</h1>
-        <div [innerHTML]="data.productData.description"></div>
+        <div class="product-description">
+            {{ data.productData.description }}
+        </div>
         <br/>
         <div>
           <p class="item-price">{{data.productData.price}}&curren;</p>
