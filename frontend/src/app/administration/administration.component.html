@@ -55,7 +55,10 @@
 
         <ng-container matColumnDef="email">
           <mat-header-cell *matHeaderCellDef translate></mat-header-cell>
-          <mat-cell *matCellDef="let user" [innerHTML]="user.email" style="vertical-align: middle"></mat-cell>
+          <!--XSS correction-->
+          <mat-cell *matCellDef="let user" style="vertical-align: middle">
+              {{ user.email }}
+          </mat-cell>
         </ng-container>
 
         <ng-container matColumnDef="user_detail">
